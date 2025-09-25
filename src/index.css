@@ -1,0 +1,16 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-black text-cyan-400 font-mono;
+}
+
+.neon-text {
+  text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+}
+
+.neon-border {
+  box-shadow: 0 0 10px #0ff, 0 0 20px #0ff inset;
+}
