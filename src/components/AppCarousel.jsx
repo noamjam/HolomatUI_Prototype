@@ -57,23 +57,32 @@ export default function AppCarousel({ onSelect }) {
           const opacity = rel === 0 ? 1 : 0.75;
 
           return (
-            <div
-              key={app}
-              className="absolute pointer-events-auto"
-              style={{
-                transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
-                zIndex,
-                opacity,
-                transition: 'transform 0.3s ease, opacity 0.3s ease',
-              }}
-            >
-              <button
-                onClick={() => onSelect(app)}
-                className="w-32 h-32 rounded-full bg-cyan-700/30 text-white text-xl font-semibold shadow-xl border border-cyan-500 backdrop-blur-md drop-shadow-[0_0_6px_cyan] hover:scale-105 transition"
+              <motion.div
+                  key={app}
+                  animate={{
+                      x: translateX,
+                      scale: scale,
+                      opacity: opacity,
+                      rotateY: rotateY,
+                      z: translateZ,
+                  }}
+                  transition={{
+                      type: "spring",
+                      stiffness: 120,
+                      damping: 15,
+                  }}
+                  className="absolute pointer-events-auto"
+                  style={{ zIndex }}
               >
-                {app}
-              </button>
-            </div>
+                  <motion.button
+                      onClick={() => onSelect(app)}
+                      whileHover={{ scale: 1.1, boxShadow: "0 0 10px cyan" }}
+                      whileTap={{ scale: 0.95 }}
+                      className="w-32 h-32 rounded-full bg-cyan-700/30 text-white text-xl font-semibold shadow-xl border border-cyan-500 backdrop-blur-md drop-shadow-[0_0_6px_cyan]"
+                  >
+                      {app}
+                  </motion.button>
+              </motion.div>
           );
         })}
       </div>

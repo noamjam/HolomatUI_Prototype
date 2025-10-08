@@ -7,6 +7,7 @@ import ByteIndicator from './components/ByteIndicator';
 import useByteStatus from './components/useByteStatus';
 import ThreeViewer from './components/ThreeViewer';
 
+
 function App() {
   const [currentApp, setCurrentApp] = useState(null);
   const isActive = useByteStatus();

@@ -8,7 +8,7 @@ let byteProcess = null;
 
 function startByteAssistant() {
   const scriptPath = path.resolve(__dirname, './byte-assistant/ByteAssistant.py');
-  const pythonCmd = path.resolve(__dirname, './byte-assistant/venv/bin/python');
+  const pythonCmd = path.resolve(__dirname, './byte-assistant/venv/Scripts/python');
 
 
   console.log('🚀 Starte Byte-Sprachassistent...');
