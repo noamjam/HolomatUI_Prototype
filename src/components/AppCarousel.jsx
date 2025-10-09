@@ -65,6 +65,7 @@ export default function AppCarousel({ onSelect }) {
                       opacity: opacity,
                       rotateY: rotateY,
                       z: translateZ,
+
                   }}
                   transition={{
                       type: "spring",
