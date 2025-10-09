@@ -81,9 +81,11 @@ export default function PaintView({ onBack }) {
 
   const startDrawing = (e) => {
     const pos = getMousePos(e);
+
     if (tool === "draw") {
       setDrawing(true);
       setLastPos(pos);
+
     } else {
       setStartShape(pos);
     }
@@ -198,12 +200,27 @@ export default function PaintView({ onBack }) {
         <canvas
           ref={canvasRef}
           className="w-full h-[80vh] bg-white rounded border border-cyan-500 cursor-crosshair"
+
           onMouseDown={startDrawing}
-          onMouseUp={endDrawing}
           onMouseMove={draw}
+          onMouseUp={endDrawing}
           onMouseLeave={endDrawing}
+          onTouchStart={(e) => {
+              e.preventDefault();
+              const touch = e.touches[0];
+              startDrawing({ clientX: touch.clientX, clientY: touch.clientY });
+          }}
+          onTouchMove={(e) => {
+              e.preventDefault();
+              const touch = e.touches[0];
+              draw({ clientX: touch.clientX, clientY: touch.clientY });
+          }}
+          onTouchEnd={(e) => {
+              e.preventDefault();
+              endDrawing(e.changedTouches[0] || e.touches[0]);
+          }}
         />
-        {/* Optionales horizontales/vertikales Lineal */}
+          {/* Optionales horizontales/vertikales Lineal */}
         <div className="absolute top-0 left-0 w-full h-6 bg-gradient-to-r from-gray-800 via-gray-600 to-gray-800 opacity-60 text-xs text-cyan-300 flex justify-between px-2 pointer-events-none">
           {[...Array(10)].map((_, i) => <span key={i}>{i * 100}px</span>)}
         </div>
