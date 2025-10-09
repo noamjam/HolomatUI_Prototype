@@ -21,12 +21,17 @@ module.exports = {
         },
       },
       animation: {
-        'glow-cycle': 'glow 4s ease-in-out infinite',
+         bootPop: 'bootPop 1.2s cubic-bezier(0.68,-0.55,0.27,1.55) forwards',
         'carousel-spin': 'orbit 20s linear infinite',
         'pulse-byte': 'pulseByte 1.5s ease-in-out infinite',
       },
       keyframes: {
-        glow: {
+          bootPop: {
+           '0%':   { transform: 'scale(0.5)', opacity: '0'},
+           '50%':  { transform: 'scale(1.2)', opacity: '1'},
+           '100%': { transform: 'scale(1)', opacity: '1'},
+          },
+          glow: {
           '0%, 100%': {
             boxShadow: '0 0 8px #00ffff, 0 0 16px #00ffff',
           },

@@ -6,13 +6,14 @@ import AppCarousel from './components/AppCarousel';
 import ByteIndicator from './components/ByteIndicator';
 import useByteStatus from './components/useByteStatus';
 import ThreeViewer from './components/ThreeViewer';
-
+import BootScreen from './components/BootScreen';
 
 function App() {
+  const [bootDone, setBootDone] = useState(false);
   const [currentApp, setCurrentApp] = useState(null);
   const isActive = useByteStatus();
-
   const [theme, setTheme] = useState('default');
+
 
   useEffect(() => {
     const saved = localStorage.getItem('theme') || 'default';
@@ -44,6 +45,10 @@ function App() {
         return 'cyan-400';
     }
   };
+
+  if (!bootDone) {
+        return <BootScreen onFinish={() => setBootDone(true)} />;
+    }
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${getBgGradient()} text-white font-orbitron relative overflow-hidden`}>
