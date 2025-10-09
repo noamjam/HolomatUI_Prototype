@@ -200,11 +200,12 @@ export default function PaintView({ onBack }) {
         <canvas
           ref={canvasRef}
           className="w-full h-[80vh] bg-white rounded border border-cyan-500 cursor-crosshair"
-
+          //Maus Input
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={endDrawing}
           onMouseLeave={endDrawing}
+          //Touch Input
           onTouchStart={(e) => {
               e.preventDefault();
               const touch = e.touches[0];

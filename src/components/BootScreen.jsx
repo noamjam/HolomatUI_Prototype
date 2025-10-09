@@ -35,7 +35,7 @@ export default function BootScreen({ onFinish }) {
                 }}
                 className="text-6xl font-bold tracking-wide"
             >
-                Holomat Prototype start
+                Interactive Workbench
             </motion.h1>
         </motion.div>
     );
