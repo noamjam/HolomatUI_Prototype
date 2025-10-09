@@ -1,7 +1,16 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { themes } from "../themes";
+
 
 export default function BootScreen({ onFinish }) {
+    const [theme, setTheme] = useState(themes.default);
+
+    useEffect(() => {
+        const saved = localStorage.getItem("theme") || "default";
+        setTheme(themes[saved] || themes.default);
+    }, []);
+
     return (
         <motion.div
             initial={{ backgroundPosition: "0% 0%" }}
@@ -9,8 +18,7 @@ export default function BootScreen({ onFinish }) {
             transition={{ duration: 3, ease: "easeInOut" }}
             onAnimationComplete={onFinish}
             style={{
-                backgroundImage:
-                    "linear-gradient(to bottom right, #00ffff, #1e3a8a, #6d28d9)",
+                backgroundImage: theme.bgGradient, // 🎨 dynamischer Hintergrund
                 backgroundSize: "200% 200%",
                 backgroundRepeat: "no-repeat",
             }}
@@ -20,8 +28,12 @@ export default function BootScreen({ onFinish }) {
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: [0.5, 2.5, 1.5], opacity: 1 }}
                 transition={{ duration: 3, ease: "easeOut" }}
-                onAnimationComplete={onFinish} // ← ruft App-Start auf
-                className="text-6xl font-bold tracking-wide text-cyan-400 drop-shadow-[0_0_20px_#00ffff]"
+                onAnimationComplete={onFinish}
+                style={{
+                    color: theme.textColor, // ✨ Textfarbe an Theme anpassen
+                    textShadow: `0 0 20px ${theme.textColor}`,
+                }}
+                className="text-6xl font-bold tracking-wide"
             >
                 Holomat Prototype start
             </motion.h1>
