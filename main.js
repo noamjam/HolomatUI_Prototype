@@ -1,4 +1,3 @@
-// main.js — Stable version (Byte + Chat + IPC fixes)
 process.on("unhandledRejection", (reason) => {
     console.error("⚠️ Unhandled Promise Rejection:", reason);
 });
@@ -10,13 +9,51 @@ const net = require("net");
 
 app.disableHardwareAcceleration();
 
+let ollamaProcess = null;
 let byteProcess = null;
 let chatProcess = null;
 let mainWindow = null;
-global.chatPort = null; // <--- shared between main and renderer
+global.chatPort = null;
 
 // ------------------------------------------------------
-// 🎤 Byte Sprachassistent
+// Ollama Autostart
+// ------------------------------------------------------
+function startOllamaServer() {
+    return new Promise((resolve, reject) => {
+        console.log("🧩 Starting Ollama background server...");
+
+        // Prüfen ob Ollama schon läuft
+        const check = require("child_process").spawn("curl", ["-s", "http://127.0.0.1:11434/api/tags"]);
+
+        let output = "";
+        check.stdout.on("data", (d) => (output += d.toString()));
+        check.on("close", (code) => {
+            if (output.includes("models")) {
+                console.log("✅ Ollama is already running.");
+                resolve();
+                return;
+            }
+
+            // Wenn nicht läuft → starten
+            ollamaProcess = spawn("ollama", ["serve"], {
+                detached: true,
+                stdio: "ignore", // läuft still im Hintergrund
+            });
+            ollamaProcess.unref();
+
+            console.log("🚀 Ollama started in background.");
+            setTimeout(resolve, 1500); // gib ihm kurz Zeit zum Starten
+        });
+
+        check.on("error", (err) => {
+            console.error("💥 Ollama check failed:", err);
+            reject(err);
+        });
+    });
+}
+
+// ------------------------------------------------------
+// Byte Sprachassistent
 // ------------------------------------------------------
 function startByteAssistant() {
     const scriptPath = path.resolve(__dirname, "./byte-assistant/ByteAssistant.py");
@@ -31,7 +68,7 @@ function startByteAssistant() {
 }
 
 // ------------------------------------------------------
-// 💬 Chat Assistant (FastAPI/Uvicorn)
+// Chat Assistant
 // ------------------------------------------------------
 async function findFreePort(startPort = 5050) {
     return new Promise((resolve) => {
@@ -60,11 +97,6 @@ async function startChatAssistant() {
             { cwd: path.resolve(__dirname, "./byte-assistant") }
         );
 
-        if (!chatProcess || !chatProcess.stdout) {
-            console.error("❌ Chat process did not start correctly!");
-            return;
-        }
-
         chatProcess.stdout.on("data", (data) => {
             const line = data.toString().trim();
             console.log(`[Chat stdout] ${line}`);
@@ -90,7 +122,7 @@ async function startChatAssistant() {
 }
 
 // ------------------------------------------------------
-// 🪟 Electron Window
+// Electron Window
 // ------------------------------------------------------
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -108,9 +140,10 @@ function createWindow() {
 }
 
 // ------------------------------------------------------
-// 🚀 App Lifecycle
+// Lifecycle
 // ------------------------------------------------------
 app.whenReady().then(async () => {
+    await startOllamaServer();
     startByteAssistant();
     createWindow();
     await startChatAssistant();
@@ -118,25 +151,23 @@ app.whenReady().then(async () => {
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
-        console.log("🛑 Cleaning up child processes...");
+        console.log("🛑 Cleaning up processes...");
         if (byteProcess) byteProcess.kill("SIGTERM");
         if (chatProcess) chatProcess.kill("SIGTERM");
+        if (ollamaProcess) ollamaProcess.kill("SIGTERM");
+
         app.quit();
     }
 });
 
 // ------------------------------------------------------
-// 🧩 IPC Handlers
+// IPC Handlers
 // ------------------------------------------------------
-ipcMain.handle("get-chat-port", () => {
-    return global.chatPort || null;
-});
+ipcMain.handle("get-chat-port", () => global.chatPort || null);
 
 ipcMain.on("launch-paint", () => {
     const scriptPath = path.join(__dirname, "paint.py");
-    const pythonCmd = "python";
-    console.log(`🎨 Starting Paint: ${scriptPath}`);
-    exec(`${pythonCmd} "${scriptPath}"`, (err, stdout, stderr) => {
+    exec(`python "${scriptPath}"`, (err, stdout, stderr) => {
         if (err) console.error(`❌ Paint error: ${err.message}`);
         if (stdout) console.log(`[Paint stdout] ${stdout.trim()}`);
         if (stderr) console.error(`[Paint stderr] ${stderr.trim()}`);
@@ -147,8 +178,6 @@ ipcMain.on("open-file-explorer", () => {
     let cmd = "xdg-open .";
     if (process.platform === "win32") cmd = "start .";
     if (process.platform === "darwin") cmd = "open .";
-
-    console.log(`📁 Opening File Explorer: ${cmd}`);
     exec(cmd, (err) => {
         if (err) console.error("❌ File Explorer error:", err);
     });
