@@ -12,7 +12,8 @@ export default function BootScreen({ onFinish }) {
     }, []);
 
     return (
-        <motion.div
+        <motion.div // Background
+            className="fixed inset-0 flex flex-col justify-between items-center h-screen text-white py-16"
             initial={{ backgroundPosition: "0% 0%" }}
             animate={{ backgroundPosition: "100% 100%" }}
             transition={{ duration: 3, ease: "easeInOut" }}
@@ -22,12 +23,20 @@ export default function BootScreen({ onFinish }) {
                 backgroundSize: "200% 200%",
                 backgroundRepeat: "no-repeat",
             }}
-            className="fixed inset-0 flex items-center justify-center h-screen text-white"
         >
-            <motion.h1
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: [0.5, 2.5, 1.5], opacity: 1 }}
-                transition={{ duration: 3, ease: "easeOut" }}
+            <motion.img //Logo
+                src={"./logo.png"}
+                alt="Logo"
+                className="w-32 h-32"
+                initial={{ y: -10, opacity: 0, scale: 0.8 }}
+                animate={{ y: 30, opacity: 1, scale: 2 }}
+                transition={{ duration: 3, ease: "easeInOut" }}
+            />
+
+            <motion.h1 //Text
+                initial={{ y: -10, opacity: 0, scale: 0.8 }}
+                animate={{ y: -60, opacity: 1, scale: 2 }}
+                transition={{ duration: 3, ease: "easeInOut" }}
                 onAnimationComplete={onFinish}
                 style={{
                     color: theme.textColor, // ✨ Textfarbe an Theme anpassen
@@ -36,7 +45,9 @@ export default function BootScreen({ onFinish }) {
                 className="text-6xl font-bold tracking-wide"
             >
                 Holomat Prototype start
+
             </motion.h1>
         </motion.div>
+
     );
 }
