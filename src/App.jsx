@@ -7,12 +7,14 @@ import ByteIndicator from './components/ByteIndicator';
 import useByteStatus from './components/useByteStatus';
 import ThreeViewer from './components/ThreeViewer';
 import BootScreen from './components/BootScreen';
+import MusicLibrary from "./components/Musiclibrary";
 
 function App() {
   const [bootDone, setBootDone] = useState(false);
   const [currentApp, setCurrentApp] = useState(null);
   const isActive = useByteStatus();
   const [theme, setTheme] = useState('default');
+
 
 
   useEffect(() => {
@@ -57,9 +59,11 @@ function App() {
       {currentApp === 'Files' && <FileView onBack={() => setCurrentApp(null)} />}
       {currentApp === 'Settings' && <SettingsView onBack={() => setCurrentApp(null)} />}
       {currentApp === '3D Viewer' && <ThreeViewer onBack={() => setCurrentApp(null)} />}
+      {currentApp === 'MusicLibrary' && <MusicLibrary onBack={() => setCurrentApp(null)} />}
 
 
-      {/* Startansicht */}
+
+        {/* Startansicht */}
       {currentApp === null && (
         <div className="p-8">
           <h1 className={`text-4xl text-${getAccentColor()} font-bold mb-12 text-center drop-shadow-[0_0_8px_cyan]`}>
