@@ -1,59 +1,74 @@
-# byte-assistant/ChatAssistant.py
-from fastapi import FastAPI, Request
+"""
+ChatAssistant.py — Stable FastAPI backend for Electron Byte Assistant
+Author: GPT-5
+"""
+
+import asyncio
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-import ollama
 from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
+import logging
 
-app = FastAPI()
+# Optional: You can replace this with your real AI logic later
+async def generate_response(message: str) -> str:
+    await asyncio.sleep(0.4)  # Simulate thinking time
+    return f"Byte received: {message}"
 
-# 🔧 Allow Electron renderer to connect
+# -------------------------------------------
+# FastAPI setup
+# -------------------------------------------
+app = FastAPI(title="Byte Chat Assistant", version="1.0.0")
+
+# Allow requests from Electron frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Electron is local
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 🩺 Healthcheck route (frontend expects this)
+# -------------------------------------------
+# Data model
+# -------------------------------------------
+class ChatMessage(BaseModel):
+    message: str
+
+# -------------------------------------------
+# Health check endpoint
+# -------------------------------------------
 @app.get("/health")
-def health():
+async def health_check():
     return {"status": "ok"}
 
-class Message(BaseModel):
-    text: str
-
-@app.post("/chat")
-def chat(message: Message):
-    return {"response": f"Echo: {message.text}"}
-
-app = FastAPI()
-
-# 🔓 Erlaubt lokale Frontend-Zugriffe
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
+# -------------------------------------------
+# Main chat endpoint
+# -------------------------------------------
 @app.post("/api/chat")
-async def chat(request: Request):
-    """Empfängt Textnachrichten vom UI und antwortet über Ollama."""
-    data = await request.json()
-    user_message = data.get("message", "")
+async def chat_endpoint(payload: ChatMessage, request: Request):
+    try:
+        msg = payload.message.strip()
+        if not msg:
+            raise HTTPException(status_code=400, detail="Empty message")
 
-    if not user_message.strip():
-        return {"reply": "Bitte gib eine Nachricht ein."}
+        logging.info(f"🧠 Received: {msg}")
+        reply = await generate_response(msg)
+        return {"reply": reply}
 
-    # 💬 Anfrage an Ollama
-    response = ollama.chat(
-        model="llama3",
-        messages=[
-            {"role": "system", "content": "Du bist Byte, ein freundlicher Assistent in einer futuristischen Benutzeroberfläche."},
-            {"role": "user", "content": user_message},
-        ],
-    )
+    except HTTPException as e:
+        logging.warning(f"⚠️ User error: {e.detail}")
+        raise e
+    except Exception as e:
+        logging.error(f"💥 Internal error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
-    reply = response["message"]["content"]
-    return {"reply": reply}
+# -------------------------------------------
+# Startup / Shutdown hooks
+# -------------------------------------------
+@app.on_event("startup")
+async def on_startup():
+    logging.info("🚀 ChatAssistant API is starting...")
+
+@app.on_event("shutdown")
+async def on_shutdown():
+    logging.info("🛑 ChatAssistant API is shutting down...")

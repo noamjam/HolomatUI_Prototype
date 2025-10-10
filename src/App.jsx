@@ -58,7 +58,6 @@ function App() {
       {currentApp === 'Settings' && <SettingsView onBack={() => setCurrentApp(null)} />}
       {currentApp === '3D Viewer' && <ThreeViewer onBack={() => setCurrentApp(null)} />}
 
-
       {/* Startansicht */}
       {currentApp === null && (
         <div className="p-8">

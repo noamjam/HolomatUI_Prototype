@@ -1,3 +1,4 @@
+// AssistantChat.jsx — React Chat Component
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -6,40 +7,67 @@ export default function AssistantChat({ isOpen, onClose }) {
     const [history, setHistory] = useState([]);
     const [chatPort, setChatPort] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
+    const [status, setStatus] = useState("connecting");
 
-    // 💬 Hole dynamisch den Port vom Electron-Prozess
     useEffect(() => {
-        if (window.electronAPI?.onChatServerStarted) {
-            window.electronAPI.onChatServerStarted((port) => {
-                console.log("💬 Chat server started on port:", port);
-                setChatPort(port);
-                checkHealth(port);
-            });
-        } else {
-            console.warn("⚠️ electronAPI not available – running without Electron bridge?");
+        let didCancel = false;
+
+        const handlePort = (port) => {
+            if (!port) return;
+            console.log("💬 Chat server port:", port);
+            setChatPort(port);
+            setTimeout(() => checkHealth(port), 300);
+        };
+
+        try {
+            if (window.electronAPI?.onChatServerStarted) {
+                window.electronAPI.onChatServerStarted((port) => {
+                    if (didCancel) return;
+                    handlePort(port);
+                });
+            }
+
+            // fallback: ask for port if event was missed
+            (async () => {
+                if (window.electronAPI?.getChatPort) {
+                    const maybePort = await window.electronAPI.getChatPort();
+                    if (!didCancel && maybePort) {
+                        console.log("💬 Chat server port (fallback):", maybePort);
+                        handlePort(maybePort);
+                    }
+                }
+            })();
+        } catch (err) {
+            console.error("Electron API init error:", err);
         }
+
+        return () => {
+            didCancel = true;
+        };
     }, []);
 
-    // 🔍 Healthcheck, um zu prüfen, ob Server erreichbar ist
-    const checkHealth = async (port) => {
-        try {
-            const res = await fetch(`http://127.0.0.1:${port}/health`);
-            if (res.ok) {
-                console.log("✅ Chat server is healthy");
-                setIsConnected(true);
-            } else {
-                console.warn("⚠️ Chat server health check failed");
+    const checkHealth = (port) => {
+        fetch(`http://127.0.0.1:${port}/health`)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log("💚 Healthcheck:", data);
+                if (data.status === "ok") {
+                    setIsConnected(true);
+                    setStatus("online");
+                } else {
+                    setIsConnected(false);
+                    setStatus("offline");
+                }
+            })
+            .catch((err) => {
+                console.error("Health check failed:", err);
                 setIsConnected(false);
-            }
-        } catch (err) {
-            console.error("❌ Cannot reach Chat server:", err);
-            setIsConnected(false);
-        }
+                setStatus("offline");
+            });
     };
 
-    // 📨 Nachricht senden
     const handleSend = async () => {
-        if (!message.trim() || !chatPort) return;
+        if (!message.trim() || !chatPort || !isConnected) return;
 
         const userMsg = { from: "user", text: message };
         setHistory((prev) => [...prev, userMsg]);
@@ -51,14 +79,9 @@ export default function AssistantChat({ isOpen, onClose }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message }),
             });
-
             if (!res.ok) throw new Error("Network response was not ok");
             const data = await res.json();
-
-            setHistory((prev) => [
-                ...prev,
-                { from: "assistant", text: data.reply || "No response." },
-            ]);
+            setHistory((prev) => [...prev, { from: "assistant", text: data.reply || "No response." }]);
         } catch (err) {
             console.error("❌ Connection Error:", err);
             setHistory((prev) => [
@@ -66,6 +89,7 @@ export default function AssistantChat({ isOpen, onClose }) {
                 { from: "assistant", text: "⚠️ Connection Error — server unreachable." },
             ]);
             setIsConnected(false);
+            setStatus("offline");
         }
     };
 
@@ -77,12 +101,12 @@ export default function AssistantChat({ isOpen, onClose }) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 40 }}
                     transition={{ duration: 0.3 }}
-                    className="fixed bottom-28 left-6 w-80 bg-black/80 backdrop-blur-md border border-cyan-500 rounded-2xl shadow-lg shadow-cyan-500/30 p-4 text-white z-[60]"
+                    className="fixed bottom-28 left-6 w-80 bg-black/80 backdrop-blur-md border border-cyan-500 rounded-2xl shadow-lg p-4 text-white z-[60]"
                 >
                     <div className="flex justify-between items-center mb-2 text-xs text-cyan-300">
                         <span>Byte Chat</span>
                         <span className={isConnected ? "text-green-400" : "text-red-400"}>
-                            {isConnected ? "● Connected" : "● Offline"}
+                            {isConnected ? "● Online" : `● ${status}`}
                         </span>
                     </div>
 
@@ -93,7 +117,7 @@ export default function AssistantChat({ isOpen, onClose }) {
                                 className={`p-2 rounded-lg ${
                                     msg.from === "user"
                                         ? "bg-cyan-700/40 text-right"
-                                        : "bg-cyan-900/40 text-left"
+                                        : "bg-gray-800/40 text-left"
                                 }`}
                             >
                                 {msg.text}
@@ -111,21 +135,14 @@ export default function AssistantChat({ isOpen, onClose }) {
                             autoComplete="off"
                             spellCheck={false}
                             className="flex-grow bg-white border border-cyan-500 rounded-lg px-3 py-2 text-sm placeholder-gray-500 outline-none"
-                            style={{
-                                color: "#000",
-                                caretColor: "#000",
-                                WebkitTextFillColor: "#000",
-                            }}
+                            style={{ color: "#000", caretColor: "#000", WebkitTextFillColor: "#000" }}
                             disabled={!isConnected}
                         />
-
                         <button
                             onClick={handleSend}
                             disabled={!isConnected}
                             className={`px-3 py-2 rounded-lg text-sm text-white ${
-                                isConnected
-                                    ? "bg-cyan-600 hover:bg-cyan-500"
-                                    : "bg-gray-500 cursor-not-allowed"
+                                isConnected ? "bg-cyan-600 hover:bg-cyan-500" : "bg-gray-500 cursor-not-allowed"
                             }`}
                         >
                             Send
