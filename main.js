@@ -1,98 +1,184 @@
-const path = require('path');
-const { app, BrowserWindow, ipcMain } = require('electron');
-const { spawn, exec } = require('child_process');
+process.on("unhandledRejection", (reason) => {
+    console.error("⚠️ Unhandled Promise Rejection:", reason);
+});
+
+const path = require("path");
+const { app, BrowserWindow, ipcMain } = require("electron");
+const { spawn, exec } = require("child_process");
+const net = require("net");
 
 app.disableHardwareAcceleration();
 
+let ollamaProcess = null;
 let byteProcess = null;
+let chatProcess = null;
+let mainWindow = null;
+global.chatPort = null;
 
+// ------------------------------------------------------
+// Ollama Autostart
+// ------------------------------------------------------
+function startOllamaServer() {
+    return new Promise((resolve, reject) => {
+        console.log("🧩 Starting Ollama background server...");
+
+        // Prüfen ob Ollama schon läuft
+        const check = require("child_process").spawn("curl", ["-s", "http://127.0.0.1:11434/api/tags"]);
+
+        let output = "";
+        check.stdout.on("data", (d) => (output += d.toString()));
+        check.on("close", (code) => {
+            if (output.includes("models")) {
+                console.log("✅ Ollama is already running.");
+                resolve();
+                return;
+            }
+
+            // Wenn nicht läuft → starten
+            ollamaProcess = spawn("ollama", ["serve"], {
+                detached: true,
+                stdio: "ignore", // läuft still im Hintergrund
+            });
+            ollamaProcess.unref();
+
+            console.log("🚀 Ollama started in background.");
+            setTimeout(resolve, 1500); // gib ihm kurz Zeit zum Starten
+        });
+
+        check.on("error", (err) => {
+            console.error("💥 Ollama check failed:", err);
+            reject(err);
+        });
+    });
+}
+
+// ------------------------------------------------------
+// Byte Sprachassistent
+// ------------------------------------------------------
 function startByteAssistant() {
-  const scriptPath = path.resolve(__dirname, './byte-assistant/ByteAssistant.py');
-  const pythonCmd = path.resolve(__dirname, './byte-assistant/venv/Scripts/python');
+    const scriptPath = path.resolve(__dirname, "./byte-assistant/ByteAssistant.py");
+    const pythonCmd = path.resolve(__dirname, "./byte-assistant/venv/Scripts/python.exe");
 
+    console.log("🚀 Starting Byte assistant...");
+    byteProcess = spawn(pythonCmd, [scriptPath], { cwd: path.dirname(scriptPath) });
 
-  console.log('🚀 Starte Byte-Sprachassistent...');
-  console.log(`📄 Python-Skript: ${scriptPath}`);
-
-  byteProcess = spawn(pythonCmd, [scriptPath]);
-
-  byteProcess.stdout.on('data', (data) => {
-    console.log(`[Byte stdout] ${data.toString().trim()}`);
-  });
-
-  byteProcess.stderr.on('data', (data) => {
-    console.error(`[Byte stderr] ${data.toString().trim()}`);
-  });
-
-  byteProcess.on('exit', (code, signal) => {
-    console.warn(`⚠️ Byte-Prozess beendet. Code: ${code}, Signal: ${signal}`);
-  });
+    byteProcess.stdout.on("data", (d) => console.log(`[Byte stdout] ${d.toString().trim()}`));
+    byteProcess.stderr.on("data", (d) => console.error(`[Byte stderr] ${d.toString().trim()}`));
+    byteProcess.on("exit", (code, sig) => console.warn(`⚠️ Byte process exited — code=${code}, signal=${sig}`));
 }
 
+// ------------------------------------------------------
+// Chat Assistant
+// ------------------------------------------------------
+async function findFreePort(startPort = 5050) {
+    return new Promise((resolve) => {
+        const server = net.createServer();
+        server.once("listening", () => {
+            const { port } = server.address();
+            server.close(() => resolve(port));
+        });
+        server.once("error", () => resolve(findFreePort(startPort + 1)));
+        server.listen(startPort, "127.0.0.1");
+    });
+}
+
+async function startChatAssistant() {
+    try {
+        const scriptPath = path.resolve(__dirname, "./byte-assistant/ChatAssistant.py");
+        const pythonCmd = path.resolve(__dirname, "./byte-assistant/venv/Scripts/python.exe");
+        const freePort = await findFreePort(5050);
+
+        global.chatPort = freePort;
+        console.log(`💬 Using free port ${freePort} for ChatAssistant`);
+
+        chatProcess = spawn(
+            pythonCmd,
+            ["-m", "uvicorn", "ChatAssistant:app", "--host", "127.0.0.1", "--port", `${freePort}`],
+            { cwd: path.resolve(__dirname, "./byte-assistant") }
+        );
+
+        chatProcess.stdout.on("data", (data) => {
+            const line = data.toString().trim();
+            console.log(`[Chat stdout] ${line}`);
+
+            if (line.includes("Uvicorn running") || line.includes("Running on")) {
+                console.log(`✅ Chat server started on port ${freePort}`);
+                if (mainWindow?.webContents) {
+                    mainWindow.webContents.send("chat-server-started", freePort);
+                }
+            }
+        });
+
+        chatProcess.stderr.on("data", (data) =>
+            console.error(`[Chat stderr] ${data.toString().trim()}`)
+        );
+
+        chatProcess.on("exit", (code, sig) =>
+            console.warn(`⚠️ Chat process exited — code=${code}, signal=${sig}`)
+        );
+    } catch (err) {
+        console.error("💥 Failed to start Chat Assistant:", err);
+    }
+}
+
+// ------------------------------------------------------
+// Electron Window
+// ------------------------------------------------------
 function createWindow() {
-  const mainWindow = new BrowserWindow({
-    width: 1024,
-    height: 768,
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js'),
-    },
-  });
+    mainWindow = new BrowserWindow({
+        width: 1024,
+        height: 768,
+        webPreferences: {
+            preload: path.join(__dirname, "preload.js"),
+            contextIsolation: true,
+            nodeIntegration: false,
+        },
+    });
 
-  mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
+    mainWindow.loadFile(path.join(__dirname, "dist", "index.html"));
+    mainWindow.on("closed", () => (mainWindow = null));
 }
 
-app.whenReady().then(() => {
-  startByteAssistant();   // ✅ Byte starten
-  createWindow();
+// ------------------------------------------------------
+// Lifecycle
+// ------------------------------------------------------
+app.whenReady().then(async () => {
+    await startOllamaServer();
+    startByteAssistant();
+    createWindow();
+    await startChatAssistant();
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    if (byteProcess) {
-      console.log('🛑 Beende Byte-Sprachassistent...');
-      byteProcess.kill();
+app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+        console.log("🛑 Cleaning up processes...");
+        if (byteProcess) byteProcess.kill("SIGTERM");
+        if (chatProcess) chatProcess.kill("SIGTERM");
+        if (ollamaProcess) ollamaProcess.kill("SIGTERM");
+
+        app.quit();
     }
-    app.quit();
-  }
 });
 
-// 🖌️ Paint starten bei Button-Klick
-ipcMain.on('launch-paint', () => {
-  const pythonPath = 'python3'; // oder 'python'
-  const scriptPath = path.join(__dirname, 'paint.py');
+// ------------------------------------------------------
+// IPC Handlers
+// ------------------------------------------------------
+ipcMain.handle("get-chat-port", () => global.chatPort || null);
 
-  console.log(`🎨 Starte Paint: ${scriptPath}`);
-
-  exec(`${pythonPath} "${scriptPath}"`, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`❌ Fehler beim Starten von Paint: ${error.message}`);
-      return;
-    }
-    console.log(`✅ Paint gestartet.`);
-    if (stdout) console.log(`[Paint stdout] ${stdout.trim()}`);
-    if (stderr) console.error(`[Paint stderr] ${stderr.trim()}`);
-  });
+ipcMain.on("launch-paint", () => {
+    const scriptPath = path.join(__dirname, "paint.py");
+    exec(`python "${scriptPath}"`, (err, stdout, stderr) => {
+        if (err) console.error(`❌ Paint error: ${err.message}`);
+        if (stdout) console.log(`[Paint stdout] ${stdout.trim()}`);
+        if (stderr) console.error(`[Paint stderr] ${stderr.trim()}`);
+    });
 });
 
-// 📂 Dateiexplorer öffnen bei Button-Klick
-ipcMain.on('open-file-explorer', () => {
-  let command = 'xdg-open .'; // Linux
-
-  if (process.platform === 'win32') {
-    command = 'start .';
-  } else if (process.platform === 'darwin') {
-    command = 'open .';
-  }
-
-  console.log(`📁 Öffne Datei-Explorer mit Befehl: ${command}`);
-
-  exec(command, (error) => {
-    if (error) {
-      console.error('❌ Fehler beim Öffnen des Datei-Explorers:', error);
-    } else {
-      console.log('✅ Datei-Explorer geöffnet.');
-    }
-  });
+ipcMain.on("open-file-explorer", () => {
+    let cmd = "xdg-open .";
+    if (process.platform === "win32") cmd = "start .";
+    if (process.platform === "darwin") cmd = "open .";
+    exec(cmd, (err) => {
+        if (err) console.error("❌ File Explorer error:", err);
+    });
 });

@@ -222,12 +222,12 @@ export default function PaintView({ onBack }) {
           }}
         />
           {/* Optionales horizontales/vertikales Lineal */}
-        <div className="absolute top-0 left-0 w-full h-6 bg-gradient-to-r from-gray-800 via-gray-600 to-gray-800 opacity-60 text-xs text-cyan-300 flex justify-between px-2 pointer-events-none">
+          {/*<div className="absolute top-0 left-0 w-full h-6 bg-gradient-to-r from-gray-800 via-gray-600 to-gray-800 opacity-60 text-xs text-cyan-300 flex justify-between px-2 pointer-events-none">
           {[...Array(10)].map((_, i) => <span key={i}>{i * 100}px</span>)}
         </div>
-        <div className="absolute top-0 left-0 w-6 h-full bg-gradient-to-b from-gray-800 via-gray-600 to-gray-800 opacity-60 text-[10px] text-cyan-300 flex flex-col justify-between py-2 pointer-events-none">
+        <div className="absolute top-0 left-00 w-6 h-full bg-gradient-to-b from-gray-800 via-gray-600 to-gray-800 opacity-60 text-[10px] text-cyan-300 flex flex-col justify-between py-2 pointer-events-none">
           {[...Array(10)].map((_, i) => <span key={i}>{i * 80}</span>)}
-        </div>
+        </div>*/}
       </div>
     </div>
   );
