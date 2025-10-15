@@ -9,6 +9,7 @@
   "dependencies": {
     "@react-three/drei": "^9.76.1",
     "@react-three/fiber": "^8.13.7",
+    "axios": "^1.12.2",
     "clsx": "^2.1.1",
     "electron": "^27.0.0",
     "framer-motion": "^10.18.0",
