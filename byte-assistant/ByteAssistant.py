@@ -82,6 +82,7 @@ async def status_ws_sender(status_queue: asyncio.Queue):
             payload = json.dumps({"status": status})
             await broadcast(payload)
 
+
 # Async LLM request using aiohttp
 async def ask_llm(prompt: str, api_url: str = CHAT_API_URL, timeout: int = 20) -> str:
     try:
