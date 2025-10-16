@@ -7,6 +7,7 @@ import ByteIndicator from './components/ByteIndicator';
 import useByteStatus from './components/useByteStatus';
 import ThreeViewer from './components/ThreeViewer';
 import BootScreen from './components/BootScreen';
+import MusicLibrary from './components/Musiclibrary';
 
 function App() {
   const [bootDone, setBootDone] = useState(false);
@@ -57,6 +58,7 @@ function App() {
       {currentApp === 'Files' && <FileView onBack={() => setCurrentApp(null)} />}
       {currentApp === 'Settings' && <SettingsView onBack={() => setCurrentApp(null)} />}
       {currentApp === '3D Viewer' && <ThreeViewer onBack={() => setCurrentApp(null)} />}
+      {currentApp === 'MusicLibrary' && <MusicLibrary onBack={() => setCurrentApp(null)} />}
 
       {/* Startansicht */}
       {currentApp === null && (

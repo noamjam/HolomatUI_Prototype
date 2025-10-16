@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-const apps = ["Paint", "Files", "Settings", "3D Viewer"];
+const apps = ["Paint", "Files", "Settings", "3D Viewer", "MusicLibrary"];
 
 
 export default function AppCarousel({ onSelect }) {
