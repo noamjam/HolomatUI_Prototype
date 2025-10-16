@@ -14,7 +14,7 @@ export default function AssistantChat({ isOpen, onClose }) {
 
         const handlePort = (port) => {
             if (!port) return;
-            console.log("💬 Chat server port:", port);
+            console.log("Chat server port:", port);
             setChatPort(port);
             setTimeout(() => checkHealth(port), 300);
         };
@@ -79,7 +79,9 @@ export default function AssistantChat({ isOpen, onClose }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message }),
             });
-            if (!res.ok) throw new Error("Network response was not ok");
+            if (!res.ok) {
+                throw new Error("Network response was not ok");
+            }
             const data = await res.json();
             setHistory((prev) => [...prev, { from: "assistant", text: data.reply || "No response." }]);
         } catch (err) {
