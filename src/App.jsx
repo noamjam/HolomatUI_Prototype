@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import PaintView from './components/PaintView';
 import FileView from './components/FileView';
 import SettingsView from './components/SettingsView';
@@ -16,9 +16,9 @@ import GameCollection from "./components/GameCollection";
 function App() {
   const [bootDone, setBootDone] = useState(false);
   const [currentApp, setCurrentApp] = useState(null);
+  const [startInGrid, setStartInGrid] = useState(false);
   const isActive = useByteStatus();
   const [theme, setTheme] = useState('default');
-
 
   useEffect(() => {
     const saved = localStorage.getItem('theme') || 'default';
@@ -72,7 +72,13 @@ function App() {
           <h1 className={`text-4xl text-${getAccentColor()} font-bold mb-12 text-center drop-shadow-[0_0_8px_cyan]`}>
             Welcome to your futuristic workbench
           </h1>
-          <AppCarousel onSelect={(app) => setCurrentApp(app)} />
+            <AppCarousel
+                onSelect={(app, wasGrid) => {
+                    setStartInGrid(wasGrid);  // state remember
+                    setCurrentApp(app);
+                }}
+                startInGrid={startInGrid}
+            />
         </div>
       )}
 
