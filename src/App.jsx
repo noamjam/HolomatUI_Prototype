@@ -66,11 +66,10 @@ function App() {
           <h1 className={`text-4xl text-${getAccentColor()} font-bold mb-12 text-center drop-shadow-[0_0_8px_cyan]`}>
             Welcome to your futuristic workbench
           </h1>
-            {/* 🟢 AppCarousel bekommt startInGrid und merkt sich, aus welchem Modus gestartet wurde */}
             <AppCarousel
                 onSelect={(app, wasGrid) => {
-                    setStartInGrid(wasGrid);  // merkt sich, ob Grid oder Carousel aktiv war
-                    setCurrentApp(app);        // öffnet die App
+                    setStartInGrid(wasGrid);  // state remember
+                    setCurrentApp(app);
                 }}
                 startInGrid={startInGrid}
             />
