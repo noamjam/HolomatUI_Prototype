@@ -1,92 +1,122 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const apps = ["Paint", "Files", "Settings", "3D Viewer", "MusicLibrary", "OrcaSlicer", "Game Collection"];
 
 
-export default function AppCarousel({ onSelect }) {
-  const [current, setCurrent] = useState(0);
+export default function AppCarousel({ onSelect, startInGrid = false }) {
+    const [current, setCurrent] = useState(0);
+    const [isGrid, setIsGrid] = useState(startInGrid);
 
-  const rotateLeft = () =>
-    setCurrent((prev) => (prev - 1 + apps.length) % apps.length);
-  const rotateRight = () =>
-    setCurrent((prev) => (prev + 1) % apps.length);
+    useEffect(() => {
+        setIsGrid(startInGrid);
+    }, [startInGrid]);
 
-  const handleDragEnd = (event, info) => {
-    const offset = info.offset.x;
-    const velocity = info.velocity.x;
+    const rotateLeft = () =>
+        setCurrent((prev) => (prev - 1 + apps.length) % apps.length);
+    const rotateRight = () =>
+        setCurrent((prev) => (prev + 1) % apps.length);
 
-    if (offset < -30 || velocity < -300) {
-      rotateRight();
-    } else if (offset > 30 || velocity > 300) {
-      rotateLeft();
-    }
-  };
+    const handleDragEnd = (event, info) => {
+        const offsetX = info.offset.x;
+        const velocityX = info.velocity.x;
+        const offsetY = info.offset.y;
+        const velocityY = info.velocity.y;
 
-  const getRelativeIndex = (i) => {
-    const len = apps.length;
-    const diff = (i - current + len) % len;
-    if (diff === 0) return 0;
-    if (diff === 1 || diff === -len + 1) return 1;
-    if (diff === len - 1 || diff === -1) return -1;
-    return null;
-  };
+        // Horizontal wischen → App wechseln
+        if (Math.abs(offsetX) > Math.abs(offsetY)) {
+            if (offsetX < -30 || velocityX < -300) rotateRight();
+            else if (offsetX > 30 || velocityX > 300) rotateLeft();
+        }
+        // Vertikal wischen → Grid öffnen/schließen
+        else {
+            if (offsetY < -50 || velocityY < -300) {
+                console.log("Swipe nach oben → Grid öffnen");
+                setIsGrid(true);
+            } else if (offsetY > 50 || velocityY > 300) {
+                console.log("Swipe nach unten → zurück zum Carousel");
+                setIsGrid(false);
+            }
+        }
+    };
 
-  return (
-    <div className="relative flex justify-center items-center h-[320px] overflow-hidden">
-      {/* Drag-Fläche ohne sichtbare Bewegung */}
-      <motion.div
-        className="absolute inset-0 z-0"
-        drag="x"
-        dragConstraints={{ left: 0, right: 0 }}
-        onDragEnd={handleDragEnd}
-        style={{ position: 'absolute', width: '100%', height: '100%' }}
-      />
+    const getRelativeIndex = (i) => {
+        const len = apps.length;
+        const diff = (i - current + len) % len;
+        if (diff === 0) return 0;
+        if (diff === 1 || diff === -len + 1) return 1;
+        if (diff === len - 1 || diff === -1) return -1;
+        return null;
+    };
 
-      {/* Statische, fixierte Buttons */}
-      <div className="relative flex justify-center items-center w-full h-full pointer-events-none">
-        {apps.map((app, i) => {
-          const rel = getRelativeIndex(i);
-          if (rel === null) return null;
+    return (
+        <div className="relative flex justify-center items-center h-[320px] overflow-hidden">
+            {/* 🔹 Eine kombinierte Drag-Fläche (X & Y gleichzeitig) */}
+            <motion.div
+                className="absolute inset-0 z-0"
+                drag
+                dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                onDragEnd={handleDragEnd}
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    touchAction: "none",
+                    background: "transparent",
+                }}
+            />
 
-          const translateX = rel * 120;
-          const translateZ = rel === 0 ? 0 : -60;
-          const rotateY = rel * -6;
-          const scale = rel === 0 ? 1.25 : 1.0;
-          const zIndex = rel === 0 ? 10 : 5;
-          const opacity = rel === 0 ? 1 : 0.75;
+            {isGrid ? (
+                <div className="flex overflow-x-auto gap-4 px-4 py-2 z-0">
+                    {apps.map((app) => (
+                        <motion.button
+                            key={app}
+                            onClick={() => onSelect(app, true)}
+                            whileHover={{ scale: 1.1, boxShadow: "0 0 30px rgba(0,255,255,0.8)" }}
+                            whileTap={{ scale: 0.95 }}
+                            style={{
+                                boxShadow: "0 0 20px rgba(0,255,255,0.6)"
+                            }}
+                            className="w-32 h-32 rounded-full bg-cyan-700/30 text-white text-xl font-semibold border border-cyan-500 backdrop-blur-md transition-shadow duration-300"
+                        >
+                            {app}
+                        </motion.button>
+                    ))}
+                </div>
+            ) : (
+                <div className="relative flex justify-center items-center w-full h-full pointer-events-none z-0">
+                    {apps.map((app, i) => {
+                        const rel = getRelativeIndex(i);
+                        if (rel === null) return null;
+                        const translateX = rel * 120;
+                        const rotateY = rel * -6;
+                        const scale = rel === 0 ? 1.25 : 1.0;
+                        const zIndex = rel === 0 ? 10 : 5;
+                        const opacity = rel === 0 ? 1 : 0.75;
 
-          return (
-              <motion.div
-                  key={app}
-                  animate={{
-                      x: translateX,
-                      scale: scale,
-                      opacity: opacity,
-                      rotateY: rotateY,
-                      z: translateZ,
-
-                  }}
-                  transition={{
-                      type: "spring",
-                      stiffness: 120,
-                      damping: 15,
-                  }}
-                  className="absolute pointer-events-auto"
-                  style={{ zIndex }}
-              >
-                  <motion.button
-                      onClick={() => onSelect(app)}
-                      whileHover={{ scale: 1.1, boxShadow: "0 0 10px cyan" }}
-                      whileTap={{ scale: 0.95 }}
-                      className="w-32 h-32 rounded-full bg-cyan-700/30 text-white text-xl font-semibold shadow-xl border border-cyan-500 backdrop-blur-md drop-shadow-[0_0_6px_cyan]"
-                  >
-                      {app}
-                  </motion.button>
-              </motion.div>
-          );
-        })}
-      </div>
-    </div>
-  );
+                        return (
+                            <motion.div
+                                key={app}
+                                animate={{ x: translateX, scale, opacity, rotateY }}
+                                transition={{ type: "spring", stiffness: 120, damping: 15 }}
+                                className="absolute pointer-events-auto"
+                                style={{ zIndex }}
+                            >
+                                <motion.button
+                                    onClick={() => onSelect(app, false)}
+                                    whileHover={{ scale: 1.1, boxShadow: "0 0 30px rgba(0,255,255,0.8)" }}
+                                    whileTap={{ scale: 0.95 }}
+                                    style={{
+                                        boxShadow: "0 0 20px rgba(0,255,255,0.6)"
+                                    }}
+                                    className="w-32 h-32 rounded-full bg-cyan-700/30 text-white text-xl font-semibold border border-cyan-500 backdrop-blur-md transition-shadow duration-300"
+                                >
+                                    {app}
+                                </motion.button>
+                            </motion.div>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
 }
