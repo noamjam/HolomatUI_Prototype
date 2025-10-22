@@ -1,9 +1,14 @@
 import React from "react";
+import invadersCover from "../assets/invaders.png";
 
 export default function GameCollection({ onBack }) {
-// Später kannst du hier ein Array mit Spielen hinzufügen:
+    // Hier Spiele hinzufügen:
     const games = [
-        { name: "Byte Invaders", description: "Retro Space Shooter", image: "invaders.jpg" },
+        {
+            name: "Byte Invaders",
+            description: "Retro Space Shooter",
+            image: invadersCover, // <-- richtiges importiertes Bild
+        },
     ];
 
     return (
@@ -48,6 +53,4 @@ export default function GameCollection({ onBack }) {
             </div>
         </div>
     );
-
-
 }
