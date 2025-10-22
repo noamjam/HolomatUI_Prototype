@@ -2,20 +2,23 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
-    // 🎨 Paint
+    //Paint
     launchPaint: () => ipcRenderer.send("launch-paint"),
 
-    // 💬 Chat server ready event
+    //Chat server ready event
     onChatServerStarted: (callback) =>
         ipcRenderer.on("chat-server-started", (_, port) => callback(port)),
 
-    // 📂 File Explorer
+    //File Explorer
     openFileExplorer: () => ipcRenderer.send("open-file-explorer"),
 
-    // 🧠 Fallback: ask main for chat port
+    //Fallback: ask main for chat port
     getChatPort: async () => {
         return await ipcRenderer.invoke("get-chat-port");
     },
+
+    //Orca Slicer
+    launchOrcaSlicer: ()=> ipcRenderer.send("launch-orca-slicer"),
 
     // 🔄 Optional generic messaging
     sendMessage: (channel, data) => ipcRenderer.send(channel, data),

@@ -182,3 +182,19 @@ ipcMain.on("open-file-explorer", () => {
         if (err) console.error("❌ File Explorer error:", err);
     });
 });
+
+ipcMain.on("launch-orca-slicer", () => {
+    const slicerPath = path.resolve(
+        "C:\\Program Files\\FlashForge\\Orca-Flashforge\\orca-flashforge.exe"
+    );
+    console.log(`Starting Orca Slicer: ${slicerPath}`);
+    const child = spawn(slicerPath, [], {
+        detached: true,
+        stdio: "ignore",
+    });
+    child.on("error", (err) => {
+        console.error(`Failed to start Orca Slicer: ${err.message}`);
+    });
+    // optional: Prozess unabhängig weiterlaufen lassen
+    child.unref();
+});
