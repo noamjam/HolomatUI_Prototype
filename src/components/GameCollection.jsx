@@ -1,19 +1,18 @@
 import React from "react";
 import invadersCover from "../assets/invaders.png";
 
-export default function GameCollection({ onBack }) {
-    // Hier Spiele hinzufügen:
+export default function GameCollection({ onBack, onStartGame }) {
     const games = [
         {
             name: "Byte Invaders",
             description: "Retro Space Shooter",
-            image: invadersCover, // <-- richtiges importiertes Bild
+            image: invadersCover,
+            id: "byte-invaders",
         },
     ];
 
     return (
         <div className="relative flex flex-col justify-between h-screen text-white bg-gradient-to-b from-black/70 to-gray-900 backdrop-blur-md p-6">
-            {/* Header */}
             <div className="text-center mt-6">
                 <button
                     className="bg-cyan-700 px-3 py-2 rounded hover:bg-cyan-500 transition"
@@ -29,11 +28,14 @@ export default function GameCollection({ onBack }) {
                 </p>
             </div>
 
-            {/* Games Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 mt-6 overflow-y-auto">
-                {games.map((game, index) => (
+                {games.map((game) => (
                     <div
-                        key={index}
+                        key={game.id}
+                        onClick={() => {
+                            console.log("Clicked:", game.id);
+                            if (onStartGame) onStartGame(game.id);
+                        }}
                         className="bg-gray-800/50 border border-cyan-600 rounded-xl p-4 shadow-lg hover:bg-gray-700/60 transition cursor-pointer"
                     >
                         <img
@@ -47,7 +49,6 @@ export default function GameCollection({ onBack }) {
                 ))}
             </div>
 
-            {/* Footer */}
             <div className="text-center text-gray-400 text-xs mt-4 mb-2">
                 © 2025 Interactive Workbench — Game Collection
             </div>

@@ -10,7 +10,7 @@ import BootScreen from './components/BootScreen';
 import MusicLibrary from './components/Musiclibrary';
 import OrcaSlicer from "./components/OrcaSlicer";
 import GameCollection from "./components/GameCollection";
-
+import SpaceInvaders from "./components/SpaceInvaders.jsx";
 
 
 function App() {
@@ -19,6 +19,7 @@ function App() {
   const [startInGrid, setStartInGrid] = useState(false);
   const isActive = useByteStatus();
   const [theme, setTheme] = useState('default');
+  const [activeGame, setActiveGame] = useState(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('theme') || 'default';
@@ -64,7 +65,21 @@ function App() {
       {currentApp === '3D Viewer' && <ThreeViewer onBack={() => setCurrentApp(null)} />}
       {currentApp === 'MusicLibrary' && <MusicLibrary onBack={() => setCurrentApp(null)} />}
       {currentApp === 'OrcaSlicer' && <OrcaSlicer onBack={() => setCurrentApp(null)} />}
-      {currentApp === 'Game Collection' && <GameCollection onBack={() => setCurrentApp(null)} />}
+
+      {/* 🕹️ Game Collection & Space Invaders */}
+      {currentApp === 'Game Collection' && !activeGame && (
+          <GameCollection
+              onBack={() => setCurrentApp(null)}
+              onStartGame={(gameId) => {
+                  console.log("Starte Spiel:", gameId); // <-- debug output
+                  if (gameId === 'byte-invaders') setActiveGame('byte-invaders');
+              }}
+          />
+      )}
+
+      {activeGame === 'byte-invaders' && (
+          <SpaceInvaders onBack={() => setActiveGame(null)} />
+      )}
 
       {/* Startansicht */}
       {currentApp === null && (
