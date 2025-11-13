@@ -6,8 +6,17 @@ const path = require("path");
 const { app, BrowserWindow, ipcMain } = require("electron");
 const { spawn, exec } = require("child_process");
 const net = require("net");
+const os = require("os");
 
-app.disableHardwareAcceleration();
+// Plattform erkennen
+const platform = os.platform(); // 'win32', 'darwin', 'linux'
+
+if (platform === "win32") {
+    console.log("Running on Windows → Disabling hardware acceleration");
+    app.disableHardwareAcceleration();
+} else {
+    console.log(`Running on ${platform} → Keeping hardware acceleration enabled`);
+}
 
 let ollamaProcess = null;
 let byteProcess = null;
