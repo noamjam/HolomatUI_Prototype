@@ -1,180 +1,203 @@
 import React, { useRef, useEffect, useState } from "react";
 
-export default function SpaceInvaders({ onBack }) {
+export default function SpaceInvaders({ onBack, onHome }) {
     const canvasRef = useRef(null);
-    const [gameOver, setGameOver] = useState(false);
+    const [isGameOver, setIsGameOver] = useState(false);
+    const [score, setScore] = useState(0);
+    const [level, setLevel] = useState(1);
 
-    // Spieler
+    // Refs (für stabile Werte im Loop)
+    const scoreRef = useRef(0);
+    const levelRef = useRef(1);
     const player = useRef({ x: 375, y: 560, w: 50, h: 20 });
-    const moveSpeed = 6;
-
-    // Bullets + Gegner
-    const bulletsRef = useRef([]);
-    const enemiesRef = useRef([]);
-
-    // Gegnerbewegung
-    const enemySpeedRef = useRef(1);
-    const enemyDirRef = useRef(1);
-
-    // Steuerung
+    const bullets = useRef([]);
+    const enemies = useRef([]);
+    const enemyDir = useRef(1);
+    const enemySpeed = useRef(1);
+    const lastShot = useRef(0);
+    const animationRef = useRef(null);
     const keys = useRef({ left: false, right: false, shoot: false });
+
     const bulletSpeed = 8;
-    const bulletW = 4;
-    const bulletH = 10;
-    const shootCooldown = 200;
-    const lastShotRef = useRef(0);
+    const shootCooldown = 300;
 
     // === Gegner erstellen ===
-    useEffect(() => {
-        const enemies = [];
+    const spawnEnemies = () => {
+        const newEnemies = [];
+        const rows = 4;
         const cols = 8;
-        const rows = 3;
-        const spacing = 80;
-        const offsetX = 60;
+        const spacingX = 70;
+        const spacingY = 50;
+        const offsetX = 80;
         const offsetY = 60;
-
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < cols; x++) {
-                enemies.push({
-                    x: offsetX + x * spacing,
-                    y: offsetY + y * 50,
+                newEnemies.push({
+                    x: offsetX + x * spacingX,
+                    y: offsetY + y * spacingY,
                     w: 40,
                     h: 20,
                     alive: true,
                 });
             }
         }
+        enemies.current = newEnemies;
+    };
 
-        enemiesRef.current = enemies;
-    }, []);
+    // === Spiel resetten ===
+    const resetGame = () => {
+        player.current = { x: 375, y: 560, w: 50, h: 20 };
+        bullets.current = [];
+        enemyDir.current = 1;
+        enemySpeed.current = 1;
+        spawnEnemies();
+        scoreRef.current = 0;
+        levelRef.current = 1;
+        setScore(0);
+        setLevel(1);
+    };
 
     // === Steuerung ===
     useEffect(() => {
-        const down = (e) => {
+        const handleKeyDown = (e) => {
             if (e.key === "ArrowLeft" || e.key === "a") keys.current.left = true;
             if (e.key === "ArrowRight" || e.key === "d") keys.current.right = true;
             if (e.key === " ") keys.current.shoot = true;
         };
-        const up = (e) => {
+        const handleKeyUp = (e) => {
             if (e.key === "ArrowLeft" || e.key === "a") keys.current.left = false;
             if (e.key === "ArrowRight" || e.key === "d") keys.current.right = false;
             if (e.key === " ") keys.current.shoot = false;
         };
-        window.addEventListener("keydown", down);
-        window.addEventListener("keyup", up);
+        window.addEventListener("keydown", handleKeyDown);
+        window.addEventListener("keyup", handleKeyUp);
         return () => {
-            window.removeEventListener("keydown", down);
-            window.removeEventListener("keyup", up);
+            window.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener("keyup", handleKeyUp);
         };
     }, []);
 
-    // === Game Loop ===
-    useEffect(() => {
+    // === Hauptloop ===
+    const gameLoop = (timestamp) => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
         const ctx = canvas.getContext("2d");
 
-        const loop = (timestamp) => {
-            if (gameOver) return;
+        // Hintergrund
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Hintergrund
-            ctx.fillStyle = "black";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const p = player.current;
+        if (keys.current.left) p.x = Math.max(0, p.x - 6);
+        if (keys.current.right) p.x = Math.min(800 - p.w, p.x + 6);
 
-            const p = player.current;
-            const enemies = enemiesRef.current;
-            const bullets = bulletsRef.current;
+        // Schießen
+        if (keys.current.shoot && timestamp - lastShot.current > shootCooldown) {
+            bullets.current.push({
+                x: p.x + p.w / 2 - 2,
+                y: p.y - 10,
+                w: 4,
+                h: 10,
+            });
+            lastShot.current = timestamp;
+        }
 
-            // Bewegung
-            if (keys.current.left) p.x = Math.max(p.x - moveSpeed, 0);
-            if (keys.current.right) p.x = Math.min(p.x + moveSpeed, 800 - p.w);
+        // Bullets bewegen
+        bullets.current = bullets.current
+            .map((b) => ({ ...b, y: b.y - bulletSpeed }))
+            .filter((b) => b.y > 0);
 
-            // Schießen
-            if (keys.current.shoot && timestamp - lastShotRef.current > shootCooldown) {
-                bullets.push({
-                    x: p.x + p.w / 2 - bulletW / 2,
-                    y: p.y - bulletH,
-                    w: bulletW,
-                    h: bulletH,
-                });
-                lastShotRef.current = timestamp;
-            }
+        // Gegner bewegen
+        let shiftDown = false;
+        for (let e of enemies.current) {
+            if (!e.alive) continue;
+            e.x += enemyDir.current * enemySpeed.current;
+            if (e.x < 10 || e.x + e.w > 790) shiftDown = true;
+        }
+        if (shiftDown) {
+            enemyDir.current *= -1;
+            for (let e of enemies.current) e.y += 20;
+        }
 
-            // Bullets bewegen + filtern
-            bulletsRef.current = bullets
-                .map((b) => ({ ...b, y: b.y - bulletSpeed }))
-                .filter((b) => b.y + b.h > 0);
-
-            // Gegner bewegen
-            let shiftDown = false;
-            for (let e of enemies) {
-                if (!e.alive) continue;
-                e.x += enemyDirRef.current * enemySpeedRef.current;
-                if (e.x < 10 || e.x + e.w > 790) shiftDown = true;
-            }
-
-            if (shiftDown) {
-                enemyDirRef.current *= -1;
-                for (let e of enemies) {
-                    e.y += 20;
-                }
-            }
-
-            // === Bullet ↔ Gegner Kollision ===
-            for (let b of bulletsRef.current) {
-                for (let e of enemies) {
-                    if (!e.alive) continue;
-                    if (
-                        b.x < e.x + e.w &&
-                        b.x + b.w > e.x &&
-                        b.y < e.y + e.h &&
-                        b.y + b.h > e.y
-                    ) {
-                        e.alive = false;
-                        b.hit = true;
-                    }
-                }
-            }
-
-            // Getroffene Bullets entfernen
-            bulletsRef.current = bulletsRef.current.filter((b) => !b.hit);
-
-            // === Gegner ↔ Spieler Kollision (Game Over) ===
-            for (let e of enemies) {
+        // Bullet-Kollisionen
+        for (let b of bullets.current) {
+            for (let e of enemies.current) {
                 if (!e.alive) continue;
                 if (
-                    e.x < p.x + p.w &&
-                    e.x + e.w > p.x &&
-                    e.y < p.y + p.h &&
-                    e.y + e.h > p.y
+                    b.x < e.x + e.w &&
+                    b.x + b.w > e.x &&
+                    b.y < e.y + e.h &&
+                    b.y + b.h > e.y
                 ) {
-                    setGameOver(true);
+                    e.alive = false;
+                    b.hit = true;
+                    scoreRef.current += 10;
+                    setScore(scoreRef.current);
                 }
             }
+        }
+        bullets.current = bullets.current.filter((b) => !b.hit);
 
-            // === Zeichnen ===
-            // Spieler
-            ctx.fillStyle = "cyan";
-            ctx.fillRect(p.x, p.y, p.w, p.h);
+        // Spieler tot?
+        for (let e of enemies.current) {
+            if (!e.alive) continue;
+            if (
+                e.x < p.x + p.w &&
+                e.x + e.w > p.x &&
+                e.y < p.y + p.h &&
+                e.y + e.h > p.y
+            ) {
+                setIsGameOver(true);
+                cancelAnimationFrame(animationRef.current);
+                return;
+            }
+        }
 
-            // Bullets
-            ctx.fillStyle = "red";
-            bulletsRef.current.forEach((b) => ctx.fillRect(b.x, b.y, b.w, b.h));
+        // Alle Gegner tot → neues Level
+        if (enemies.current.every((e) => !e.alive)) {
+            levelRef.current += 1;
+            enemySpeed.current += 1;
+            setLevel(levelRef.current);
+            spawnEnemies();
+        }
 
-            // Gegner
-            ctx.fillStyle = "lime";
-            enemies.forEach((e) => {
-                if (e.alive) ctx.fillRect(e.x, e.y, e.w, e.h);
-            });
+        // Zeichnen
+        ctx.fillStyle = "cyan";
+        ctx.fillRect(p.x, p.y, p.w, p.h);
 
-            requestAnimationFrame(loop);
-        };
+        ctx.fillStyle = "red";
+        for (let b of bullets.current) ctx.fillRect(b.x, b.y, b.w, b.h);
 
-        requestAnimationFrame(loop);
-    }, [gameOver]);
+        ctx.fillStyle = "lime";
+        for (let e of enemies.current) if (e.alive) ctx.fillRect(e.x, e.y, e.w, e.h);
 
-    // === Game Over Overlay ===
+        ctx.fillStyle = "white";
+        ctx.font = "16px Orbitron, monospace";
+        ctx.fillText(`Score: ${scoreRef.current}`, 680, 30);
+        ctx.fillText(`Level: ${levelRef.current}`, 680, 50);
+
+        animationRef.current = requestAnimationFrame(gameLoop);
+    };
+
+    const startGame = () => {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = requestAnimationFrame(gameLoop);
+    };
+
+    const handleRestart = () => {
+        resetGame();
+        setIsGameOver(false);
+        requestAnimationFrame(() => startGame());
+    };
+
+    useEffect(() => {
+        resetGame();
+        startGame();
+        return () => cancelAnimationFrame(animationRef.current);
+    }, []);
+
     return (
-        <div className="fixed inset-0 flex flex-col items-center justify-center bg-black text-white z-50">
+        <div className="fixed inset-0 flex flex-col items-center justify-center bg-black text-white">
             <button
                 onClick={onBack}
                 className="absolute top-4 left-4 bg-cyan-700 px-3 py-2 rounded hover:bg-cyan-500 transition"
@@ -197,16 +220,27 @@ export default function SpaceInvaders({ onBack }) {
                 Steuerung: A / D oder Pfeiltasten · Schuss: Leertaste
             </p>
 
-            {gameOver && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80">
-                    <h2 className="text-4xl text-red-500 font-bold drop-shadow-[0_0_10px_red] mb-4">
-                        GAME OVER
-                    </h2>
+            {isGameOver && (
+                <div className="absolute inset-0 bg-black/90 flex flex-col justify-center items-center text-white">
+                    <h1 className="text-4xl font-bold mb-6">GAME OVER</h1>
+                    <p className="mb-4 text-lg">Score: {scoreRef.current}</p>
                     <button
-                        onClick={() => window.location.reload()}
-                        className="bg-red-600 px-4 py-2 rounded hover:bg-red-400 transition"
+                        onClick={handleRestart}
+                        className="bg-cyan-600 px-4 py-2 rounded mb-3 hover:bg-cyan-500"
                     >
                         Restart
+                    </button>
+                    <button
+                        onClick={onBack}
+                        className="bg-gray-600 px-4 py-2 rounded mb-3 hover:bg-gray-500"
+                    >
+                        Game Collection
+                    </button>
+                    <button
+                        onClick={onHome}
+                        className="bg-red-600 px-4 py-2 rounded hover:bg-red-500"
+                    >
+                        Home Menu
                     </button>
                 </div>
             )}

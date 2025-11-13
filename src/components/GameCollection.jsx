@@ -1,5 +1,6 @@
 import React from "react";
 import invadersCover from "../assets/invaders.png";
+import Snake from "../assets/SnakeCover.png";
 
 export default function GameCollection({ onBack, onStartGame }) {
     const games = [
@@ -8,6 +9,12 @@ export default function GameCollection({ onBack, onStartGame }) {
             description: "Retro Space Shooter",
             image: invadersCover,
             id: "byte-invaders",
+        },
+        {
+            name: "Snake Game",
+            description: "Simple Snake Game",
+            image: Snake,
+            id: "snake-game",
         },
     ];
 
@@ -43,11 +50,14 @@ export default function GameCollection({ onBack, onStartGame }) {
                             alt={game.name}
                             className="w-full h-40 object-cover rounded-lg mb-3"
                         />
+
                         <h2 className="text-xl font-semibold text-cyan-300">{game.name}</h2>
                         <p className="text-gray-400 text-sm">{game.description}</p>
                     </div>
                 ))}
             </div>
+
+
 
             <div className="text-center text-gray-400 text-xs mt-4 mb-2">
                 © 2025 Interactive Workbench — Game Collection
