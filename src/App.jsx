@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from "react";
-import PaintView from "./components/PaintView";
-import FileView from "./components/FileView";
-import SettingsView from "./components/SettingsView";
-import AppCarousel from "./components/AppCarousel";
-import ByteIndicator from "./components/ByteIndicator";
-import useByteStatus from "./components/useByteStatus";
-import ThreeViewer from "./components/ThreeViewer";
-import BootScreen from "./components/BootScreen";
-import MusicLibrary from "./components/Musiclibrary";
+import React, { useState, useEffect} from 'react';
+import { themes } from './themes';
+import PaintView from './components/PaintView';
+import FileView from './components/FileView';
+import SettingsView from './components/SettingsView';
+import AppCarousel from './components/AppCarousel';
+import ByteIndicator from './components/ByteIndicator';
+import useByteStatus from './components/useByteStatus';
+import ThreeViewer from './components/ThreeViewer';
+import BootScreen from './components/BootScreen';
+import MusicLibrary from './components/Musiclibrary';
 import OrcaSlicer from "./components/OrcaSlicer";
 import GameCollection from "./components/GameCollection";
+import SolarSystem from "./components/SolarSystem";
 import SpaceInvaders from "./components/SpaceInvaders.jsx";
 import SnakeGame from "./components/SnakeGame.jsx";
 
@@ -18,59 +20,37 @@ function App() {
     const [currentApp, setCurrentApp] = useState(null);
     const [startInGrid, setStartInGrid] = useState(false);
     const isActive = useByteStatus();
-    const [theme, setTheme] = useState("default");
+    const [theme, setTheme] = useState(themes.default);
     const [activeGame, setActiveGame] = useState(null);
 
-    // === Theme laden ===
+
+
     useEffect(() => {
-        const saved = localStorage.getItem("theme") || "default";
-        setTheme(saved);
+        const saved = localStorage.getItem('theme') || 'default';
+        setTheme(themes[saved] || themes.default);
     }, []);
 
-    // === Farbverläufe ===
-    const getBgGradient = () => {
-        switch (theme) {
-            case "red":
-                return "from-black via-gray-900 to-gray-800";
-            case "yellow":
-                return "from-black via-gray-900 to-yellow-800";
-            case "green":
-                return "from-black via-gray-900 to-green-900";
-            default:
-                return "from-gray-900 via-gray-800 to-black";
-        }
-    };
-
-    const getAccentColor = () => {
-        switch (theme) {
-            case "red":
-                return "red-400";
-            case "yellow":
-                return "yellow-400";
-            case "green":
-                return "green-400";
-            default:
-                return "cyan-400";
-        }
-    };
-
-    // === Bootscreen ===
     if (!bootDone) {
         return <BootScreen onFinish={() => setBootDone(true)} />;
     }
 
-    // === Render ===
     return (
         <div
-            className={`min-h-screen bg-gradient-to-br ${getBgGradient()} text-white font-orbitron relative overflow-hidden`}
+            className="min-h-screen text-white font-orbitron relative overflow-hidden"
+            style={{
+                backgroundImage: theme.bgGradient, // CSS Gradient aus themes.js
+                backgroundSize: "cover",
+                backgroundAttachment: "fixed"
+            }}
         >
-            {/* === Anwendungen === */}
-            {currentApp === "Paint" && <PaintView onBack={() => setCurrentApp(null)} />}
-            {currentApp === "Files" && <FileView onBack={() => setCurrentApp(null)} />}
-            {currentApp === "Settings" && <SettingsView onBack={() => setCurrentApp(null)} />}
-            {currentApp === "3D Viewer" && <ThreeViewer onBack={() => setCurrentApp(null)} />}
-            {currentApp === "MusicLibrary" && <MusicLibrary onBack={() => setCurrentApp(null)} />}
-            {currentApp === "OrcaSlicer" && <OrcaSlicer onBack={() => setCurrentApp(null)} />}
+            {/* Anwendungen */}
+            {currentApp === 'Paint' && <PaintView onBack={() => setCurrentApp(null)} />}
+            {currentApp === 'Files' && <FileView onBack={() => setCurrentApp(null)} />}
+            {currentApp === 'Settings' && <SettingsView onBack={() => setCurrentApp(null)} />}
+            {currentApp === '3D Viewer' && <ThreeViewer onBack={() => setCurrentApp(null)} />}
+            {currentApp === 'MusicLibrary' && <MusicLibrary onBack={() => setCurrentApp(null)} />}
+            {currentApp === 'OrcaSlicer' && <OrcaSlicer onBack={() => setCurrentApp(null)} />}
+            {currentApp === 'Solar System' && <SolarSystem onBack={() => setCurrentApp(null)} />}
 
             {/* === Game Collection === */}
             {currentApp === "Game Collection" && !activeGame && (
@@ -106,11 +86,12 @@ function App() {
                 />
             )}
 
-            {/* === Startansicht === */}
-            {currentApp === null && !activeGame && (
+            {/* Startansicht */}
+            {currentApp === null && (
                 <div className="p-8">
                     <h1
-                        className={`text-4xl text-${getAccentColor()} font-bold mb-12 text-center drop-shadow-[0_0_8px_cyan]`}
+                        className="text-4xl font-bold mb-12 text-center drop-shadow-[0_0_8px_cyan]"
+                        style={{ color: theme.textColor }} // Textfarbe aus themes.js
                     >
                         Welcome to your futuristic workbench
                     </h1>
@@ -124,7 +105,7 @@ function App() {
                 </div>
             )}
 
-            {/* === Byte-Indikator === */}
+            {/* Byte-Indikator bleibt immer sichtbar */}
             <ByteIndicator isActive={isActive} />
         </div>
     );

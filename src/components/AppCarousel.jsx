@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-const apps = ["Paint", "Files", "Settings", "3D Viewer", "MusicLibrary", "OrcaSlicer", "Game Collection"];
+const apps = ["Paint", "Files", "Settings", "3D Viewer", "MusicLibrary", "OrcaSlicer",
+    "Game Collection", "Solar System"];
 
 
 export default function AppCarousel({ onSelect, startInGrid = false }) {
@@ -66,21 +67,35 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
             />
 
             {isGrid ? (
-                <div className="flex overflow-x-auto gap-4 px-4 py-2 z-0">
-                    {apps.map((app) => (
-                        <motion.button
-                            key={app}
-                            onClick={() => onSelect(app, true)}
-                            whileHover={{ scale: 1.1, boxShadow: "0 0 30px rgba(0,255,255,0.8)" }}
-                            whileTap={{ scale: 0.95 }}
-                            style={{
-                                boxShadow: "0 0 20px rgba(0,255,255,0.6)"
-                            }}
-                            className="w-32 h-32 rounded-full bg-cyan-700/30 text-white text-xl font-semibold border border-cyan-500 backdrop-blur-md transition-shadow duration-300"
-                        >
-                            {app}
-                        </motion.button>
-                    ))}
+                <div className="flex flex-col items-center overflow-y-auto max-h-[300px] py-4 z-0">
+                    {/* Teile Apps in Gruppen von 5 pro Zeile */}
+                    {(() => {
+                        const rows = [];
+                        const appsPerRow = 5;
+
+                        for (let i = 0; i < apps.length; i += appsPerRow) {
+                            const rowApps = apps.slice(i, i + appsPerRow);
+                            rows.push(
+                                <div key={i} className="flex justify-center gap-4 mb-4">
+                                    {rowApps.map((app) => (
+                                        <motion.button
+                                            key={app}
+                                            onClick={() => onSelect(app, true)}
+                                            whileHover={{ scale: 1.1, boxShadow: "0 0 30px rgba(0,255,255,0.8)" }}
+                                            whileTap={{ scale: 0.95 }}
+                                            style={{
+                                                boxShadow: "0 0 20px rgba(0,255,255,0.6)"
+                                            }}
+                                            className="w-32 h-32 rounded-full bg-cyan-700/30 text-white text-xl font-semibold border border-cyan-500 backdrop-blur-md transition-shadow duration-300"
+                                        >
+                                            {app}
+                                        </motion.button>
+                                    ))}
+                                </div>
+                            );
+                        }
+                        return rows;
+                    })()}
                 </div>
             ) : (
                 <div className="relative flex justify-center items-center w-full h-full pointer-events-none z-0">
