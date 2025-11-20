@@ -1,5 +1,5 @@
 .idea/
-.venv/
+byte-assistant/.venv
 node_modules/
 dist/
 

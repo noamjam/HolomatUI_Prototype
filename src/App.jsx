@@ -15,6 +15,7 @@ import SolarSystem from "./components/SolarSystem";
 import SpaceInvaders from "./components/SpaceInvaders.jsx";
 import SnakeGame from "./components/SnakeGame.jsx";
 import FreeCAD from "./components/FreeCAD";
+import Minesweeper from "./components/Minesweeper";
 
 function App() {
     const [bootDone, setBootDone] = useState(false);
@@ -62,6 +63,7 @@ function App() {
                         // Spiele auswählen
                         if (gameId === "byte-invaders") setActiveGame("byte-invaders");
                         if (gameId === "snake-game") setActiveGame("snake-game");
+                        if (gameId === "Minesweeper") setActiveGame("Minesweeper");
                     }}
                 />
             )}
@@ -80,6 +82,17 @@ function App() {
             {/* === Snake === */}
             {activeGame === "snake-game" && (
                 <SnakeGame
+                    onBack={() => setActiveGame(null)} // Zurück zur Game Collection
+                    onHome={() => {
+                        setActiveGame(null);
+                        setCurrentApp(null); // ins Hauptmenü
+                    }}
+                />
+            )}
+
+            {/* === Minesweeper === */}
+            {activeGame === "Minesweeper" && (
+                <Minesweeper
                     onBack={() => setActiveGame(null)} // Zurück zur Game Collection
                     onHome={() => {
                         setActiveGame(null);

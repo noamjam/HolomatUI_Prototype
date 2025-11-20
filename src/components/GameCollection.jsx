@@ -1,6 +1,7 @@
 import React from "react";
 import invadersCover from "../assets/invaders.png";
 import Snake from "../assets/SnakeCover.png";
+import Minesweeper from "../assets/Minesweeper.png";
 
 export default function GameCollection({ onBack, onStartGame }) {
     const games = [
@@ -15,6 +16,12 @@ export default function GameCollection({ onBack, onStartGame }) {
             description: "Simple Snake Game",
             image: Snake,
             id: "snake-game",
+        },
+        {
+            name: "Minesweeper",
+            description: "Clear all mines",
+            image: Minesweeper,
+            id: "Minesweeper",
         },
     ];
 
