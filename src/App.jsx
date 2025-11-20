@@ -16,6 +16,7 @@ import SpaceInvaders from "./components/SpaceInvaders.jsx";
 import SnakeGame from "./components/SnakeGame.jsx";
 import FreeCAD from "./components/FreeCAD";
 import Minesweeper from "./components/Minesweeper";
+import WeatherApp from "./components/Weather.jsx";
 
 function App() {
     const [bootDone, setBootDone] = useState(false);
@@ -54,6 +55,7 @@ function App() {
             {currentApp === 'OrcaSlicer' && <OrcaSlicer onBack={() => setCurrentApp(null)} />}
             {currentApp === 'Solar System' && <SolarSystem onBack={() => setCurrentApp(null)} />}
             {currentApp === 'FreeCAD' && <FreeCAD onBack={() => setCurrentApp(null)} />}
+            {currentApp === 'Weather' && <WeatherApp onBack={() => setCurrentApp(null)} />}
 
             {/* === Game Collection === */}
             {currentApp === "Game Collection" && !activeGame && (

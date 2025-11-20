@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const apps = ["Paint", "Files", "Settings", "3D Viewer", "MusicLibrary", "OrcaSlicer",
-    "Game Collection", "Solar System", "FreeCAD"];
+    "Game Collection", "Solar System", "FreeCAD", "Weather"];
 
 
 export default function AppCarousel({ onSelect, startInGrid = false }) {
