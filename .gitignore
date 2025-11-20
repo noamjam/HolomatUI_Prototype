@@ -2,5 +2,6 @@
 byte-assistant/.venv
 node_modules/
 dist/
+/.venv1/
 
 *~
