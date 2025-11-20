@@ -20,6 +20,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     //Orca Slicer
     launchOrcaSlicer: ()=> ipcRenderer.send("launch-orca-slicer"),
 
+    launchFreeCAD: () => ipcRenderer.send('launch-freecad'),
+
     // 🔄 Optional generic messaging
     sendMessage: (channel, data) => ipcRenderer.send(channel, data),
     onMessage: (channel, func) =>

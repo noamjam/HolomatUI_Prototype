@@ -16,7 +16,7 @@ export default function SolarSystem({onBack}) {
         jupiter: 0, saturn: 0, uranus: 0, neptune: 0
     });
 
-    const moonAnglesRef = useRef({}); // ✅ FEHLTE - JETZT HINZUGEFÜGT
+    const moonAnglesRef = useRef({});
     const asteroidsRef = useRef([]);
     const asteroidAnglesRef = useRef([]);
     const setRealLifePositionsRef = useRef(null);
@@ -152,7 +152,7 @@ export default function SolarSystem({onBack}) {
 
         planet.add(moon);
 
-        // ✅ KORRIGIERT: planetName statt planet verwenden
+
         const moonId = `${planetName}-${moonConfig.name}`;
         moonAnglesRef.current[moonId] = Math.random() * Math.PI * 2;
 
@@ -176,7 +176,7 @@ export default function SolarSystem({onBack}) {
             moonData.mesh.position.x = moonData.distance * Math.cos(angle);
             moonData.mesh.position.z = moonData.distance * Math.sin(angle);
 
-            // ✅ KORRIGIERT: rotation statt position für Y-Achse
+
             moonData.mesh.rotation.y += 0.02 * globalSpeed;
         });
     };
@@ -184,7 +184,7 @@ export default function SolarSystem({onBack}) {
     // create moons
     const createMoonsForPlanet = (planet, planetName) => {
         if (moonData[planetName]) {
-            // ✅ KORRIGIERT: moonData statt moonsRef verwenden
+
             moonData[planetName].forEach(moonConfig => {
                 createMoon(planet, moonConfig, planetName);
             });
@@ -208,6 +208,30 @@ export default function SolarSystem({onBack}) {
         mountRef.current.appendChild(renderer.domElement);
 
         const textureLoader = new THREE.TextureLoader();
+
+        const atmosphereVertexShader = `
+  varying vec3 vNormal;
+  void main() {
+    vNormal = normalize(normalMatrix * normal);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+        const atmosphereFragmentShader = `
+  varying vec3 vNormal;
+  void main() {
+    float intensity = pow(0.65 - dot(vNormal, vec3(0, 0, 1.0)), 2.0); // Blickwinkel zur Kamera
+    gl_FragColor = vec4(0.3, 0.6, 1.0, 0.55) * intensity; // Blaues Leuchten, Transparenz
+  }
+`;
+
+        const atmosphereMaterial = new THREE.ShaderMaterial({
+            vertexShader: atmosphereVertexShader,
+            fragmentShader: atmosphereFragmentShader,
+            blending: THREE.AdditiveBlending,
+            side: THREE.BackSide,
+            transparent: true
+        });
 
         // Raycaster für Mouse-Interaktion
         const raycaster = new THREE.Raycaster();
@@ -424,7 +448,7 @@ export default function SolarSystem({onBack}) {
         controls.addEventListener('start', onCameraControlStart);
 
         // 🌞 SONNE
-        function createSunWithRealLight() {
+        function createSunWithAnimatedShader() {
             const sunGeometry = new THREE.SphereGeometry(1, 64, 64);
 
             const sunMaterial = new THREE.ShaderMaterial({
@@ -433,30 +457,30 @@ export default function SolarSystem({onBack}) {
                     lightIntensity: { value: 3.0 }
                 },
                 vertexShader: `
-                    varying vec3 vWorldPosition;
-                    varying vec3 vNormal;
-                    void main() {
-                        vNormal = normalize(normalMatrix * normal);
-                        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-                        vWorldPosition = worldPosition.xyz;
-                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                    }
-                `,
+            varying vec3 vWorldPosition;
+            varying vec3 vNormal;
+            void main() {
+                vNormal = normalize(normalMatrix * normal);
+                vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                vWorldPosition = worldPosition.xyz;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `,
                 fragmentShader: `
-                    uniform float time;
-                    uniform float lightIntensity;
-                    varying vec3 vWorldPosition;
-                    varying vec3 vNormal;
-                    void main() {
-                        vec3 coreColor = vec3(1.0, 0.8, 0.3);
-                        float turbulence = sin(vWorldPosition.x * 10.0 + time) * 
-                                         sin(vWorldPosition.y * 8.0 + time * 1.2) * 
-                                         sin(vWorldPosition.z * 12.0 + time * 0.8) * 0.1;
-                        float pulse = sin(time * 2.0) * 0.1 + 0.9;
-                        vec3 finalColor = coreColor * (1.0 + turbulence) * pulse * lightIntensity;
-                        gl_FragColor = vec4(finalColor, 1.0);
-                    }
-                `
+            uniform float time;
+            uniform float lightIntensity;
+            varying vec3 vWorldPosition;
+            varying vec3 vNormal;
+            void main() {
+                vec3 coreColor = vec3(1.0, 0.8, 0.2);
+                float turbulence = sin(vWorldPosition.x * 10.0 + time) * 
+                                 sin(vWorldPosition.y * 8.0 + time * 1.2) * 
+                                 sin(vWorldPosition.z * 12.0 + time * 0.8) * 0.3;
+                float pulse = sin(time * 2.0) * 0.1 + 0.9;
+                vec3 finalColor = coreColor * (1.0 + turbulence) * pulse * lightIntensity;
+                gl_FragColor = vec4(finalColor, 1.0);
+            }
+        `
             });
 
             const sun = new THREE.Mesh(sunGeometry, sunMaterial);
@@ -464,7 +488,7 @@ export default function SolarSystem({onBack}) {
             return { sun, material: sunMaterial };
         }
 
-        const { sun, material: sunShaderMaterial } = createSunWithRealLight();
+        const { sun, material: sunShaderMaterial } = createSunWithAnimatedShader();
 
         sun.castShadow = false;
         sun.receiveShadow = false;
@@ -522,6 +546,12 @@ export default function SolarSystem({onBack}) {
         const mercury = createPBRPlanet(0.3, 'mercury.jpg', 4, 0.1, 0.9, false);
         const venus = createPBRPlanet(0.4, 'venus.jpg', 6, 0.1, 0.7, false);
         const earth = createPBRPlanet(0.6, 'earth_texture.jpg', 8, 0.3, 0.7, false);
+        const atmosphere = new THREE.Mesh(
+            new THREE.SphereGeometry(0.70, 64, 64),
+            atmosphereMaterial
+        );
+        scene.add(atmosphere);
+        atmosphere.position.copy(earth.position);
         const mars = createPBRPlanet(0.4, 'mars.jpg', 10, 0.1, 0.9, false);
         const jupiter = createPBRPlanet(1.2, 'jupiter.jpg', 14, 0.2, 0.8, true);
         const saturn = createPBRPlanet(1.0, 'saturn.jpg', 18, 0.2, 0.7, true);
@@ -688,6 +718,10 @@ export default function SolarSystem({onBack}) {
                 anglesRef.current.neptune += 0.003 * globalSpeed;
 
                 updatePlanetPositions();
+
+                atmosphere.position.copy(earth.position);
+                atmosphere.rotation.copy(earth.rotation);
+
                 updatePlanetLighting();
                 saturnRing.rotation.y += 0.01 * globalSpeed;
 

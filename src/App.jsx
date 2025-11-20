@@ -14,6 +14,7 @@ import GameCollection from "./components/GameCollection";
 import SolarSystem from "./components/SolarSystem";
 import SpaceInvaders from "./components/SpaceInvaders.jsx";
 import SnakeGame from "./components/SnakeGame.jsx";
+import FreeCAD from "./components/FreeCAD";
 
 function App() {
     const [bootDone, setBootDone] = useState(false);
@@ -51,6 +52,7 @@ function App() {
             {currentApp === 'MusicLibrary' && <MusicLibrary onBack={() => setCurrentApp(null)} />}
             {currentApp === 'OrcaSlicer' && <OrcaSlicer onBack={() => setCurrentApp(null)} />}
             {currentApp === 'Solar System' && <SolarSystem onBack={() => setCurrentApp(null)} />}
+            {currentApp === 'FreeCAD' && <FreeCAD onBack={() => setCurrentApp(null)} />}
 
             {/* === Game Collection === */}
             {currentApp === "Game Collection" && !activeGame && (

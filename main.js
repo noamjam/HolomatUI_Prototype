@@ -66,7 +66,10 @@ function startOllamaServer() {
 // ------------------------------------------------------
 function startByteAssistant() {
     const scriptPath = path.resolve(__dirname, "./byte-assistant/ByteAssistant.py");
-    const pythonCmd = path.resolve(__dirname, "./byte-assistant/venv/Scripts/python.exe");
+
+    const pythonCmd = process.platform === "win32"
+        ? path.resolve(__dirname, "./byte-assistant/venv/Scripts/python.exe")
+        : path.resolve(__dirname, "./byte-assistant/venv/venv/bin/python");
 
     console.log("🚀 Starting Byte assistant...");
     byteProcess = spawn(pythonCmd, [scriptPath], { cwd: path.dirname(scriptPath) });
@@ -93,8 +96,11 @@ async function findFreePort(startPort = 5050) {
 
 async function startChatAssistant() {
     try {
-        const scriptPath = path.resolve(__dirname, "./byte-assistant/ChatAssistant.py");
-        const pythonCmd = path.resolve(__dirname, "./byte-assistant/venv/Scripts/python.exe");
+        const scriptPath = path.resolve(__dirname, "./byte-assistant/ByteAssistant.py");
+
+        const pythonCmd = process.platform === "win32"
+            ? path.resolve(__dirname, "./byte-assistant/venv/Scripts/python.exe")
+            : path.resolve(__dirname, "./byte-assistant/venv/venv/bin/python");
         const freePort = await findFreePort(5050);
 
         global.chatPort = freePort;
@@ -206,4 +212,8 @@ ipcMain.on("launch-orca-slicer", () => {
     });
     // optional: Prozess unabhängig weiterlaufen lassen
     child.unref();
+});
+
+ipcMain.on('launch-freecad', () => {
+    exec('open -a /Applications/FreeCAD.app'); // macOS-kompatibler Start!
 });
