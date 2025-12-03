@@ -41,8 +41,8 @@ export default function BootScreen({ onFinish }) {
                 src={"./logo.png"}
                 alt="Logo"
                 className="w-32 h-32"
-                initial={{ y: -10, opacity: 0, scale: 0.8 }}
-                animate={{ y: 30, opacity: 1, scale: 2 }}
+                initial={{ y: 250, opacity: 0, scale: 0.8 }}
+                animate={{ y: 100, opacity: 1, scale: 2 }}
                 transition={{ duration: 4, ease: "easeInOut" }}
             />
 

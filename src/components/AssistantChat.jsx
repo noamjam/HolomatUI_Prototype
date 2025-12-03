@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function AssistantChat({ isOpen, onClose }) {
+export default function AssistantChat({ isOpen }) {
     const [message, setMessage] = useState("");
     const [history, setHistory] = useState([]);
     const [chatPort, setChatPort] = useState(null);
@@ -95,6 +95,16 @@ export default function AssistantChat({ isOpen, onClose }) {
         }
     };
 
+    const handleCopy = async (text) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            console.log("Copied to clipboard");
+        }
+        catch (err) {
+            console.error("Clipboard copy failed:", err);
+        }
+    };
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -103,7 +113,7 @@ export default function AssistantChat({ isOpen, onClose }) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 40 }}
                     transition={{ duration: 0.3 }}
-                    className="fixed bottom-28 left-6 w-80 bg-black/80 backdrop-blur-md border border-cyan-500 rounded-2xl shadow-lg p-4 text-white z-[60]"
+                    className="fixed bottom-28 left-6 w-80 bg-black/80 backdrop-blur-md rounded-2xl shadow-lg p-4 text-white z-[60]"
                 >
                     <div className="flex justify-between items-center mb-2 text-xs text-cyan-300">
                         <span>Byte Chat</span>
@@ -122,7 +132,16 @@ export default function AssistantChat({ isOpen, onClose }) {
                                         : "bg-gray-800/40 text-left"
                                 }`}
                             >
-                                {msg.text}
+                                <div>{msg.text}</div>
+
+                                {msg.from === "assistant" && (
+                                    <button
+                                        onClick={() => handleCopy(msg.text)}
+                                        className="mt-2.5 text-[12px] text-cyan-300 hover:text-cyan-100 underline"
+                                    >
+                                        Copy
+                                    </button>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -149,14 +168,8 @@ export default function AssistantChat({ isOpen, onClose }) {
                         >
                             Send
                         </button>
-                    </div>
 
-                    <button
-                        onClick={onClose}
-                        className="absolute top-2 right-3 text-cyan-400 hover:text-cyan-200 text-xs"
-                    >
-                        ✕
-                    </button>
+                    </div>
                 </motion.div>
             )}
         </AnimatePresence>

@@ -1,9 +1,87 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-const apps = ["Paint", "Files", "Settings", "3D Viewer", "MusicLibrary", "OrcaSlicer",
-    "Game Collection", "Solar System", "FreeCAD", "Weather", "Text Editor"];
+const apps = [
+    "Paint",
+    "Files",
+    "Settings",
+    "3D Viewer",
+    "MusicLibrary",
+    "OrcaSlicer",
+    "Game Collection",
+    "Solar System",
+    "FreeCAD",
+    "Weather",
+    "Text Editor",
+];
 
+// Basis-Styles als JS-Objekte, damit es übersichtlich bleibt
+const wrapperStyle = {
+    position: "relative",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "480px",
+    overflow: "hidden",
+    width: "100%",        // NEU
+};
+
+const dragSurfaceStyle = {
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    touchAction: "none",
+    background: "transparent",
+    zIndex: 0,
+};
+const gridContainerStyle = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    maxHeight: "480px",
+    paddingTop: "1.5rem",
+    paddingBottom: "1.5rem",
+    overflowY: "hidden",
+    zIndex: 0,
+    width: "100%",        // NEU: volle Breite
+};
+const gridRowStyle = {
+    display: "flex",
+    justifyContent: "center",
+    gap: "1rem",
+    marginBottom: "1rem",
+    width: "100%",        // NEU: Reihe nutzt auch volle Breite
+};
+
+const carouselContainerStyle = {
+    position: "relative",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: "100%",
+    pointerEvents: "none",
+    zIndex: 0,
+};
+
+const bubbleBaseStyle = {
+    width: "8rem",
+    height: "8rem",
+    borderRadius: "9999px",
+    backgroundColor: "rgba(8,145,178,0.3)", // ungefähr bg-cyan-700/30
+    color: "#ffffff",
+    fontSize: "1.25rem",
+    fontWeight: 600,
+    border: "1px solid #22d3ee", // cyan-500
+    backdropFilter: "blur(10px)",
+    transition: "box-shadow 0.3s ease",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    boxShadow: "0 0 20px rgba(0,255,255,0.6)",
+};
 
 export default function AppCarousel({ onSelect, startInGrid = false }) {
     const [current, setCurrent] = useState(0);
@@ -51,24 +129,17 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
     };
 
     return (
-        <div className="relative flex justify-center items-center h-[320px] overflow-hidden">
-            {/* 🔹 Eine kombinierte Drag-Fläche (X & Y gleichzeitig) */}
+        <div style={wrapperStyle}>
+            {/* kombinierte Drag-Fläche (X & Y gleichzeitig) */}
             <motion.div
-                className="absolute inset-0 z-0"
                 drag
                 dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
                 onDragEnd={handleDragEnd}
-                style={{
-                    width: "100%",
-                    height: "100%",
-                    touchAction: "none",
-                    background: "transparent",
-                }}
+                style={dragSurfaceStyle}
             />
 
             {isGrid ? (
-                <div className="flex flex-col items-center overflow-y-auto max-h-[300px] py-4 z-0">
-                    {/* Teile Apps in Gruppen von 5 pro Zeile */}
+                <div style={gridContainerStyle}>
                     {(() => {
                         const rows = [];
                         const appsPerRow = 5;
@@ -76,17 +147,14 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
                         for (let i = 0; i < apps.length; i += appsPerRow) {
                             const rowApps = apps.slice(i, i + appsPerRow);
                             rows.push(
-                                <div key={i} className="flex justify-center gap-4 mb-4">
+                                <div key={i} style={gridRowStyle}>
                                     {rowApps.map((app) => (
                                         <motion.button
                                             key={app}
                                             onClick={() => onSelect(app, true)}
-                                            whileHover={{ scale: 1.1, boxShadow: "0 0 30px rgba(0,255,255,0.8)" }}
+                                            whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.95 }}
-                                            style={{
-                                                boxShadow: "0 0 20px rgba(0,255,255,0.6)"
-                                            }}
-                                            className="w-32 h-32 rounded-full bg-cyan-700/30 text-white text-xl font-semibold border border-cyan-500 backdrop-blur-md transition-shadow duration-300"
+                                            style={bubbleBaseStyle}
                                         >
                                             {app}
                                         </motion.button>
@@ -98,10 +166,11 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
                     })()}
                 </div>
             ) : (
-                <div className="relative flex justify-center items-center w-full h-full pointer-events-none z-0">
+                <div style={carouselContainerStyle}>
                     {apps.map((app, i) => {
                         const rel = getRelativeIndex(i);
                         if (rel === null) return null;
+
                         const translateX = rel * 120;
                         const rotateY = rel * -6;
                         const scale = rel === 0 ? 1.25 : 1.0;
@@ -113,17 +182,13 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
                                 key={app}
                                 animate={{ x: translateX, scale, opacity, rotateY }}
                                 transition={{ type: "spring", stiffness: 120, damping: 15 }}
-                                className="absolute pointer-events-auto"
-                                style={{ zIndex }}
+                                style={{ position: "absolute", pointerEvents: "auto", zIndex }}
                             >
                                 <motion.button
                                     onClick={() => onSelect(app, false)}
-                                    whileHover={{ scale: 1.1, boxShadow: "0 0 30px rgba(0,255,255,0.8)" }}
+                                    whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.95 }}
-                                    style={{
-                                        boxShadow: "0 0 20px rgba(0,255,255,0.6)"
-                                    }}
-                                    className="w-32 h-32 rounded-full bg-cyan-700/30 text-white text-xl font-semibold border border-cyan-500 backdrop-blur-md transition-shadow duration-300"
+                                    style={bubbleBaseStyle}
                                 >
                                     {app}
                                 </motion.button>

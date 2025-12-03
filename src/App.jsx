@@ -39,6 +39,7 @@ function App() {
     }
 
     return (
+
         <div
             className="min-h-screen text-white font-orbitron relative overflow-hidden"
             style={{
@@ -127,6 +128,7 @@ function App() {
             {/* Byte-Indikator bleibt immer sichtbar */}
             <ByteIndicator isActive={isActive} />
         </div>
+
     );
 }
 
