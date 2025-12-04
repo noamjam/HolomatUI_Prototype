@@ -15,7 +15,6 @@ const apps = [
     "Text Editor",
 ];
 
-// Basis-Styles als JS-Objekte
 const wrapperStyle = {
     position: "relative",
     display: "flex",
@@ -24,16 +23,6 @@ const wrapperStyle = {
     height: "480px",
     overflow: "hidden",
     width: "100%",
-};
-
-const dragSurfaceStyle = {
-    position: "absolute",
-    inset: 0,
-    width: "100%",
-    height: "100%",
-    touchAction: "none",
-    background: "transparent",
-    zIndex: -1, // oberste Ebene, bekommt alle Swipes
 };
 
 const gridContainerStyle = {
@@ -96,23 +85,23 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
     const rotateRight = () =>
         setCurrent((prev) => (prev + 1) % apps.length);
 
-    const handleDragEnd = (event, info) => {
+    const handlePanEnd = (event, info) => {
         const offsetX = info.offset.x;
         const velocityX = info.velocity.x;
         const offsetY = info.offset.y;
         const velocityY = info.velocity.y;
 
-        // Horizontal wischen → App wechseln
+        // Horizontal swipe → change app
         if (Math.abs(offsetX) > Math.abs(offsetY)) {
             if (offsetX < -30 || velocityX < -300) rotateRight();
             else if (offsetX > 30 || velocityX > 300) rotateLeft();
         } else {
-            // Vertikal wischen → Grid öffnen/schließen
+            // Vertical swipe → toggle grid
             if (offsetY < -50 || velocityY < -300) {
-                console.log("Swipe nach oben → Grid öffnen");
+                console.log("Swipe up → open grid");
                 setIsGrid(true);
             } else if (offsetY > 50 || velocityY > 300) {
-                console.log("Swipe nach unten → zurück zum Carousel");
+                console.log("Swipe down → back to carousel");
                 setIsGrid(false);
             }
         }
@@ -129,11 +118,9 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
 
     return (
         <div style={wrapperStyle}>
-            {/* äußerer, unsichtbarer Rahmen für Drag-Gesten */}
+            {/* gesture surface: reacts to pans, but does NOT drag itself */}
             <motion.div
-                drag
-                dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                onDragEnd={handleDragEnd}
+                onPanEnd={handlePanEnd}
                 style={{
                     position: "relative",
                     width: "100%",
@@ -182,12 +169,11 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
                             const rotateY = rel * -1;
                             const scale = rel === 0 ? 1.1 : 0.95;
                             const zIndex = rel === 0 ? 10 : 5;
-                            const opacity = 1;
 
                             return (
                                 <motion.div
                                     key={app}
-                                    animate={{ x: translateX, scale, opacity, rotateY }}
+                                    animate={{ x: translateX, scale, rotateY }}
                                     transition={{ type: "spring", stiffness: 80, damping: 30 }}
                                     style={{ position: "absolute", pointerEvents: "auto", zIndex }}
                                 >
@@ -207,5 +193,4 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
             </motion.div>
         </div>
     );
-
 }
