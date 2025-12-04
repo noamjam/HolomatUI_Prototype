@@ -294,7 +294,7 @@ export default function WeatherApp({ onBack }) {
                             border: "1px solid rgba(255,255,255,0.2)",
                             backgroundColor: "rgba(15,23,42,0.8)",
                             fontSize: "0.875rem",
-                            color: "black",
+                            color: "white",
                             outline: "none",
                         }}
                     />
