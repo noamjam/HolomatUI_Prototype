@@ -15,7 +15,7 @@ const apps = [
     "Text Editor",
 ];
 
-// Basis-Styles als JS-Objekte, damit es übersichtlich bleibt
+// Basis-Styles als JS-Objekte
 const wrapperStyle = {
     position: "relative",
     display: "flex",
@@ -23,7 +23,7 @@ const wrapperStyle = {
     alignItems: "center",
     height: "480px",
     overflow: "hidden",
-    width: "100%",        // NEU
+    width: "100%",
 };
 
 const dragSurfaceStyle = {
@@ -33,8 +33,9 @@ const dragSurfaceStyle = {
     height: "100%",
     touchAction: "none",
     background: "transparent",
-    zIndex: 0,
+    zIndex: 10, // oberste Ebene, bekommt alle Swipes
 };
+
 const gridContainerStyle = {
     display: "flex",
     flexDirection: "column",
@@ -43,15 +44,16 @@ const gridContainerStyle = {
     paddingTop: "1.5rem",
     paddingBottom: "1.5rem",
     overflowY: "hidden",
-    zIndex: 0,
-    width: "100%",        // NEU: volle Breite
+    width: "100%",
+    pointerEvents: "none", // Container blockiert keine Drags
 };
+
 const gridRowStyle = {
     display: "flex",
     justifyContent: "center",
     gap: "1rem",
     marginBottom: "1rem",
-    width: "100%",        // NEU: Reihe nutzt auch volle Breite
+    width: "100%",
 };
 
 const carouselContainerStyle = {
@@ -61,7 +63,7 @@ const carouselContainerStyle = {
     alignItems: "center",
     width: "100%",
     height: "100%",
-    pointerEvents: "none",
+    pointerEvents: "none", // wie vorher
     zIndex: 0,
 };
 
@@ -69,11 +71,11 @@ const bubbleBaseStyle = {
     width: "8rem",
     height: "8rem",
     borderRadius: "9999px",
-    backgroundColor: "rgba(8,145,178,0.3)", // ungefähr bg-cyan-700/30
+    backgroundColor: "rgba(8,145,178,0.3)",
     color: "#ffffff",
     fontSize: "1.25rem",
     fontWeight: 600,
-    border: "1px solid #22d3ee", // cyan-500
+    border: "1px solid #22d3ee",
     backdropFilter: "blur(10px)",
     transition: "box-shadow 0.3s ease",
     display: "flex",
@@ -106,9 +108,8 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
         if (Math.abs(offsetX) > Math.abs(offsetY)) {
             if (offsetX < -30 || velocityX < -300) rotateRight();
             else if (offsetX > 30 || velocityX > 300) rotateLeft();
-        }
-        // Vertikal wischen → Grid öffnen/schließen
-        else {
+        } else {
+            // Vertikal wischen → Grid öffnen/schließen
             if (offsetY < -50 || velocityY < -300) {
                 console.log("Swipe nach oben → Grid öffnen");
                 setIsGrid(true);
@@ -154,7 +155,7 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
                                             onClick={() => onSelect(app, true)}
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.95 }}
-                                            style={bubbleBaseStyle}
+                                            style={{ ...bubbleBaseStyle, pointerEvents: "auto" }} // Buttons klickbar
                                         >
                                             {app}
                                         </motion.button>
@@ -188,7 +189,7 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
                                     onClick={() => onSelect(app, false)}
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.95 }}
-                                    style={bubbleBaseStyle}
+                                    style={{ ...bubbleBaseStyle, pointerEvents: "auto" }}
                                 >
                                     {app}
                                 </motion.button>
