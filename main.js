@@ -69,7 +69,7 @@ function startByteAssistant() {
 
     const pythonCmd = process.platform === "win32"
         ? path.resolve(__dirname, "./byte-assistant/.venv/Scripts/python.exe")
-        : path.resolve(__dirname, "./byte-assistant/.venv/bin/python");
+        : path.resolve(__dirname, ".venv1/bin/python");
 
     console.log("🚀 Starting Byte assistant...");
     byteProcess = spawn(pythonCmd, [scriptPath], { cwd: path.dirname(scriptPath) });
@@ -100,7 +100,7 @@ async function startChatAssistant() {
 
         const pythonCmd = process.platform === "win32"
             ? path.resolve(__dirname, "./byte-assistant/.venv/Scripts/python.exe")
-            : path.resolve(__dirname, "./byte-assistant/.venv/bin/python");
+            : path.resolve(__dirname, ".venv1/bin/python");
         const freePort = await findFreePort(5050);
 
         global.chatPort = freePort;
