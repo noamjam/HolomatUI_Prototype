@@ -32,7 +32,7 @@ export default function MusicLibrary({ onBack }) {
     };
 
     const openFileDialog = () => {
-        document.getElementById("fileInput").click();
+        document.getElementById("music-file-input")?.click();
     };
 
     const activeTrack = customTrack || tracks[currentTrack];
