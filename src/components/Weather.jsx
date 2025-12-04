@@ -9,6 +9,7 @@ const initialPresets = [
 ];
 
 export default function WeatherApp({ onBack }) {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [presets, setPresets] = useState(initialPresets);
     const [selectedPreset, setSelectedPreset] = useState(initialPresets[0]);
     const [weather, setWeather] = useState(null);
@@ -18,17 +19,21 @@ export default function WeatherApp({ onBack }) {
     const [searchCity, setSearchCity] = useState("");
     const [searchResult, setSearchResult] = useState(null);
 
-    // Wetter vom ausgewählten Ort abrufen
+
+// Wetter vom ausgewählten Ort abrufen
     useEffect(() => {
         if (!selectedPreset) return;
         setLoading(true);
         setError(null);
 
         const { lat, lon } = selectedPreset;
-        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
-    .then(res => res.json())
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&timezone=auto`)
+            .then(res => res.json())
             .then(data => {
-                setWeather(data.current_weather);
+                setWeather({
+                    current: data.current_weather,
+                    daily: data.daily
+                });
                 setLoading(false);
             })
             .catch(err => {
@@ -38,6 +43,92 @@ export default function WeatherApp({ onBack }) {
             });
     }, [selectedPreset]);
 
+    function getSuggestedCityFromIpLocation(ipData) {
+        const { city, country } = ipData;
+
+// Österreich-spezifische Heuristik
+        if (country === "Austria") {
+// Steiermark
+            if (city && /graz|frohnleiten|bruck an der mur|leoben/i.test(city)) {
+                return { name: "Graz", lat: 47.0707, lon: 15.4395 };
+            }
+// Niederösterreich (Beispiele)
+            if (city && /st\.? p[oö]lten|krems|tulln|amstetten/i.test(city)) {
+                return { name: "St. Pölten", lat: 48.2043, lon: 15.6254 };
+            }
+// Wien und Umfeld
+            if (city && /wien|klosterneuburg|bruck an der leitha/i.test(city)) {
+                return { name: "Wien", lat: 48.20849, lon: 16.37208 };
+            }
+        }
+// Fallback: einfach IP-Stadt selbst verwenden
+        return null;
+    }
+
+    const handleUseMyLocation = async () => {
+        if (!window.electronAPI?.getApproxLocation) {
+            setError("Standort-Ermittlung ist in dieser Umgebung nicht verfügbar.");
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const ipData = await window.electronAPI.getApproxLocation(); // {lat, lon, city, country}
+
+            if (!ipData) {
+                setError("Konnte ungefähren Standort nicht bestimmen.");
+                setLoading(false);
+                return;
+            }
+
+// Vorschlag
+            const suggestedCity = getSuggestedCityFromIpLocation(ipData);
+
+            let finalLocation;
+
+            if (suggestedCity) {
+                const useSuggested = window.confirm(
+                    `Ihr ungefährer Standort wurde als ${ipData.city || "unbekannt"} erkannt.\n` +
+                    `Möchten Sie stattdessen die nächstgrößere Stadt verwenden? (Vorschlag: ${suggestedCity.name})`
+                );
+
+                if (useSuggested) {
+                    finalLocation = suggestedCity;
+                } else {
+                    finalLocation = {
+                        name: ipData.city
+                            ? `${ipData.city} (${ipData.country})`
+                            : "Mein Standort (IP)",
+                        lat: ipData.lat,
+                        lon: ipData.lon,
+                    };
+                }
+            } else {
+// Kein spezieller Vorschlag -> IP-Daten direkt nutzen
+                finalLocation = {
+                    name: ipData.city
+                        ? `${ipData.city} (${ipData.country})`
+                        : "Mein Standort (IP)",
+                    lat: ipData.lat,
+                    lon: ipData.lon,
+                };
+            }
+
+            setSelectedPreset(finalLocation);
+// Optional: in Presets aufnehmen
+// setPresets(prev => [...prev, finalLocation]);
+
+        } catch (e) {
+            console.error(e);
+            setError("Fehler beim Ermitteln des ungefähren Standorts.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
     const handleSearch = async (e) => {
         e.preventDefault();
         if (!searchCity) return;
@@ -45,7 +136,7 @@ export default function WeatherApp({ onBack }) {
         setLoading(true);
         setError(null);
 
-        // Open-Meteo Geocoding API
+// Open-Meteo Geocoding API
         const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchCity)}&count=1`;
         const res = await fetch(geoUrl).then(r => r.json());
 
@@ -58,10 +149,10 @@ export default function WeatherApp({ onBack }) {
         }
         setLoading(false);
     };
-    // add button
+// add button
     const handleAddPreset = () => {
         if (!searchResult) return;
-        // Prüfen ob Stadt schon existiert
+// Prüfen ob Stadt schon existiert
         const alreadyPreset = presets.some(p =>
             p.name === searchResult.name &&
             Math.abs(p.lat - searchResult.latitude) < 0.0001 &&
@@ -80,99 +171,672 @@ export default function WeatherApp({ onBack }) {
         setSearchCity("");
     };
     return (
-        <div className="flex flex-col items-center justify-center h-full bg-gradient-to-b from-blue-700 via-blue-300 to-white text-black p-4">
-            <button
-                className="bg-cyan-700 px-3 py-2 rounded text-white mb-4"
-                onClick={onBack}
-            >⬅ Zurück</button>
-
-            <h2 className="text-2xl font-bold mb-6">Wetter</h2>
-
-            <form onSubmit={handleSearch} className="mb-4 flex gap-2">
-                <input
-                    type="text"
-                    placeholder="Suche beliebige Stadt..."
-                    value={searchCity}
-                    onChange={e => setSearchCity(e.target.value)}
-                    className="px-3 py-1 rounded border border-gray-400 text-black"
-                    style={{ color: 'black', minWidth: 180 }}
-                />
+        <div
+            style={{
+                height: "100%",
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-between",
+                overflow: "hidden",
+                backgroundImage:
+                    "radial-gradient(circle at top, #38bdf8 0, #0f172a 55%, #020617 100%)",
+                color: "#e2e8f0",
+            }}
+        >
+            <aside
+                style={{
+                    flexShrink: 0,
+                    overflow: "hidden",
+                    transitionProperty: "width",
+                    transitionDuration: "300ms",
+                    transitionTimingFunction: "ease-in-out",
+                    width: isSidebarOpen ? "16rem" : "3rem",
+                    backgroundColor: "rgba(2,6,23,0.7)",
+                    backdropFilter: "blur(24px)",
+                    borderRight: "1px solid rgba(255,255,255,0.1)",
+                    boxShadow: "0 25px 80px rgba(15,23,42,0.95)",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
                 <button
-                    type="submit"
-                    className="bg-orange-500 px-4 py-1 rounded text-white font-bold"
-                >Suchen</button>
-                {searchResult && (
-                    <button
-                        type="button"
-                        className="bg-green-600 px-3 py-1 rounded text-white font-bold"
-                        onClick={handleAddPreset}
-                    >
-                        Hinzufügen
-                    </button>
-                )}
-            </form>
-
-            {searchResult && (
-                <div className="mb-2 text-green-700 text-sm">
-                    Gefunden: {searchResult.name}{searchResult.country ? `, ${searchResult.country} `: ""}
-                </div>
-            )}
-            <label htmlFor="city-select" className="font-bold">
-                Ort:
-                <br />
-                <select
-                    id="city-select"
-                    value={selectedPreset.name}
-                    onChange={e => {
-                        const preset = presets.find(p => p.name === e.target.value);
-                        setSelectedPreset(preset);
+                    onClick={() => setIsSidebarOpen(o => !o)}
+                    style={{
+                        margin: "0.75rem",
+                        marginBottom: "1rem",
+                        display: "inline-flex",
+                        height: "2.25rem",
+                        width: "2.25rem",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: "1rem",
+                        backgroundColor: "rgba(255,255,255,0.1)",
+                        border: "1px solid rgba(255,255,255,0.2)",
+                        fontSize: "0.875rem",
+                        cursor: "pointer",
                     }}
-                    className="px-2 py-1 rounded border-2 border-orange-400 font-semibold "
-                    style={{color: 'black', minWidth: 120 }}
                 >
-                    {presets.map(preset => (
-                        <option key={preset.name} value={preset.name} className={"text-black"}>
-                            {preset.name}
-                        </option>
-                    ))}
-                </select>
-            </label>
+                    {isSidebarOpen ? "⟨" : "⟩"}
+                </button>
 
-            {loading && <div>Lade Wetterdaten...</div>}
-            {error && <div className="text-red-600">{error}</div>}
+                {/* Städte-Liste */}
+                <div
+                    style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        paddingLeft: "0.5rem",
+                        paddingRight: "0.5rem",
+                        paddingBottom: "1rem",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "0.25rem",
+                    }}
+                >
+                    {presets.map(city => {
+                        const isActive = selectedPreset?.name === city.name;
+                        return (
+                            <button
+                                key={city.name}
+                                onClick={() => setSelectedPreset(city)}
+                                style={{
+                                    width: "100%",
+                                    textAlign: "left",
+                                    padding: "0.5rem 0.75rem",
+                                    borderRadius: "1rem",
+                                    fontSize: "0.875rem",
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    transition:
+                                        "background-color 150ms ease, color 150ms ease, box-shadow 150ms ease",
+                                    backgroundColor: isActive
+                                        ? "rgba(56,189,248,0.8)"
+                                        : "rgba(255,255,255,0.05)",
+                                    color: isActive ? "#020617" : "#f9fafb",
+                                    boxShadow: isActive
+                                        ? "0 14px 35px rgba(56,189,248,0.9)"
+                                        : "none",
+                                    border: "none",
+                                    cursor: "pointer",
+                                }}
+                            >
+                                {isSidebarOpen ? city.name : city.name[0]}
+                            </button>
+                        );
+                    })}
+                </div>
 
-            {weather && (
-                <div className="bg-white/80 rounded-lg p-6 mt-2 shadow-lg">
-                    <div className="text-xl font-semibold mb-2">
-                        {selectedPreset.name}
+                {/* Suche + Hinzufügen in der Sidebar */}
+                <form
+                    onSubmit={handleSearch}
+                    style={{
+                        paddingLeft: "0.75rem",
+                        paddingRight: "0.75rem",
+                        paddingBottom: "0.75rem",
+                        paddingTop: "0.75rem",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "0.5rem",
+                        borderTop: "1px solid rgba(255,255,255,0.1)",
+                    }}
+                >
+                    <input
+                        type="text"
+                        placeholder="Suche Stadt..."
+                        value={searchCity}
+                        onChange={e => setSearchCity(e.target.value)}
+                        style={{
+                            paddingLeft: "0.75rem",
+                            paddingRight: "0.75rem",
+                            paddingTop: "0.5rem",
+                            paddingBottom: "0.5rem",
+                            borderRadius: "1rem",
+                            border: "1px solid rgba(255,255,255,0.2)",
+                            backgroundColor: "rgba(15,23,42,0.8)",
+                            fontSize: "0.875rem",
+                            color: "black",
+                            outline: "none",
+                        }}
+                    />
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "0.5rem",
+                        }}
+                    >
+                        <button
+                            type="submit"
+                            style={{
+                                flex: 1,
+                                backgroundColor: "#38bdf8",
+                                padding: "0.5rem 0.75rem",
+                                borderRadius: "1rem",
+                                fontSize: "0.75rem",
+                                fontWeight: 600,
+                                color: "#020617",
+                                boxShadow: "0 4px 6px rgba(15,23,42,0.4)",
+                                border: "none",
+                                cursor: "pointer",
+                                transition: "background-color 150ms ease",
+                            }}
+                            onMouseOver={e =>
+                                ((e.currentTarget.style.backgroundColor = "#0ea5e9"))
+                            }
+                            onMouseOut={e =>
+                                ((e.currentTarget.style.backgroundColor = "#38bdf8"))
+                            }
+                        >
+                            Suchen
+                        </button>
+                        {searchResult && (
+                            <button
+                                type="button"
+                                onClick={handleAddPreset}
+                                style={{
+                                    flex: 1,
+                                    backgroundColor: "#34d399",
+                                    padding: "0.5rem 0.75rem",
+                                    borderRadius: "1rem",
+                                    fontSize: "0.75rem",
+                                    fontWeight: 600,
+                                    color: "#020617",
+                                    boxShadow: "0 4px 6px rgba(15,23,42,0.4)",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    transition: "background-color 150ms ease",
+                                }}
+                                onMouseOver={e =>
+                                    ((e.currentTarget.style.backgroundColor = "#22c55e"))
+                                }
+                                onMouseOut={e =>
+                                    ((e.currentTarget.style.backgroundColor = "#34d399"))
+                                }
+                            >
+                                Hinzufügen
+                            </button>
+                        )}
                     </div>
-                    <div className="text-4xl font-bold mb-1">
-                        {weather.temperature}°C
-                    </div>
-                    <div className="mb-1">
-                        Wind: {weather.windspeed} km/h
-                    </div>
-                    <div className="mb-1">
-                        Wetter: {translateWeatherCode(weather.weathercode)}
-                    </div>
-                    <div className="mb-1">
-                        Letztes Update um {weather.time}
-                    </div>
+                    {searchResult && (
+                        <div
+                            style={{
+                                marginTop: "0.25rem",
+                                fontSize: "11px",
+                                color: "#a7f3d0",
+                                textAlign: "center",
+                            }}
+                        >
+                            Gefunden: {searchResult.name}
+                            {searchResult.country ? `, ${searchResult.country}` : ""}
+                        </div>
+                    )}
+                </form>
+            </aside>
+
+            {/* RECHTE SEITE: WEATHER-CARD */}
+            <div
+                style={{
+                    display: "flex",
+                    flex: 1,
+                    alignItems: "center",
+                    padding: "1.5rem",
+                }}
+            >
+                <div
+                    style={{
+                        width: 1020,
+                        height: 860,
+                        marginRight: 40,
+                        marginTop: 24,
+                        marginBottom: 24,
+                        flexShrink: 0,
+                        position: "relative",
+                        borderRadius: 32,
+                        backgroundColor: "rgba(255,255,255,0.1)",
+                        border: "1px solid rgba(255,255,255,0.2)",
+                        boxShadow: "0 30px 80px rgba(15,23,42,0.95)",
+                        backdropFilter: "blur(24px)",
+                        padding: "1.5rem 2rem",
+                        overflow: "hidden",
+                    }}
+                >
+                    {/* innerer Glas-Rand */}
+                    <div
+                        style={{
+                            pointerEvents: "none",
+                            position: "absolute",
+                            inset: 1,
+                            borderRadius: 30,
+                            border: "1px solid rgba(255,255,255,0.1)",
+                            boxShadow: "inset 0 0 30px rgba(148,163,184,0.35)",
+                        }}
+                    />
+
+                    {/* HEADERBAR */}
+                    <header
+                        style={{
+                            position: "relative",
+                            zIndex: 10,
+                            width: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            marginBottom: "2rem",
+                        }}
+                    >
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.75rem",
+                            }}
+                        >
+                            <div
+                                style={{
+                                    height: "2.25rem",
+                                    width: "2.25rem",
+                                    borderRadius: "9999px",
+                                    backgroundImage:
+                                        "linear-gradient(to bottom right, #fbbf24, #facc15, #f97316)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    fontSize: "1.125rem",
+                                    boxShadow: "0 10px 25px rgba(251,191,36,0.7)",
+                                }}
+                            >
+                                ☀️
+                            </div>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    lineHeight: 1.1,
+                                }}
+                            >
+              <span
+                  style={{
+                      fontSize: "0.75rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.25em",
+                      color: "rgba(224,242,254,0.7)",
+                  }}
+              >
+                Interactive
+              </span>
+                                <span
+                                    style={{
+                                        fontSize: "1.125rem",
+                                        fontWeight: 600,
+                                    }}
+                                >
+                Weather
+              </span>
+                            </div>
+                        </div>
+
+                        <button
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.5rem",
+                                borderRadius: "9999px",
+                                backgroundColor: "rgba(15,23,42,0.7)",
+                                padding: "0.375rem 1rem",
+                                fontSize: "0.75rem",
+                                fontWeight: 500,
+                                border: "1px solid rgba(100,116,139,0.7)",
+                                boxShadow:
+                                    "0 10px 25px rgba(15,23,42,0.9), inset 0 1px 0 rgba(148,163,184,0.4)",
+                                backdropFilter: "blur(16px)",
+                                color: "#e5e7eb",
+                                cursor: "pointer",
+                                transition: "background-color 150ms ease",
+                            }}
+                            onMouseOver={e =>
+                                ((e.currentTarget.style.backgroundColor = "#0f172a"))
+                            }
+                            onMouseOut={e =>
+                                ((e.currentTarget.style.backgroundColor = "rgba(15,23,42,0.7)"))
+                            }
+                            onClick={onBack}
+                        >
+                            <span style={{ fontSize: "1rem" }}>⬅</span>
+                            <span>Zurück</span>
+                        </button>
+                    </header>
+
+                    {/* STATUS */}
+                    {loading && (
+                        <div
+                            style={{
+                                position: "relative",
+                                zIndex: 10,
+                                textAlign: "center",
+                                fontSize: "0.875rem",
+                                color: "rgba(241,245,249,0.8)",
+                                marginBottom: "0.5rem",
+                            }}
+                        >
+                            Lade Wetterdaten...
+                        </div>
+                    )}
+                    {error && (
+                        <div
+                            style={{
+                                position: "relative",
+                                zIndex: 10,
+                                textAlign: "center",
+                                fontSize: "0.875rem",
+                                color: "#fecaca",
+                                marginBottom: "0.5rem",
+                            }}
+                        >
+                            {error}
+                        </div>
+                    )}
+
+                    {/* WETTER-INHALT */}
+                    {weather && (
+                        <div
+                            style={{
+                                position: "relative",
+                                zIndex: 10,
+                            }}
+                        >
+                            {/* aktuelle Stadt + Temperatur */}
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    textAlign: "center",
+                                    marginBottom: "1.5rem",
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        fontSize: "0.75rem",
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.25em",
+                                        color: "rgba(241,245,249,0.8)",
+                                        marginBottom: "0.25rem",
+                                    }}
+                                >
+                                    {selectedPreset.name}
+                                </div>
+                                <div
+                                    style={{
+                                        marginBottom: "0.75rem",
+                                        display: "flex",
+                                        alignItems: "flex-end",
+                                        gap: "0.5rem",
+                                        borderRadius: 26,
+                                        backgroundColor: "rgba(2,6,23,0.5)",
+                                        border: "1px solid rgba(100,116,139,0.6)",
+                                        boxShadow:
+                                            "0 22px 55px rgba(15,23,42,1), inset 0 1px 0 rgba(248,250,252,0.16)",
+                                        padding: "0.75rem 1.5rem",
+                                    }}
+                                >
+                <span
+                    style={{
+                        fontSize: "4rem",
+                        fontWeight: 600,
+                        lineHeight: 1,
+                    }}
+                >
+                  {weather.current.temperature}°C
+                </span>
+                                </div>
+                                <div
+                                    style={{
+                                        fontSize: "0.75rem",
+                                        color: "rgba(241,245,249,0.85)",
+                                    }}
+                                >
+                                    Wind: {weather.current.windspeed} km/h
+                                </div>
+                                <div
+                                    style={{
+                                        fontSize: "0.75rem",
+                                        color: "rgba(241,245,249,0.85)",
+                                    }}
+                                >
+                                    Wetter: {translateWeatherCode(weather.current.weathercode)}
+                                </div>
+                                <div
+                                    style={{
+                                        marginTop: "0.25rem",
+                                        fontSize: "11px",
+                                        color: "rgba(226,232,240,0.7)",
+                                    }}
+                                >
+                                    Letztes Update um {weather.current.time}
+                                </div>
+                            </div>
+
+                            {/* Standort-Button */}
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    gap: "0.5rem",
+                                    marginBottom: "1rem",
+                                }}
+                            >
+                                <h3
+                                    style={{
+                                        fontSize: "0.875rem",
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    Standort
+                                </h3>
+                                <button
+                                    type="button"
+                                    onClick={handleUseMyLocation}
+                                    style={{
+                                        backgroundColor: "#38bdf8",
+                                        padding: "0.5rem 1.25rem",
+                                        borderRadius: "9999px",
+                                        fontSize: "0.75rem",
+                                        fontWeight: 600,
+                                        color: "#020617",
+                                        boxShadow: "0 18px 45px rgba(56,189,248,0.95)",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "0.5rem",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        transition: "background-color 150ms ease",
+                                    }}
+                                    onMouseOver={e =>
+                                        ((e.currentTarget.style.backgroundColor = "#0ea5e9"))
+                                    }
+                                    onMouseOut={e =>
+                                        ((e.currentTarget.style.backgroundColor = "#38bdf8"))
+                                    }
+                                >
+                                    <span>📍</span>
+                                    <span>Ungefähreren Standort finden</span>
+                                </button>
+                            </div>
+
+                            {/* Tageswerte-Kacheln */}
+                            {weather.daily && (
+                                <div
+                                    style={{
+                                        marginTop: "1rem",
+                                        display: "grid",
+                                        gridTemplateColumns: "repeat(4, minmax(0,1fr))",
+                                        gap: "0.75rem",
+                                    }}
+                                >
+                                    {/* Höchst */}
+                                    <div
+                                        style={{
+                                            backgroundColor: "rgba(2,6,23,0.6)",
+                                            borderRadius: "1rem",
+                                            padding: "0.75rem 1rem",
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            alignItems: "flex-start",
+                                            border: "1px solid rgba(71,85,105,0.7)",
+                                            boxShadow:
+                                                "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
+                                        }}
+                                    >
+                  <span
+                      style={{
+                          fontSize: "10px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.22em",
+                          color: "rgba(203,213,225,0.8)",
+                      }}
+                  >
+                    Höchst
+                  </span>
+                                        <span
+                                            style={{
+                                                marginTop: "0.25rem",
+                                                fontSize: "1.25rem",
+                                                fontWeight: 600,
+                                            }}
+                                        >
+                    {weather.daily.temperature_2m_max[0]}°C
+                  </span>
+                                    </div>
+
+                                    {/* Tiefst */}
+                                    <div
+                                        style={{
+                                            backgroundColor: "rgba(2,6,23,0.6)",
+                                            borderRadius: "1rem",
+                                            padding: "0.75rem 1rem",
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            alignItems: "flex-start",
+                                            border: "1px solid rgba(71,85,105,0.7)",
+                                            boxShadow:
+                                                "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
+                                        }}
+                                    >
+                  <span
+                      style={{
+                          fontSize: "10px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.22em",
+                          color: "rgba(203,213,225,0.8)",
+                      }}
+                  >
+                    Tiefst
+                  </span>
+                                        <span
+                                            style={{
+                                                marginTop: "0.25rem",
+                                                fontSize: "1.25rem",
+                                                fontWeight: 600,
+                                            }}
+                                        >
+                    {weather.daily.temperature_2m_min[0]}°C
+                  </span>
+                                    </div>
+
+                                    {/* Max. Wind */}
+                                    <div
+                                        style={{
+                                            backgroundColor: "rgba(2,6,23,0.6)",
+                                            borderRadius: "1rem",
+                                            padding: "0.75rem 1rem",
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            alignItems: "flex-start",
+                                            border: "1px solid rgba(71,85,105,0.7)",
+                                            boxShadow:
+                                                "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
+                                        }}
+                                    >
+                  <span
+                      style={{
+                          fontSize: "10px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.22em",
+                          color: "rgba(203,213,225,0.8)",
+                      }}
+                  >
+                    Max. Wind
+                  </span>
+                                        <span
+                                            style={{
+                                                marginTop: "0.25rem",
+                                                fontSize: "1.25rem",
+                                                fontWeight: 600,
+                                            }}
+                                        >
+                    {weather.daily.windspeed_10m_max[0]} km/h
+                  </span>
+                                    </div>
+
+                                    {/* Regen heute */}
+                                    <div
+                                        style={{
+                                            backgroundColor: "rgba(2,6,23,0.6)",
+                                            borderRadius: "1rem",
+                                            padding: "0.75rem 1rem",
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            alignItems: "flex-start",
+                                            border: "1px solid rgba(71,85,105,0.7)",
+                                            boxShadow:
+                                                "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
+                                        }}
+                                    >
+                  <span
+                      style={{
+                          fontSize: "10px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.22em",
+                          color: "rgba(203,213,225,0.8)",
+                      }}
+                  >
+                    Regen heute
+                  </span>
+                                        <span
+                                            style={{
+                                                marginTop: "0.25rem",
+                                                fontSize: "1.25rem",
+                                                fontWeight: 600,
+                                            }}
+                                        >
+                    {weather.daily.precipitation_sum[0]} mm
+                  </span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {/* Footer */}
-                    <div className="text-center text-gray-400 text-xs mb-4">
+                    <div
+                        style={{
+                            position: "relative",
+                            zIndex: 10,
+                            marginTop: "1.5rem",
+                            textAlign: "center",
+                            fontSize: "11px",
+                            color: "rgba(226,232,240,0.7)",
+                        }}
+                    >
                         © 2025 Interactive Workbench — Credit to Open-Meteo.com Integration
                     </div>
                 </div>
-            )}
-
-            {/* Für spätere Erweiterung: Suchfeld für Orte */}
+            </div>
         </div>
     );
 }
-
-// Hilfsfunktion: Open-Meteo WeatherCode übersetzen
 function translateWeatherCode(code) {
-    // Die wichtigsten Codes laut API-Doku
+// Die wichtigsten Codes laut API-Doku
     const weatherCodes = {
         0: "Klar/Sonne",
         1: "Hauptsächlich klar",
@@ -188,7 +852,7 @@ function translateWeatherCode(code) {
         65: "Starker Regen",
         80: "Regen-Schauer",
         95: "Gewitter",
-        // ... ergänzbar!
+// ... ergänzbar!
     };
     return weatherCodes[code] || `Code${code}`;
-}
+};

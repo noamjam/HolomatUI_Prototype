@@ -3,5 +3,10 @@ byte-assistant/.venv
 node_modules/
 dist/
 /.venv1/
-
+/node_modules/
+/dist/
+/.idea/
+/byte-assistant/.venv
+__pycache__/
+.DS_Store
 *~
