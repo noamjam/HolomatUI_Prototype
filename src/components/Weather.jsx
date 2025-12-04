@@ -27,7 +27,8 @@ export default function WeatherApp({ onBack }) {
         setError(null);
 
         const { lat, lon } = selectedPreset;
-        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&timezone=auto`)
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` + `&current_weather=true` + `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,weathercode` + `&timezone=auto&forecast_days=8`
+        )
             .then(res => res.json())
             .then(data => {
                 setWeather({
@@ -183,6 +184,7 @@ export default function WeatherApp({ onBack }) {
                 color: "#e2e8f0",
             }}
         >
+            {/* SIDEBAR */}
             <aside
                 style={{
                     flexShrink: 0,
@@ -266,7 +268,7 @@ export default function WeatherApp({ onBack }) {
                     })}
                 </div>
 
-                {/* Suche + Hinzufügen in der Sidebar */}
+                {/* Suche + Hinzufügen */}
                 <form
                     onSubmit={handleSearch}
                     style={{
@@ -320,10 +322,10 @@ export default function WeatherApp({ onBack }) {
                                 transition: "background-color 150ms ease",
                             }}
                             onMouseOver={e =>
-                                ((e.currentTarget.style.backgroundColor = "#0ea5e9"))
+                                (e.currentTarget.style.backgroundColor = "#0ea5e9")
                             }
                             onMouseOut={e =>
-                                ((e.currentTarget.style.backgroundColor = "#38bdf8"))
+                                (e.currentTarget.style.backgroundColor = "#38bdf8")
                             }
                         >
                             Suchen
@@ -346,10 +348,10 @@ export default function WeatherApp({ onBack }) {
                                     transition: "background-color 150ms ease",
                                 }}
                                 onMouseOver={e =>
-                                    ((e.currentTarget.style.backgroundColor = "#22c55e"))
+                                    (e.currentTarget.style.backgroundColor = "#22c55e")
                                 }
                                 onMouseOut={e =>
-                                    ((e.currentTarget.style.backgroundColor = "#34d399"))
+                                    (e.currentTarget.style.backgroundColor = "#34d399")
                                 }
                             >
                                 Hinzufügen
@@ -372,7 +374,7 @@ export default function WeatherApp({ onBack }) {
                 </form>
             </aside>
 
-            {/* RECHTE SEITE: WEATHER-CARD */}
+            {/* RECHTE SEITE: CARD */}
             <div
                 style={{
                     display: "flex",
@@ -453,24 +455,24 @@ export default function WeatherApp({ onBack }) {
                                     lineHeight: 1.1,
                                 }}
                             >
-              <span
-                  style={{
-                      fontSize: "0.75rem",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.25em",
-                      color: "rgba(224,242,254,0.7)",
-                  }}
-              >
-                Interactive
-              </span>
+                <span
+                    style={{
+                        fontSize: "0.75rem",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.25em",
+                        color: "rgba(224,242,254,0.7)",
+                    }}
+                >
+                  Interactive
+                </span>
                                 <span
                                     style={{
                                         fontSize: "1.125rem",
                                         fontWeight: 600,
                                     }}
                                 >
-                Weather
-              </span>
+                  Weather
+                </span>
                             </div>
                         </div>
 
@@ -493,10 +495,11 @@ export default function WeatherApp({ onBack }) {
                                 transition: "background-color 150ms ease",
                             }}
                             onMouseOver={e =>
-                                ((e.currentTarget.style.backgroundColor = "#0f172a"))
+                                (e.currentTarget.style.backgroundColor = "#0f172a")
                             }
                             onMouseOut={e =>
-                                ((e.currentTarget.style.backgroundColor = "rgba(15,23,42,0.7)"))
+                                (e.currentTarget.style.backgroundColor =
+                                    "rgba(15,23,42,0.7)")
                             }
                             onClick={onBack}
                         >
@@ -578,15 +581,15 @@ export default function WeatherApp({ onBack }) {
                                         padding: "0.75rem 1.5rem",
                                     }}
                                 >
-                <span
-                    style={{
-                        fontSize: "4rem",
-                        fontWeight: 600,
-                        lineHeight: 1,
-                    }}
-                >
-                  {weather.current.temperature}°C
-                </span>
+                  <span
+                      style={{
+                          fontSize: "4rem",
+                          fontWeight: 600,
+                          lineHeight: 1,
+                      }}
+                  >
+                    {weather.current.temperature}°C
+                  </span>
                                 </div>
                                 <div
                                     style={{
@@ -652,10 +655,10 @@ export default function WeatherApp({ onBack }) {
                                         transition: "background-color 150ms ease",
                                     }}
                                     onMouseOver={e =>
-                                        ((e.currentTarget.style.backgroundColor = "#0ea5e9"))
+                                        (e.currentTarget.style.backgroundColor = "#0ea5e9")
                                     }
                                     onMouseOut={e =>
-                                        ((e.currentTarget.style.backgroundColor = "#38bdf8"))
+                                        (e.currentTarget.style.backgroundColor = "#38bdf8")
                                     }
                                 >
                                     <span>📍</span>
@@ -687,16 +690,16 @@ export default function WeatherApp({ onBack }) {
                                                 "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
                                         }}
                                     >
-                  <span
-                      style={{
-                          fontSize: "10px",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.22em",
-                          color: "rgba(203,213,225,0.8)",
-                      }}
-                  >
-                    Höchst
-                  </span>
+                    <span
+                        style={{
+                            fontSize: "10px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.22em",
+                            color: "rgba(203,213,225,0.8)",
+                        }}
+                    >
+                      Höchst
+                    </span>
                                         <span
                                             style={{
                                                 marginTop: "0.25rem",
@@ -704,8 +707,8 @@ export default function WeatherApp({ onBack }) {
                                                 fontWeight: 600,
                                             }}
                                         >
-                    {weather.daily.temperature_2m_max[0]}°C
-                  </span>
+                      {weather.daily.temperature_2m_max[0]}°C
+                    </span>
                                     </div>
 
                                     {/* Tiefst */}
@@ -722,16 +725,16 @@ export default function WeatherApp({ onBack }) {
                                                 "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
                                         }}
                                     >
-                  <span
-                      style={{
-                          fontSize: "10px",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.22em",
-                          color: "rgba(203,213,225,0.8)",
-                      }}
-                  >
-                    Tiefst
-                  </span>
+                    <span
+                        style={{
+                            fontSize: "10px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.22em",
+                            color: "rgba(203,213,225,0.8)",
+                        }}
+                    >
+                      Tiefst
+                    </span>
                                         <span
                                             style={{
                                                 marginTop: "0.25rem",
@@ -739,10 +742,9 @@ export default function WeatherApp({ onBack }) {
                                                 fontWeight: 600,
                                             }}
                                         >
-                    {weather.daily.temperature_2m_min[0]}°C
-                  </span>
+                      {weather.daily.temperature_2m_min[0]}°C
+                    </span>
                                     </div>
-
                                     {/* Max. Wind */}
                                     <div
                                         style={{
@@ -757,16 +759,16 @@ export default function WeatherApp({ onBack }) {
                                                 "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
                                         }}
                                     >
-                  <span
-                      style={{
-                          fontSize: "10px",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.22em",
-                          color: "rgba(203,213,225,0.8)",
-                      }}
-                  >
-                    Max. Wind
-                  </span>
+                    <span
+                        style={{
+                            fontSize: "10px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.22em",
+                            color: "rgba(203,213,225,0.8)",
+                        }}
+                    >
+                      Max. Wind
+                    </span>
                                         <span
                                             style={{
                                                 marginTop: "0.25rem",
@@ -774,8 +776,8 @@ export default function WeatherApp({ onBack }) {
                                                 fontWeight: 600,
                                             }}
                                         >
-                    {weather.daily.windspeed_10m_max[0]} km/h
-                  </span>
+                      {weather.daily.windspeed_10m_max[0]} km/h
+                    </span>
                                     </div>
 
                                     {/* Regen heute */}
@@ -792,16 +794,16 @@ export default function WeatherApp({ onBack }) {
                                                 "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
                                         }}
                                     >
-                  <span
-                      style={{
-                          fontSize: "10px",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.22em",
-                          color: "rgba(203,213,225,0.8)",
-                      }}
-                  >
-                    Regen heute
-                  </span>
+                    <span
+                        style={{
+                            fontSize: "10px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.22em",
+                            color: "rgba(203,213,225,0.8)",
+                        }}
+                    >
+                      Regen heute
+                    </span>
                                         <span
                                             style={{
                                                 marginTop: "0.25rem",
@@ -809,9 +811,155 @@ export default function WeatherApp({ onBack }) {
                                                 fontWeight: 600,
                                             }}
                                         >
-                    {weather.daily.precipitation_sum[0]} mm
-                  </span>
+                      {weather.daily.precipitation_sum[0]} mm
+                    </span>
                                     </div>
+                                </div>
+                            )}
+
+                            {/* MEHRTAGES-VORHERSAGE */}
+                            {weather.daily && (
+                                <div
+                                    style={{
+                                        marginTop: "1.75rem",
+                                        padding: "0.75rem 0.5rem",
+                                        borderRadius: 24,
+                                        backgroundColor: "rgba(15,23,42,0.7)",
+                                        border: "1px solid rgba(51,65,85,0.9)",
+                                        boxShadow:
+                                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(148,163,184,0.18)",
+                                        overflowX: "auto",
+                                        display: "flex",
+                                        gap: "0.75rem",
+                                    }}
+                                >
+                                    {weather.daily.time.slice(0, 8).map((dateStr, index) => {
+                                        if (index === 0) return null;
+
+                                        const max = weather.daily.temperature_2m_max[index];
+                                        const min = weather.daily.temperature_2m_min[index];
+                                        const code = weather.daily.weathercode
+                                            ? weather.daily.weathercode[index]
+                                            : null;
+
+                                        const globalMin = -5;
+                                        const globalMax = 35;
+                                        const span = globalMax - globalMin;
+                                        const startPct = ((min - globalMin) / span) * 100;
+                                        const endPct = ((max - globalMin) / span) * 100;
+
+                                        let barColor = "rgba(56,189,248,0.8)";
+                                        if (max >= 25) barColor = "rgba(248,113,113,0.9)";
+                                        else if (max >= 15) barColor = "rgba(96,165,250,0.9)";
+
+                                        const dayLabel = new Date(dateStr).toLocaleDateString(
+                                            "de-DE",
+                                            { weekday: "short" },
+                                        );
+
+                                        return (
+                                            <div
+                                                key={dateStr}
+                                                style={{
+                                                    minWidth: 120,
+                                                    borderRadius: 18,
+                                                    padding: "0.6rem 0.7rem",
+                                                    backgroundColor: "rgba(15,23,42,0.9)",
+                                                    border: "1px solid rgba(71,85,105,0.9)",
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    gap: "0.35rem",
+                                                }}
+                                            >
+                                                <div
+                                                    style={{
+                                                        fontSize: "11px",
+                                                        textTransform: "uppercase",
+                                                        letterSpacing: "0.16em",
+                                                        color: "rgba(148,163,184,0.9)",
+                                                    }}
+                                                >
+                                                    {dayLabel}
+                                                </div>
+                                                <div
+                                                    style={{
+                                                        fontSize: "0.78rem",
+                                                        color: "rgba(226,232,240,0.9)",
+                                                        minHeight: "1.5rem",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        gap: "0.35rem",
+                                                    }}
+                                                >
+                                                    {code != null ? (
+                                                        <>
+                                                            <span>{getWeatherEmoji(code)}</span>
+                                                            <span style={{ opacity: 0.85 }}>
+                                                            {translateWeatherCode(code)}
+                                                          </span>
+                                                        </>
+                                                    ) : (
+                                                        "–"
+                                                    )}
+                                                </div>
+
+                                                {/* Temp-Balken */}
+                                                <div
+                                                    style={{
+                                                        position: "relative",
+                                                        height: 16,
+                                                        borderRadius: 9999,
+                                                        background:
+                                                            "linear-gradient(90deg, rgba(15,23,42,1), rgba(15,23,42,0.6))",
+                                                        overflow: "hidden",
+                                                        marginTop: "0.2rem",
+                                                        marginBottom: "0.1rem",
+                                                    }}
+                                                >
+                                                    <div
+                                                        style={{
+                                                            position: "absolute",
+                                                            inset: 0,
+                                                            background:
+                                                                "linear-gradient(90deg, #0f172a 0%, #1d4ed8 35%, #f97316 70%, #b91c1c 100%)",
+                                                            opacity: 0.18,
+                                                        }}
+                                                    />
+                                                    <div
+                                                        style={{
+                                                            position: "absolute",
+                                                            top: 0,
+                                                            bottom: 0,
+                                                            left: `${Math.max(0, startPct)}%`,
+                                                            width: `${Math.max(
+                                                                5,
+                                                                endPct - startPct,
+                                                            )}%`,
+                                                            backgroundColor: barColor,
+                                                            boxShadow:
+                                                                "0 0 10px rgba(59,130,246,0.8)",
+                                                        }}
+                                                    />
+                                                </div>
+
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        justifyContent: "space-between",
+                                                        fontSize: "0.75rem",
+                                                        color: "rgba(226,232,240,0.9)",
+                                                    }}
+                                                >
+                          <span style={{ opacity: 0.9 }}>
+                            {Math.round(min)}°C
+                          </span>
+                                                    <span style={{ opacity: 0.9 }}>
+                            {Math.round(max)}°C
+                          </span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
@@ -835,6 +983,20 @@ export default function WeatherApp({ onBack }) {
         </div>
     );
 }
+
+function getWeatherEmoji(code) {
+    if (code === 0) return "☀️";                  // klar
+    if (code === 1 || code === 2) return "🌤️";    // meist klar / teils bewölkt
+    if (code === 3) return "☁️";                  // bewölkt
+    if (code === 45 || code === 48) return "🌫️"; // Nebel
+    if (code >= 51 && code <= 55) return "🌦️";    // Niesel
+    if (code >= 61 && code <= 65) return "🌧️";    // Regen
+    if (code >= 71 && code <= 77) return "🌨️";    // Schnee
+    if (code >= 80 && code <= 82) return "🌧️";    // Regenschauer
+    if (code >= 95) return "⛈️";                 // Gewitter
+    return "�";                                  // Fallback
+}
+
 function translateWeatherCode(code) {
 // Die wichtigsten Codes laut API-Doku
     const weatherCodes = {
