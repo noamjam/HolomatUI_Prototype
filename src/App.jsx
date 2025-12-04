@@ -17,6 +17,7 @@ import SnakeGame from "./components/SnakeGame.jsx";
 import FreeCAD from "./components/FreeCAD";
 import Minesweeper from "./components/Minesweeper";
 import WeatherApp from "./components/Weather.jsx";
+import TextEditor from "./components/TextEditor";
 
 function App() {
     const [bootDone, setBootDone] = useState(false);
@@ -38,6 +39,7 @@ function App() {
     }
 
     return (
+
         <div
             className="min-h-screen text-white font-orbitron relative overflow-hidden"
             style={{
@@ -56,6 +58,7 @@ function App() {
             {currentApp === 'Solar System' && <SolarSystem onBack={() => setCurrentApp(null)} />}
             {currentApp === 'FreeCAD' && <FreeCAD onBack={() => setCurrentApp(null)} />}
             {currentApp === 'Weather' && <WeatherApp onBack={() => setCurrentApp(null)} />}
+            {currentApp === 'Text Editor' && <TextEditor onBack={() => setCurrentApp(null)} />}
 
             {/* === Game Collection === */}
             {currentApp === "Game Collection" && !activeGame && (
@@ -125,6 +128,7 @@ function App() {
             {/* Byte-Indikator bleibt immer sichtbar */}
             <ByteIndicator isActive={isActive} />
         </div>
+
     );
 }
 

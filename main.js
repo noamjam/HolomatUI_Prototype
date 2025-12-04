@@ -143,12 +143,19 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1024,
         height: 768,
+        fullscreen: true,   // remove this
+        frame: true,          // Fensterrahmen behalten …
+        autoHideMenuBar: true, // … aber Menüleiste ausblenden
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
             contextIsolation: true,
             nodeIntegration: false,
         },
     });
+
+    mainWindow.maximize(); // open the window maximized
+    // optional: prevent resizing smaller afterwards:
+    // mainWindow.setMinimumSize(1024, 768);
 
     mainWindow.loadFile(path.join(__dirname, "dist", "index.html"));
     mainWindow.on("closed", () => (mainWindow = null));
