@@ -23,113 +23,77 @@ export default function WeatherApp({ onBack }) {
 // Wetter vom ausgewählten Ort abrufen
     useEffect(() => {
         if (!selectedPreset) return;
-        setLoading(true);
-        setError(null);
+
+        console.log("selectedPreset =", selectedPreset);
 
         const { lat, lon } = selectedPreset;
-        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` + `&current_weather=true` + `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,weathercode` + `&timezone=auto&forecast_days=8`
-        )
-            .then(res => res.json())
-            .then(data => {
-                setWeather({
-                    current: data.current_weather,
-                    daily: data.daily
-                });
-                setLoading(false);
-            })
-            .catch(err => {
-                setError("Fehler beim Abrufen der Wetterdaten!");
-                setWeather(null);
-                setLoading(false);
-            });
-    }, [selectedPreset]);
-
-    function getSuggestedCityFromIpLocation(ipData) {
-        const { city, country } = ipData;
-
-// Österreich-spezifische Heuristik
-        if (country === "Austria") {
-// Steiermark
-            if (city && /graz|frohnleiten|bruck an der mur|leoben/i.test(city)) {
-                return { name: "Graz", lat: 47.0707, lon: 15.4395 };
-            }
-// Niederösterreich (Beispiele)
-            if (city && /st\.? p[oö]lten|krems|tulln|amstetten/i.test(city)) {
-                return { name: "St. Pölten", lat: 48.2043, lon: 15.6254 };
-            }
-// Wien und Umfeld
-            if (city && /wien|klosterneuburg|bruck an der leitha/i.test(city)) {
-                return { name: "Wien", lat: 48.20849, lon: 16.37208 };
-            }
-        }
-// Fallback: einfach IP-Stadt selbst verwenden
-        return null;
-    }
-
-    const handleUseMyLocation = async () => {
-        if (!window.electronAPI?.getApproxLocation) {
-            setError("Standort-Ermittlung ist in dieser Umgebung nicht verfügbar.");
+        if (lat == null || lon == null) {
+            console.warn("selectedPreset ohne gültige Koordinaten, breche ab.");
             return;
         }
 
         setLoading(true);
         setError(null);
 
-        try {
-            const ipData = await window.electronAPI.getApproxLocation(); // {lat, lon, city, country}
+        fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+            `&current_weather=true` +
+            `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,weathercode` +
+            `&timezone=auto&forecast_days=8`,
+        )
+            .then(res => res.json())
+            .then(data => {
+                setWeather({
+                    current: data.current_weather,
+                    daily: data.daily,
+                });
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error(err);
+                setError("Fehler beim Abrufen der Wetterdaten!");
+                setWeather(null);
+                setLoading(false);
+            });
+    }, [selectedPreset]);
 
-            if (!ipData) {
-                setError("Konnte ungefähren Standort nicht bestimmen.");
+    const handleUseMyLocation = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const res = await fetch("https://ipapi.co/json/");
+            if (!res.ok) {
+                throw new Error("IP-Location API error: " + res.status);
+            }
+            const data = await res.json();
+            console.log("ipapi data:", data);
+
+            const lat = data.latitude;
+            const lon = data.longitude;
+
+            if (lat == null || lon == null) {
+                setError("Konnte ungefähren Standort aus IP nicht bestimmen.");
                 setLoading(false);
                 return;
             }
 
-// Vorschlag
-            const suggestedCity = getSuggestedCityFromIpLocation(ipData);
-
-            let finalLocation;
-
-            if (suggestedCity) {
-                const useSuggested = window.confirm(
-                    `Ihr ungefährer Standort wurde als ${ipData.city || "unbekannt"} erkannt.\n` +
-                    `Möchten Sie stattdessen die nächstgrößere Stadt verwenden? (Vorschlag: ${suggestedCity.name})`
-                );
-
-                if (useSuggested) {
-                    finalLocation = suggestedCity;
-                } else {
-                    finalLocation = {
-                        name: ipData.city
-                            ? `${ipData.city} (${ipData.country})`
-                            : "Mein Standort (IP)",
-                        lat: ipData.lat,
-                        lon: ipData.lon,
-                    };
-                }
-            } else {
-// Kein spezieller Vorschlag -> IP-Daten direkt nutzen
-                finalLocation = {
-                    name: ipData.city
-                        ? `${ipData.city} (${ipData.country})`
-                        : "Mein Standort (IP)",
-                    lat: ipData.lat,
-                    lon: ipData.lon,
-                };
-            }
+            const finalLocation = {
+                name: data.city
+                    ? `${data.city} (${data.country_name || data.country})`
+                    : "Mein Standort (IP)",
+                lat,
+                lon,
+            };
 
             setSelectedPreset(finalLocation);
-// Optional: in Presets aufnehmen
-// setPresets(prev => [...prev, finalLocation]);
-
         } catch (e) {
-            console.error(e);
-            setError("Fehler beim Ermitteln des ungefähren Standorts.");
+            console.error("IP-Geo error:", e);
+            setError("Fehler beim Ermitteln des ungefähren Standorts über IP.");
         } finally {
             setLoading(false);
         }
     };
-
-
     const handleSearch = async (e) => {
         e.preventDefault();
         if (!searchCity) return;
@@ -537,9 +501,8 @@ export default function WeatherApp({ onBack }) {
                             {error}
                         </div>
                     )}
-
                     {/* WETTER-INHALT */}
-                    {weather && (
+                    {weather && weather.current && (
                         <div
                             style={{
                                 position: "relative",
