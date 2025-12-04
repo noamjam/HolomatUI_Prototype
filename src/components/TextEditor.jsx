@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 
 function TextEditor({ onBack }) {
     const [content, setContent] = useState("");
-    const getLineCount = () => (content ? content.split("\n").length : 1);
     const editorRef = useRef(null);
     const fileInputRef = useRef(null);
+
+    const getLineCount = () => (content ? content.split("\n").length : 1);
 
     useEffect(() => {
         const saved = localStorage.getItem("editorContent");
@@ -22,24 +23,39 @@ function TextEditor({ onBack }) {
     };
 
     const handleKeyDown = (event) => {
-        if(event.key  === "Tab")
-        {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
+
+        const range = selection.getRangeAt(0);
+
+        // TAB → zwei Spaces einfügen
+        if (event.key === "Tab") {
             event.preventDefault();
-
-            const selection = window.getSelection();
-            if(!selection|| selection.rangeCount === 0) return;
-
-            const range =   selection.getRangeAt(0);
             const tabNode = document.createTextNode("  ");
             range.insertNode(tabNode);
-
             range.setStartAfter(tabNode);
             range.setEndAfter(tabNode);
             selection.removeAllRanges();
             selection.addRange(range);
-
+            handleInput();
+            return;
         }
-        handleInput();
+
+        // ENTER → genau einen Zeilenumbruch einfügen
+        if (event.key === "Enter") {
+            event.preventDefault();
+            const br = document.createTextNode("\n");
+            range.insertNode(br);
+            range.setStartAfter(br);
+            range.setEndAfter(br);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            handleInput();
+            return;
+        }
+
+        // andere Tasten normal verarbeiten
+        // handleInput wird dann über onInput aufgerufen
     };
 
     const handleDownload = () => {
@@ -99,7 +115,7 @@ function TextEditor({ onBack }) {
 
             {/* Überschrift mittig */}
             <h2 className="text-xl font-semibold text-center mt-24">
-                Einfacher Code-Editor
+                Code-Editor
             </h2>
 
             {/* Editor-Feld mittig mit Code-Style */}
