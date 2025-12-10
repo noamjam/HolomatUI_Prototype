@@ -4,7 +4,6 @@ import AssistantChat from "./AssistantChat";
 export default function ByteIndicator({ isActive }) {
     const [isChatOpen, setChatOpen] = useState(false);
 
-    // 🔄 Kommunikation mit deinem Backend (z. B. Ollama / Python)
     const handleSendMessage = async (msg, addResponse) => {
         try {
             const res = await fetch("http://localhost:5000/api/chat", {
@@ -20,21 +19,96 @@ export default function ByteIndicator({ isActive }) {
         }
     };
 
+    const rootStyle = {
+        position: "fixed",
+        right: "1rem",          // unten rechts
+        bottom: "1rem",
+        zIndex: 50,
+        width: "5rem",
+        height: "5rem",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        userSelect: "none",
+    };
+
+    const wrapperStyle = {
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    };
+
+    const orbitStyle = {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        borderRadius: "9999px",
+        border: "2px solid rgba(34,211,238,1)", // cyan
+        opacity: 0.5,
+        transform: "rotate(30deg)",
+        boxSizing: "border-box",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    };
+
+    const orbitInnerStyle = {
+        width: "100%",
+        height: "100%",
+        borderRadius: "9999px",
+        borderWidth: "3px",
+        borderStyle: "solid",
+        borderColor: "transparent",
+        borderTopColor: "rgba(34,211,238,1)",
+        borderLeftColor: "rgba(34,211,238,1)",
+        boxSizing: "border-box",
+    };
+
+    const coreBaseStyle = {
+        width: "3.5rem",
+        height: "3.5rem",
+        borderRadius: "9999px",
+        backgroundColor: "rgba(8,145,178,0.2)", // cyan-700/20
+        border: "1px solid rgba(34,211,238,1)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "0.875rem",
+        fontWeight: 700,
+        color: "rgba(103,232,249,1)", // cyan-300
+        transition: "all 0.3s ease",
+    };
+
+    const coreActiveExtra = isActive
+        ? {
+            animation: "byte-pulse 1.5s ease-in-out infinite",
+            boxShadow: "0 0 15px rgba(6,182,212,1)",
+        }
+        : {};
+
     return (
         <>
+            <style>{`
+        @keyframes byte-pulse {
+          0%   { transform: scale(1);   opacity: 1; }
+          50%  { transform: scale(1.06); opacity: 0.85; }
+          100% { transform: scale(1);   opacity: 1; }
+        }
+      `}</style>
+
             <div
                 onClick={() => setChatOpen((prev) => !prev)}
-                className="fixed bottom-4 left-4 z-50 flex items-center justify-center w-20 h-20 cursor-pointer select-none"
+                style={rootStyle}
             >
-                <div className="relative w-full h-full flex items-center justify-center">
-                    <div className="absolute w-full h-full rounded-full border-2 border-cyan-500 opacity-50 rotate-[30deg]">
-                        <div className="w-full h-full rounded-full border-[3px] border-transparent border-t-cyan-500 border-l-cyan-500" />
+                <div style={wrapperStyle}>
+                    <div style={orbitStyle}>
+                        <div style={orbitInnerStyle} />
                     </div>
-                    <div
-                        className={`w-14 h-14 rounded-full bg-cyan-700/20 border border-cyan-400 flex items-center justify-center text-sm text-cyan-300 font-bold transition-all duration-300 ${
-                            isActive ? "animate-pulse-byte shadow-[0_0_15px_#06b6d4]" : ""
-                        }`}
-                    >
+                    <div style={{ ...coreBaseStyle, ...coreActiveExtra }}>
                         Mini
                     </div>
                 </div>

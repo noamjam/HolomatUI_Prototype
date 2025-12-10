@@ -1,227 +1,96 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
-function TextEditor({ onBack }) {
+function TextEditor({ initialContent = "", onChangeContent }) {
     const [content, setContent] = useState("");
-    const editorRef = useRef(null);
-    const fileInputRef = useRef(null);
-
-    const getLineCount = () => (content ? content.split("\n").length : 1);
 
     useEffect(() => {
-        const saved = localStorage.getItem("editorContent");
-        if (saved && editorRef.current) {
-            editorRef.current.innerText = saved;
-            setContent(saved);
+        setContent(normalizeText(initialContent));
+    }, [initialContent]);
+
+    const normalizeText = (value) =>
+        (value || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+    const updateContent = (value) => {
+        const normalized = normalizeText(value);
+        setContent(normalized);
+        localStorage.setItem("editorContent", normalized);
+        if (onChangeContent) onChangeContent(normalized);
+    };
+
+    const getLineCount = () => {
+        const value = normalizeText(content);
+        return value ? value.split("\n").length : 1;
+    };
+
+    const handleChange = (e) => {
+        updateContent(e.target.value);
+    };
+
+    const handleKeyDown = (e) => {
+        // Tab -> zwei Spaces
+        if (e.key === "Tab") {
+            e.preventDefault();
+            const {selectionStart, selectionEnd, value} = e.target;
+            const before = value.slice(0, selectionStart);
+            const after = value.slice(selectionEnd);
+            const updated = `${before}  ${after}`;
+            updateContent(updated);
+            requestAnimationFrame(() => {
+                e.target.selectionStart = e.target.selectionEnd = selectionStart + 2;
+            });
         }
-    }, []);
-
-    const handleInput = () => {
-        if (!editorRef.current) return;
-        const value = editorRef.current.innerText;
-        setContent(value);
-        localStorage.setItem("editorContent", value);
     };
-
-    const handleKeyDown = (event) => {
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return;
-
-        const range = selection.getRangeAt(0);
-
-        // TAB → zwei Spaces einfügen
-        if (event.key === "Tab") {
-            event.preventDefault();
-            const tabNode = document.createTextNode("  ");
-            range.insertNode(tabNode);
-            range.setStartAfter(tabNode);
-            range.setEndAfter(tabNode);
-            selection.removeAllRanges();
-            selection.addRange(range);
-            handleInput();
-            return;
-        }
-
-        // ENTER → genau einen Zeilenumbruch einfügen
-        if (event.key === "Enter") {
-            event.preventDefault();
-            const br = document.createTextNode("\n");
-            range.insertNode(br);
-            range.setStartAfter(br);
-            range.setEndAfter(br);
-            selection.removeAllRanges();
-            selection.addRange(range);
-            handleInput();
-            return;
-        }
-
-        // andere Tasten normal verarbeiten
-        // handleInput wird dann über onInput aufgerufen
-    };
-
-    const handleDownload = () => {
-        const blob = new Blob([content], {
-            type: "text/plain;charset=utf-8",
-        }); // TXT-Inhalt[web:125][web:136]
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "texteditor-inhalt.txt";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        URL.revokeObjectURL(url); // URL freigeben[web:127][web:139]
-    };
-
-    const handleFileChange = (event) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-
-        reader.onload = (e) => {
-            const text = e.target.result;
-            if (editorRef.current) {
-                editorRef.current.innerText = text;
-            }
-            setContent(text);
-            localStorage.setItem("editorContent", text);
-        };
-
-        reader.readAsText(file, "utf-8"); // TXT lesen[web:221][web:234]
-        event.target.value = "";
-    };
-
-    const buttonClasses =
-        "bg-cyan-700 text-white px-4 py-2 rounded hover:bg-cyan-500 active:scale-95 transition shadow";
-
     return (
         <div
-            className="relative flex flex-col text-white"
             style={{
-                minHeight: "100vh", // füllt gesamten Viewport[web:312][web:313]
+                height: "100vh",
+                width: "100%",
+                display: "flex",
                 background:
                     "radial-gradient(circle at top, #38bdf8 0, #0f172a 30%, #020617 70%, #020617 100%)",
             }}
         >
-            {/* Back Button oben links */}
-            <button
-                onClick={onBack}
+            {/* Zeilennummern-Spalte */}
+            <div
                 style={{
-                    alignSelf: "flex-start",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    borderRadius: 16,
-                    backgroundColor: "rgba(2,6,23,0.6)",
-                    padding: "0.5rem 1.25rem",
-                    fontSize: "0.75rem",
-                    fontWeight: 500,
-                    border: "1px solid rgba(71,85,105,0.7)",
-                    boxShadow:
-                        "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
-                    color: "#e5e7eb",
-                    cursor: "pointer",
-                    transform: "translateY(0)",
-                    transition:
-                        "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
-                }}
-                onMouseEnter={e => {
-                    e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
-                    e.currentTarget.style.boxShadow =
-                        "0 22px 55px rgba(15,23,42,1), inset 0 1px 0 rgba(248,250,252,0.18)";
-                    e.currentTarget.style.backgroundColor = "rgba(15,23,42,0.9)";
-                }}
-                onMouseLeave={e => {
-                    e.currentTarget.style.transform = "translateY(0) scale(1)";
-                    e.currentTarget.style.boxShadow =
-                        "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)";
-                    e.currentTarget.style.backgroundColor = "rgba(2,6,23,0.6)";
+                    width: "48px",
+                    padding: "8px 8px",
+                    textAlign: "right",
+                    userSelect: "none",
+                    color: "#9ca3af",
+                    borderRight: "1px solid #4b5563",
+                    fontSize: "13px",
+                    lineHeight: "1.4",
+                    boxSizing: "border-box",
                 }}
             >
-                <span style={{ fontSize: "1rem" }}>⬅</span>
-                <span>Zurück</span>
-            </button>
-
-            {/* Überschrift mittig */}
-            <h2 className="text-xl font-semibold text-center mt-24">
-                Code-Editor
-            </h2>
-
-            {/* Editor-Feld mittig mit Code-Style */}
-            <div className="flex justify-center mt-8 px-6">
-                <div
-                    style={{
-                        width: "100%",
-                        maxWidth: "1100px",
-                        display: "flex",
-                        border: "3px solid #4b5563",
-                        backgroundColor: "#020617",
-                    }}
-                >
-                    {/* Line numbers column */}
-                    <div
-                        style={{
-                            padding: "8px 8px",      // slightly smaller padding
-                            textAlign: "right",
-                            userSelect: "none",
-                            color: "#9ca3af",
-                            borderRight: "1px solid #4b5563",
-                            minWidth: "40px",
-                            fontSize: "13px",        // smaller numbers
-                            lineHeight: "1.4",       // match editor line-height
-                        }}
-                    >
-                        {Array.from({ length: getLineCount() }, (_, i) => (
-                            <div key={i}>{i + 1}</div>
-                        ))}
-                    </div>
-
-                    {/* Editable code area */}
-                    <div
-                        ref={editorRef}
-                        contentEditable
-                        suppressContentEditableWarning
-                        onInput={handleInput}
-                        onKeyDown={handleKeyDown}
-                        style={{
-                            flex: 1,
-                            minHeight: "320px",
-                            padding: "8px 12px",     // same vertical padding as numbers
-                            fontFamily: "monospace",
-                            fontSize: "14px",
-                            lineHeight: "1.35",       // same as numbers
-                            whiteSpace: "pre-wrap",
-                            color: "#e5e7eb",
-                            outline: "none",
-                        }}
-                    ></div>
-                </div>
+                {Array.from({length: getLineCount()}, (_, i) => (
+                    <div key={i}>{i + 1}</div>
+                ))}
             </div>
 
-            {/* Buttons unten mittig */}
-            <div className="mt-8 mb-8 text-center">
-                <button onClick={handleDownload} className={buttonClasses}>
-                    Als .txt speichern
-                </button>
-
-                <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className={buttonClasses}
-                    style={{ marginLeft: "16px" }}
-                >
-                    .txt laden
-                </button>
-
-                <input
-                    type="file"
-                    accept=".txt,text/plain"
-                    ref={fileInputRef}
-                    style={{ display: "none" }}
-                    onChange={handleFileChange}
-                />
-            </div>
+            {/* kompletter restlicher Bereich = Editor */}
+            <textarea
+                value={content}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                spellCheck={false}
+                style={{
+                    flex: 1,
+                    height: "100%",
+                    padding: "8px 12px",
+                    fontFamily: "monospace",
+                    fontSize: "14px",
+                    lineHeight: "1.35",
+                    whiteSpace: "pre",
+                    color: "#e5e7eb",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    outline: "none",
+                    resize: "none",
+                    boxSizing: "border-box",
+                }}
+            />
         </div>
     );
 }
