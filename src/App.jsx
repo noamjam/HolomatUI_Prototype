@@ -28,7 +28,6 @@ function App() {
     const [activeGame, setActiveGame] = useState(null);
 
 
-
     useEffect(() => {
         const saved = localStorage.getItem('theme') || 'default';
         setTheme(themes[saved] || themes.default);
@@ -39,7 +38,6 @@ function App() {
     }
 
     return (
-
         <div
             className="min-h-screen text-white font-orbitron relative overflow-hidden"
             style={{
