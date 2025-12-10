@@ -148,6 +148,28 @@ export default function WeatherApp({ onBack }) {
                 color: "#e2e8f0",
             }}
         >
+            {/* Toggle-Button – NICHT in der Sidebar */}
+            <button
+                onClick={() => setIsSidebarOpen(o => !o)}
+                style={{
+                    position: "absolute",
+                    top: "0.75rem",
+                    left: "0.75rem",        // feste Position, NICHT von isSidebarOpen abhängig
+                    zIndex: 50,
+                    display: "inline-flex",
+                    height: "2.25rem",
+                    width: "2.25rem",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "1rem",
+                    backgroundColor: "rgba(15,23,42,0.9)",
+                    border: "1px solid rgba(255,255,255,0.4)",
+                    fontSize: "0.875rem",
+                    cursor: "pointer",
+                }}
+            >
+                {isSidebarOpen ? "←" : "→"}
+            </button>
             {/* SIDEBAR */}
             <aside
                 style={{
@@ -156,35 +178,16 @@ export default function WeatherApp({ onBack }) {
                     transitionProperty: "width",
                     transitionDuration: "300ms",
                     transitionTimingFunction: "ease-in-out",
-                    width: isSidebarOpen ? "16rem" : "3rem",
+                    width: isSidebarOpen ? "16rem" : "0rem",
                     backgroundColor: "rgba(2,6,23,0.7)",
                     backdropFilter: "blur(24px)",
                     borderRight: "1px solid rgba(255,255,255,0.1)",
                     boxShadow: "0 25px 80px rgba(15,23,42,0.95)",
                     display: "flex",
                     flexDirection: "column",
+                    paddingTop: "3.5rem"
                 }}
             >
-                <button
-                    onClick={() => setIsSidebarOpen(o => !o)}
-                    style={{
-                        margin: "0.75rem",
-                        marginBottom: "1rem",
-                        display: "inline-flex",
-                        height: "2.25rem",
-                        width: "2.25rem",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderRadius: "1rem",
-                        backgroundColor: "rgba(255,255,255,0.1)",
-                        border: "1px solid rgba(255,255,255,0.2)",
-                        fontSize: "0.875rem",
-                        cursor: "pointer",
-                    }}
-                >
-                    {isSidebarOpen ? "⟨" : "⟩"}
-                </button>
-
                 {/* Städte-Liste */}
                 <div
                     style={{
@@ -343,15 +346,16 @@ export default function WeatherApp({ onBack }) {
                 style={{
                     display: "flex",
                     flex: 1,
-                    alignItems: "center",
+                    alignItems: "center",       // vertikal mittig
+                    justifyContent: "center",
                     padding: "1.5rem",
                 }}
             >
                 <div
                     style={{
-                        width: 1020,
+                        width: isSidebarOpen ? 1020 : 1200,
                         height: 860,
-                        marginRight: 40,
+                        marginRight: isSidebarOpen ? 40 : 0,
                         marginTop: 24,
                         marginBottom: 24,
                         flexShrink: 0,
