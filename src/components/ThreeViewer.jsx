@@ -97,7 +97,6 @@ function EditableModel({ file, mode, orbitControlsRef }) {
             obj.position.set(0, 0, 0);
             setObject(obj);
         };
-
         loadModel();
     }, [file]);
 
@@ -124,17 +123,177 @@ export default function ThreeViewer({ onBack }) {
         <div className="fixed inset-0 z-10 bg-black text-white font-orbitron">
             {/* UI-Toolbar */}
             <div className="absolute top-4 left-4 z-20 flex gap-2">
-                <button onClick={onBack} className="bg-cyan-700 px-3 py-2 rounded hover:bg-cyan-500">⬅ Zurück</button>
+                <button
+                    onClick={onBack}
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        borderRadius: 16,
+                        backgroundColor: "rgba(2,6,23,0.6)",
+                        padding: "0.5rem 1.25rem",
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        border: "1px solid rgba(71,85,105,0.7)",
+                        boxShadow:
+                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
+                        color: "#e5e7eb",
+                        cursor: "pointer",
+                        transform: "translateY(0)",
+                        transition:
+                            "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
+                    }}
+                    onMouseEnter={e => {
+                        e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
+                        e.currentTarget.style.boxShadow =
+                            "0 22px 55px rgba(15,23,42,1), inset 0 1px 0 rgba(248,250,252,0.18)";
+                        e.currentTarget.style.backgroundColor = "rgba(15,23,42,0.9)";
+                    }}
+                    onMouseLeave={e => {
+                        e.currentTarget.style.transform = "translateY(0) scale(1)";
+                        e.currentTarget.style.boxShadow =
+                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)";
+                        e.currentTarget.style.backgroundColor = "rgba(2,6,23,0.6)";
+                    }}
+                >
+                    <span style={{ fontSize: "1rem" }}>⬅</span>
+                    <span>Zurück</span>
+                </button>
                 <input
                     type="file"
                     accept=".glb,.gltf,.stl,.3mf"
                     onChange={handleFile}
-                    className="bg-gray-800 px-3 py-2 rounded border border-cyan-500"
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        borderRadius: 16,
+                        backgroundColor: "rgba(2,6,23,0.6)",
+                        padding: "0.5rem 1.25rem",
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        border: "1px solid rgba(71,85,105,0.7)",
+                        boxShadow:
+                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
+                        color: "#e5e7eb",
+                        cursor: "pointer",
+                        transform: "translateY(0)",
+                        transition:
+                            "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
+                    }}
+                    onMouseEnter={e => {
+                        e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
+                        e.currentTarget.style.boxShadow =
+                            "0 22px 55px rgba(15,23,42,1), inset 0 1px 0 rgba(248,250,252,0.18)";
+                        e.currentTarget.style.backgroundColor = "rgba(15,23,42,0.9)";
+                    }}
+                    onMouseLeave={e => {
+                        e.currentTarget.style.transform = "translateY(0) scale(1)";
+                        e.currentTarget.style.boxShadow =
+                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)";
+                        e.currentTarget.style.backgroundColor = "rgba(2,6,23,0.6)";
+                    }}
                 />
                 <div className="flex gap-2">
-                    <button onClick={() => setMode('translate')} className="bg-gray-700 px-2 py-1 rounded hover:bg-gray-500">🧲 Move</button>
-                    <button onClick={() => setMode('rotate')} className="bg-gray-700 px-2 py-1 rounded hover:bg-gray-500">🔁 Rotate</button>
-                    <button onClick={() => setMode('scale')} className="bg-gray-700 px-2 py-1 rounded hover:bg-gray-500">↔️ Scale</button>
+                    <button onClick={() => setMode('translate')} style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        borderRadius: 16,
+                        backgroundColor: "rgba(2,6,23,0.6)",
+                        padding: "0.5rem 1.25rem",
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        border: "1px solid rgba(71,85,105,0.7)",
+                        boxShadow:
+                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
+                        color: "#e5e7eb",
+                        cursor: "pointer",
+                        transform: "translateY(0)",
+                        transition:
+                            "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
+                    }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
+                                e.currentTarget.style.boxShadow =
+                                    "0 22px 55px rgba(15,23,42,1), inset 0 1px 0 rgba(248,250,252,0.18)";
+                                e.currentTarget.style.backgroundColor = "rgba(15,23,42,0.9)";
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.transform = "translateY(0) scale(1)";
+                                e.currentTarget.style.boxShadow =
+                                    "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)";
+                                e.currentTarget.style.backgroundColor = "rgba(2,6,23,0.6)";
+                            }}
+                    >
+                        <span style={{ fontSize: "1rem" }}></span>🧲 Move
+                    </button>
+                    <button onClick={() => setMode('rotate')} style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        borderRadius: 16,
+                        backgroundColor: "rgba(2,6,23,0.6)",
+                        padding: "0.5rem 1.25rem",
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        border: "1px solid rgba(71,85,105,0.7)",
+                        boxShadow:
+                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
+                        color: "#e5e7eb",
+                        cursor: "pointer",
+                        transform: "translateY(0)",
+                        transition:
+                            "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
+                    }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
+                                e.currentTarget.style.boxShadow =
+                                    "0 22px 55px rgba(15,23,42,1), inset 0 1px 0 rgba(248,250,252,0.18)";
+                                e.currentTarget.style.backgroundColor = "rgba(15,23,42,0.9)";
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.transform = "translateY(0) scale(1)";
+                                e.currentTarget.style.boxShadow =
+                                    "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)";
+                                e.currentTarget.style.backgroundColor = "rgba(2,6,23,0.6)";
+                            }}
+                    >
+                        <span style={{ fontSize: "1rem" }}></span>🔁 Rotate
+                    </button>
+                    <button onClick={() => setMode('scale')} style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        borderRadius: 16,
+                        backgroundColor: "rgba(2,6,23,0.6)",
+                        padding: "0.5rem 1.25rem",
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        border: "1px solid rgba(71,85,105,0.7)",
+                        boxShadow:
+                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
+                        color: "#e5e7eb",
+                        cursor: "pointer",
+                        transform: "translateY(0)",
+                        transition:
+                            "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
+                    }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
+                                e.currentTarget.style.boxShadow =
+                                    "0 22px 55px rgba(15,23,42,1), inset 0 1px 0 rgba(248,250,252,0.18)";
+                                e.currentTarget.style.backgroundColor = "rgba(15,23,42,0.9)";
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.transform = "translateY(0) scale(1)";
+                                e.currentTarget.style.boxShadow =
+                                    "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)";
+                                e.currentTarget.style.backgroundColor = "rgba(2,6,23,0.6)";
+                            }}
+                    >
+                        <span style={{ fontSize: "1rem" }}></span>
+                        ↔️ Scale</button>
                 </div>
             </div>
 

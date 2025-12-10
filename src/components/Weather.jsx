@@ -439,33 +439,38 @@ export default function WeatherApp({ onBack }) {
                 </span>
                             </div>
                         </div>
-
                         <button
+                            onClick={onBack}
                             style={{
                                 display: "flex",
                                 alignItems: "center",
                                 gap: "0.5rem",
-                                borderRadius: "9999px",
-                                backgroundColor: "rgba(15,23,42,0.7)",
-                                padding: "0.375rem 1rem",
+                                borderRadius: 16,
+                                backgroundColor: "rgba(2,6,23,0.6)",
+                                padding: "0.5rem 1.25rem",
                                 fontSize: "0.75rem",
                                 fontWeight: 500,
-                                border: "1px solid rgba(100,116,139,0.7)",
+                                border: "1px solid rgba(71,85,105,0.7)",
                                 boxShadow:
-                                    "0 10px 25px rgba(15,23,42,0.9), inset 0 1px 0 rgba(148,163,184,0.4)",
-                                backdropFilter: "blur(16px)",
+                                    "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
                                 color: "#e5e7eb",
                                 cursor: "pointer",
-                                transition: "background-color 150ms ease",
+                                transform: "translateY(0)",
+                                transition:
+                                    "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
                             }}
-                            onMouseOver={e =>
-                                (e.currentTarget.style.backgroundColor = "#0f172a")
-                            }
-                            onMouseOut={e =>
-                                (e.currentTarget.style.backgroundColor =
-                                    "rgba(15,23,42,0.7)")
-                            }
-                            onClick={onBack}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
+                                e.currentTarget.style.boxShadow =
+                                    "0 22px 55px rgba(15,23,42,1), inset 0 1px 0 rgba(248,250,252,0.18)";
+                                e.currentTarget.style.backgroundColor = "rgba(15,23,42,0.9)";
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.transform = "translateY(0) scale(1)";
+                                e.currentTarget.style.boxShadow =
+                                    "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)";
+                                e.currentTarget.style.backgroundColor = "rgba(2,6,23,0.6)";
+                            }}
                         >
                             <span style={{ fontSize: "1rem" }}>⬅</span>
                             <span>Zurück</span>
