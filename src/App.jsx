@@ -28,9 +28,6 @@ function App() {
     const [activeGame, setActiveGame] = useState(null); // einzelnes Spiel innerhalb der Game Collection
     const isActive = useByteStatus();
 
-    // Theme aus localStorage laden
-    const [activeGame, setActiveGame] = useState(null);
-
 
     useEffect(() => {
         const saved = localStorage.getItem("theme") || "default";
