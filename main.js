@@ -8,7 +8,48 @@ const { spawn, exec } = require("child_process");
 const net = require("net");
 const os = require("os");
 
+// 🚀 Express-Code-Runner-Server ---------------------------------
+const express = require("express");
+const cors = require("cors");
+
+let runServerApp = null;
+let runServerInstance = null;
+
+function startRunServer() {
+    if (runServerInstance) return;
+
+    runServerApp = express();
+    runServerApp.use(cors());
+    runServerApp.use(express.json());
+
+    // /api/run Endpoint – hier kannst du später echte Code-Ausführung einbauen
+    runServerApp.post("/api/run", (req, res) => {
+        const { language, code, filename } = req.body || {};
+        console.log("💻 /api/run request:", { language, filename });
+
+        // Platzhalter-Ausgabe
+        const output =
+            `Fake runner\n` +
+            `Language: ${language}\n` +
+            `File: ${filename}\n` +
+            `Code length: ${code ? code.length : 0}`;
+
+        res.json({ output });
+    });
+
+    const port = 5000;
+    runServerInstance = runServerApp.listen(port, "127.0.0.1", () => {
+        console.log(`✅ Run server listening on http://127.0.0.1:${port}`);
+    });
+
+    runServerInstance.on("error", (err) => {
+        console.error("💥 Run server error:", err);
+    });
+}
+
+// ------------------------------------------------------
 // Plattform erkennen
+// ------------------------------------------------------
 const platform = os.platform(); // 'win32', 'darwin', 'linux'
 
 if (platform === "win32") {
@@ -31,7 +72,6 @@ function startOllamaServer() {
     return new Promise((resolve, reject) => {
         console.log("🧩 Starting Ollama background server...");
 
-        // Prüfen ob Ollama schon läuft
         const check = require("child_process").spawn("curl", ["-s", "http://127.0.0.1:11434/api/tags"]);
 
         let output = "";
@@ -43,15 +83,14 @@ function startOllamaServer() {
                 return;
             }
 
-            // Wenn nicht läuft → starten
             ollamaProcess = spawn("ollama", ["serve"], {
                 detached: true,
-                stdio: "ignore", // läuft still im Hintergrund
+                stdio: "ignore",
             });
             ollamaProcess.unref();
 
             console.log("🚀 Ollama started in background.");
-            setTimeout(resolve, 1500); // gib ihm kurz Zeit zum Starten
+            setTimeout(resolve, 1500);
         });
 
         check.on("error", (err) => {
@@ -60,6 +99,7 @@ function startOllamaServer() {
         });
     });
 }
+
 // ------------------------------------------------------
 // Byte Sprachassistent
 // ------------------------------------------------------
@@ -142,9 +182,9 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1024,
         height: 768,
-        fullscreen: true,   // remove this
-        frame: true,          // Fensterrahmen behalten …
-        autoHideMenuBar: true, // … aber Menüleiste ausblenden
+        fullscreen: true,
+        frame: true,
+        autoHideMenuBar: true,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
             contextIsolation: true,
@@ -152,10 +192,7 @@ function createWindow() {
         },
     });
 
-    mainWindow.maximize(); // open the window maximized
-    // optional: prevent resizing smaller afterwards:
-    // mainWindow.setMinimumSize(1024, 768);
-
+    mainWindow.maximize();
     mainWindow.loadFile(path.join(__dirname, "dist", "index.html"));
     mainWindow.on("closed", () => (mainWindow = null));
 }
@@ -164,6 +201,9 @@ function createWindow() {
 // Lifecycle
 // ------------------------------------------------------
 app.whenReady().then(async () => {
+    // Code-Runner-Server für /api/run starten
+    startRunServer();
+
     await startOllamaServer();
     startByteAssistant();
     createWindow();
@@ -176,6 +216,7 @@ app.on("window-all-closed", () => {
         if (byteProcess) byteProcess.kill("SIGTERM");
         if (chatProcess) chatProcess.kill("SIGTERM");
         if (ollamaProcess) ollamaProcess.kill("SIGTERM");
+        if (runServerInstance) runServerInstance.close();
 
         app.quit();
     }
@@ -216,10 +257,9 @@ ipcMain.on("launch-orca-slicer", () => {
     child.on("error", (err) => {
         console.error(`Failed to start Orca Slicer: ${err.message}`);
     });
-    // optional: Prozess unabhängig weiterlaufen lassen
     child.unref();
 });
 
-ipcMain.on('launch-freecad', () => {
-    exec('open -a /Applications/FreeCAD.app'); // macOS-kompatibler Start!
+ipcMain.on("launch-freecad", () => {
+    exec('open -a /Applications/FreeCAD.app');
 });

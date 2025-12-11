@@ -2,26 +2,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import TextEditor from "./TextEditor.jsx";
 
-const initialFiles = [
-    {
-        id: 1,
-        name: "main.jsx",
-        content: "// main entry file\n",
-        language: "javascript",
-    },
-    {
-        id: 2,
-        name: "TextEditor.jsx",
-        content: "// text editor component\n",
-        language: "javascript",
-    },
-    {
-        id: 3,
-        name: "styles.css",
-        content: "body { margin: 0; }\n",
-        language: "plaintext",
-    },
-];
+const STORAGE_KEY =  "vscodeLayoutFiles";
 
 const languageByExt = (ext) => {
     switch (ext) {
@@ -40,15 +21,46 @@ const languageByExt = (ext) => {
 };
 
 function VSCodeLayout({ onBack }) {
-    const [files, setFiles] = useState(initialFiles);
-    const [activeFileId, setActiveFileId] = useState(initialFiles[0].id);
-    const [nextId, setNextId] = useState(initialFiles.length + 1);
+    const [files, setFiles] = useState([]);
+    const [activeFileId, setActiveFileId] = useState(null);
+    const [nextId, setNextId] = useState(1);
     const [newFileExt, setNewFileExt] = useState("txt");
+
+    const [runOutput, setRunOutput] = useState("");
+    const [showRunOutput, setShowRunOutput] = useState(false);
 
     const fileInputRef = useRef(null);
 
     const activeFile = files.find((f) => f.id === activeFileId) || null;
 
+    useEffect(() => {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed.files) && parsed.files.length > 0) {
+                setFiles(parsed.files);
+                setActiveFileId(
+                    parsed.activeFileId ?? parsed.files[0].id
+                );
+                setNextId(parsed.nextId ?? parsed.files.length + 1);
+            }
+        } catch (e) {
+            console.error("Failed to load editor state", e);
+        }
+    }, []);
+
+    // ---- persist session whenever files / active change ----
+    useEffect(() => {
+        const payload = {
+            files,
+            activeFileId,
+            nextId,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    }, [files, activeFileId, nextId]);
+
+    // ---- Run code, show popup output ----
     const runCode = async () => {
         if (!activeFile) return;
         try {
@@ -62,9 +74,12 @@ function VSCodeLayout({ onBack }) {
                 }),
             });
             const data = await res.json();
-            console.log("Run result:", data.output);
+            setRunOutput(data.output ?? "No output");
+            setShowRunOutput(true);
         } catch (err) {
             console.error("Run error", err);
+            setRunOutput("Run error: " + err.message);
+            setShowRunOutput(true);
         }
     };
 
@@ -75,7 +90,9 @@ function VSCodeLayout({ onBack }) {
     const handleEditorContentChange = (newContent) => {
         setFiles((prev) =>
             prev.map((file) =>
-                file.id === activeFileId ? { ...file, content: newContent } : file
+                file.id === activeFileId
+                    ? { ...file, content: newContent }
+                    : file
             )
         );
     };
@@ -98,7 +115,9 @@ function VSCodeLayout({ onBack }) {
         if (!activeFile) return;
         setFiles((prev) =>
             prev.map((file) =>
-                file.id === activeFileId ? { ...file, language: langId } : file
+                file.id === activeFileId
+                    ? { ...file, language: langId }
+                    : file
             )
         );
     };
@@ -130,12 +149,13 @@ function VSCodeLayout({ onBack }) {
 
     // ----- open/save handling -----
     const handleOpenClick = () => {
+        // Here we use the OS picker – this is for "Open" only
         fileInputRef.current?.click();
     };
 
     const handleLoadedFile = (event) => {
         const fileObj = event.target.files?.[0];
-        if (!fileObj || !activeFile) return;
+        if (!fileObj) return;
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -143,23 +163,24 @@ function VSCodeLayout({ onBack }) {
             const ext = (fileObj.name.split(".").pop() || "txt").toLowerCase();
             const lang = languageByExt(ext);
 
-            setFiles((prev) =>
-                prev.map((f) =>
-                    f.id === activeFileId
-                        ? {
-                            ...f,
-                            name: fileObj.name || f.name,
-                            content: text,
-                            language: lang,
-                        }
-                        : f
-                )
-            );
+            const id = nextId;
+            const newFile = {
+                id,
+                name: fileObj.name,
+                content: text,
+                language: lang,
+            };
+
+            setFiles((prev) => [...prev, newFile]);
+            setActiveFileId(id);
+            setNextId(id + 1);
         };
         reader.readAsText(fileObj, "utf-8");
         event.target.value = "";
     };
 
+
+    // "Save" bedeutet hier: aktuelle Version als Datei herunterladen
     const handleSaveActiveFile = useCallback(() => {
         if (!activeFile) return;
         const blob = new Blob([activeFile.content || ""], {
@@ -183,7 +204,7 @@ function VSCodeLayout({ onBack }) {
             const key = e.key.toLowerCase();
             if ((e.ctrlKey || e.metaKey) && key === "s") {
                 e.preventDefault();
-                handleSaveActiveFile();
+                handleSaveActiveFile(); // überschreibt direkt die "Datei" unter gleichem Namen
             }
             if ((e.ctrlKey || e.metaKey) && key === "o") {
                 e.preventDefault();
@@ -411,6 +432,81 @@ function VSCodeLayout({ onBack }) {
                     language={activeFile?.language || "plaintext"}
                 />
             </div>
+
+            {/* Run output popup */}
+            {showRunOutput && (
+                <div
+                    style={{
+                        position: "fixed",
+                        inset: 0,
+                        backgroundColor: "rgba(15,23,42,0.75)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 60,
+                    }}
+                    onClick={() => setShowRunOutput(false)}
+                >
+                    <div
+                        style={{
+                            width: "70%",
+                            maxWidth: "800px",
+                            maxHeight: "70vh",
+                            backgroundColor: "#020617",
+                            borderRadius: "12px",
+                            border: "1px solid #4b5563",
+                            padding: "16px",
+                            boxShadow: "0 20px 40px rgba(0,0,0,0.8)",
+                            display: "flex",
+                            flexDirection: "column",
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div
+                            style={{
+                                marginBottom: "8px",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                            }}
+                        >
+              <span style={{ fontSize: "14px", fontWeight: 600 }}>
+                Run output – {activeFile?.name || "untitled"}
+              </span>
+                            <button
+                                onClick={() => setShowRunOutput(false)}
+                                style={{
+                                    padding: "4px 8px",
+                                    fontSize: "12px",
+                                    borderRadius: "6px",
+                                    border: "1px solid #4b5563",
+                                    backgroundColor: "#111827",
+                                    color: "#e5e7eb",
+                                    cursor: "pointer",
+                                }}
+                            >
+                                Close
+                            </button>
+                        </div>
+                        <pre
+                            style={{
+                                flex: 1,
+                                margin: 0,
+                                padding: "8px",
+                                borderRadius: "8px",
+                                backgroundColor: "#020617",
+                                color: "#e5e7eb",
+                                fontFamily: "monospace",
+                                fontSize: "13px",
+                                overflow: "auto",
+                                whiteSpace: "pre-wrap",
+                            }}
+                        >
+              {runOutput}
+            </pre>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
