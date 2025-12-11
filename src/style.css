@@ -1,3 +1,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.rain-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 5;
+}
+
+.raindrop {
+     position: absolute;
+     width: 3px;
+     height: 10px;
+     background: rgba(255, 255, 255, 0.7);
+     border-radius: 50% 50% 70% 70%;
+     transform-origin: center top;
+     animation-name: raindrop-fall;
+     animation-timing-function: linear;
+     animation-iteration-count: infinite;
+ }
+@keyframes raindrop-fall {
+    0% {
+        transform: translateY(-20px) scaleY(0.7);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    80% {
+        transform: translateY(90vh) scaleY(1.1); /* wird etwas länger */
+    }
+    100% {
+        transform: translateY(115vh) scaleY(0.4) scaleX(1.6); /* unten „zerquetscht“ */
+        opacity: 0;
+    }
+}

@@ -149,6 +149,96 @@ export default function WeatherApp({ onBack }) {
         setSearchResult(null);
         setSearchCity("");
     };
+    function getBackgroundStyleForWeather(code) {
+        if (code == null) {
+            return {
+                backgroundImage:
+                    "radial-gradient(circle at top, #38bdf8 0, #0f172a 55%, #020617 100%)",
+            };
+        }
+
+        // Klar / Sonne
+        if (code === 0 || code === 1) {
+            return {
+                backgroundImage:
+                    "radial-gradient(circle at top, #fbbf24 0%, #f59e0b 35%, #ea580c 60%, #020617 100%)",
+            };
+        }
+
+        // Nebel (45, 48)
+        if (code === 45 || code === 48) {
+            return {
+                backgroundImage:
+                    "radial-gradient(circle at top, #9ca3af 0, #4b5563 40%, #020617 100%)",
+            };
+        }
+
+        // Teils bewölkt / bewölkt
+        if (code === 2 || code === 3) {
+            return {
+                backgroundImage:
+                    "radial-gradient(circle at top, #64748b 0, #020617 60%, #000000 100%)",
+            };
+        }
+
+        // Regen / Schauer (51–67, 80–82)
+        if (
+            (code >= 51 && code <= 67) || // Niesel + Regen
+            (code >= 80 && code <= 82)   // Regenschauer
+        ) {
+            return {
+                backgroundImage:
+                    "radial-gradient(circle at top, #0ea5e9 0, #1d4ed8 45%, #020617 100%)",
+                animation: "rain-pulse 4s infinite",
+            };
+        }
+
+        // Gewitter
+        if (code === 95 || code === 96 || code === 99) {
+            return {
+                backgroundImage:
+                    "radial-gradient(circle at top, #1e293b 0, #020617 60%, #000000 100%)",
+            };
+        }
+
+        // Standard
+        return {
+            backgroundImage:
+                "radial-gradient(circle at top, #38bdf8 0, #0f172a 55%, #020617 100%)",
+        };
+    }
+    function getFilterForWeather(code) {
+        if (code == null) return "none";
+
+        // leichter Effekt bei Regen / Schauern
+        if (
+            (code >= 51 && code <= 67) ||
+            (code >= 80 && code <= 82)
+        ) {
+            return "hue-rotate(-6deg) brightness(0.95)";
+        }
+
+        // dezentes Aufhellen bei Gewitter
+        if (code === 95 || code === 96 || code === 99) {
+            return "brightness(1.15)";
+        }
+
+        // sonst kein Effekt
+        return "none";
+    }
+    const weatherCode = weather?.current?.weathercode ?? null;
+    const isRain =
+        (weatherCode >= 51 && weatherCode <= 67) ||
+        (weatherCode >= 80 && weatherCode <= 82);
+
+    const raindrops = isRain
+        ? Array.from({ length: 40 }, (_, i) => {
+            const left = Math.random() * 100;          // % von links
+            const delay = Math.random() * 1.5;
+            const duration = 1 + Math.random() * 2;
+            return { id: i, left, delay, duration };
+        })
+        : [];
     return (
         <div
             style={{
@@ -157,11 +247,28 @@ export default function WeatherApp({ onBack }) {
                 display: "flex",
                 justifyContent: "space-between",
                 overflow: "hidden",
-                backgroundImage:
-                    "radial-gradient(circle at top, #38bdf8 0, #0f172a 55%, #020617 100%)",
                 color: "#e2e8f0",
+                position: "relative",
+                transition: "background-image 500ms ease-in-out",
+                ...getBackgroundStyleForWeather(weatherCode),
             }}
         >
+            {isRain && (
+                <div className="rain-overlay">
+                    {raindrops.map((drop) => (
+                        <div
+                            key={drop.id}
+                            className="raindrop"
+                            style={{
+                                left: `${drop.left}vw`,
+                                top: "-40px",
+                                animationDuration: `${drop.duration}s`,
+                                animationDelay: `${drop.delay}s`,
+                            }}
+                        />
+                    ))}
+                </div>
+            )}
             {/* Toggle-Button – NICHT in der Sidebar */}
             <button
                 onClick={() => setIsSidebarOpen(o => !o)}
