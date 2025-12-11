@@ -13,6 +13,7 @@ const apps = [
     "FreeCAD",
     "Weather",
     "Text Editor",
+    "Calendar"
 ];
 
 const wrapperStyle = {

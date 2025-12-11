@@ -19,6 +19,7 @@ import FreeCAD from "./components/FreeCAD";
 import Minesweeper from "./components/Minesweeper";
 import WeatherApp from "./components/Weather.jsx";
 import VSCodeLayout from "./components/VSCodeLayout.jsx";
+import CalendarApp from "./components/CalendarApp.jsx";
 
 function App() {
     const [bootDone, setBootDone] = useState(false);
@@ -55,7 +56,6 @@ function App() {
             }}
         >
             {/* Einzelne Apps */}
-
             {currentApp === "Paint" && (
                 <PaintView onBack={goHome} />
             )}
@@ -97,6 +97,9 @@ function App() {
                 <VSCodeLayout onBack={goHome} />
             )}
 
+            {currentApp === "Calendar" && (
+                <CalendarApp onBack={goHome} />
+            )}
             {/* ==== Game Collection und Spiele ==== */}
 
             {currentApp === "Game Collection" && !activeGame && (
