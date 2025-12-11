@@ -10,7 +10,21 @@ const initialPresets = [
 
 export default function WeatherApp({ onBack }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [presets, setPresets] = useState(initialPresets);
+    const [presets, setPresets] = useState(() => {
+        const stored = localStorage.getItem("weather-presets");
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch {
+                // Falls kaputt: auf Default zurück
+                return initialPresets;
+            }
+        }
+        return initialPresets;
+    });
+    useEffect(() => {
+        localStorage.setItem("weather-presets", JSON.stringify(presets));
+    }, [presets]);
     const [selectedPreset, setSelectedPreset] = useState(initialPresets[0]);
     const [weather, setWeather] = useState(null);
     const [loading, setLoading] = useState(false);
