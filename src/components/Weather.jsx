@@ -207,25 +207,6 @@ export default function WeatherApp({ onBack }) {
                 "radial-gradient(circle at top, #38bdf8 0, #0f172a 55%, #020617 100%)",
         };
     }
-    function getFilterForWeather(code) {
-        if (code == null) return "none";
-
-        // leichter Effekt bei Regen / Schauern
-        if (
-            (code >= 51 && code <= 67) ||
-            (code >= 80 && code <= 82)
-        ) {
-            return "hue-rotate(-6deg) brightness(0.95)";
-        }
-
-        // dezentes Aufhellen bei Gewitter
-        if (code === 95 || code === 96 || code === 99) {
-            return "brightness(1.15)";
-        }
-
-        // sonst kein Effekt
-        return "none";
-    }
     const weatherCode = weather?.current?.weathercode ?? null;
     const isRain =
         (weatherCode >= 51 && weatherCode <= 67) ||
