@@ -319,6 +319,22 @@ ipcMain.on("launch-orca-slicer", () => {
     child.unref();
 });
 
+
+ipcMain.on("launch-bambu-studio", () => {
+    const slicerPath = path.resolve(
+        "C:\\Program Files\\Bambu Studio\\bambu-studio.exe"
+    );
+    console.log(`Starting Bambu Studio: ${slicerPath}`);
+    const child = spawn(slicerPath, [], {
+        detached: true,
+        stdio: "ignore",
+    });
+    child.on("error", (err) => {
+        console.error(`Failed to start Bambu Studio: ${err.message}`);
+    });
+    child.unref();
+});
+
 ipcMain.on("launch-freecad", () => {
     exec('open -a /Applications/FreeCAD.app');
 });
