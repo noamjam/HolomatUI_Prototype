@@ -1,7 +1,8 @@
-// src/AssistantChat.jsx
-import React, { useState } from "react";
+// src/chat-renderer.jsx
+import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom/client";
 
-export default function AssistantChat({ isOpen, onSend }) {
+function AssistantChat({ isOpen, onSend }) {
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState([]);
 
@@ -127,3 +128,46 @@ export default function AssistantChat({ isOpen, onSend }) {
         </div>
     );
 }
+
+function ChatWindowRoot() {
+    const [chatPort, setChatPort] = useState(null);
+    useEffect(() => {
+        let mounted = true;
+        (async () => {
+            try {
+                const port = await window.electronAPI?.getChatPort?.();
+                if (mounted) setChatPort(port);
+            } catch (err) {
+                console.error("Failed to get chat port:", err);
+            }
+        })();
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
+    const handleSendMessage = async (msg, addResponse) => {
+        if (!chatPort) {
+            addResponse("⚠️ Chat server not ready.");
+            return;
+        }
+        try {
+            const res = await fetch(`http://127.0.0.1:${chatPort}/api/chat`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: msg }),
+            });
+            const data = await res.json();
+            addResponse(data.reply || "No response");
+        } catch (err) {
+            addResponse("⚠️ Connection error.");
+            console.error(err);
+        }
+    };
+
+    return <AssistantChat isOpen={true} onSend={handleSendMessage} />;
+}
+
+ReactDOM.createRoot(document.getElementById("chat-root")).render(
+    <ChatWindowRoot />
+);

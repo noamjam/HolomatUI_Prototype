@@ -1,13 +1,11 @@
-// BambuStudio.jsx — auto-launch Bambu Studio when page mounts
 import React, { useEffect } from "react";
 
 export default function BambuStudio({ onBack }) {
     useEffect(() => {
-        // Starte Bambu Studio automatisch beim Laden der Seite
         try {
-            if (window.electronAPI?.launchBambuStudio()) {
-                console.log("Auto-launching c...");
-                window.electronAPI.launchBambuStudio();
+            if (window.electronAPI?.launchBambuStudio) {
+                console.log("Auto-launching Bambu Studio…");
+                window.electronAPI.launchBambuStudio();   // nur hier aufrufen
             } else {
                 console.error("Electron API not available — BambuStudio not started.");
                 alert("Electron bridge not available: cannot start BambuStudio.");
@@ -15,6 +13,7 @@ export default function BambuStudio({ onBack }) {
         } catch (err) {
             console.error("Error launching BambuStudio:", err);
         }
+
     }, []);
 
     return (

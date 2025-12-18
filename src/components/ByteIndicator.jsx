@@ -1,124 +1,51 @@
-import React, { useState } from "react";
-import AssistantChat from "./AssistantChat";
+// src/ByteIndicator.jsx
+import React from "react";
 
-export default function ByteIndicator({ isActive }) {
-    const [isChatOpen, setChatOpen] = useState(false);
-
-    const handleSendMessage = async (msg, addResponse) => {
+export default function ByteIndicator() {
+    const handleClick = () => {
         try {
-            const res = await fetch("http://localhost:5000/api/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: msg }),
-            });
-            const data = await res.json();
-            addResponse(data.reply || "No response");
+            window.electronAPI?.openChatWindow?.();
         } catch (err) {
-            addResponse("⚠️ Connection error.");
-            console.error(err);
+            console.error("Failed to open chat window:", err);
         }
     };
 
-    const rootStyle = {
+    const buttonStyle = {
         position: "fixed",
-        right: "1rem",          // unten rechts
-        bottom: "1rem",
-        zIndex: 50,
-        width: "5rem",
-        height: "5rem",
+        bottom: 0,
+        right: 0,
+        width: "56px",
+        height: "56px",
+        background: "linear-gradient(135deg, #06b6d4, #0ea5e9)",
+        borderTopLeftRadius: "56px",
+        borderTopRightRadius: 0,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+        boxShadow: "0 -4px 18px rgba(0,0,0,0.6)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         cursor: "pointer",
+        zIndex: 120,
         userSelect: "none",
     };
 
-    const wrapperStyle = {
-        position: "relative",
-        width: "100%",
-        height: "100%",
+    const iconStyle = {
+        width: "22px",
+        height: "22px",
+        borderRadius: "9999px",
+        border: "2px solid rgba(240,249,255,0.9)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        fontSize: "12px",
+        color: "#e0f2fe",
+        boxShadow: "0 0 8px rgba(125,211,252,0.8)",
     };
-
-    const orbitStyle = {
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-        borderRadius: "9999px",
-        border: "2px solid rgba(34,211,238,1)", // cyan
-        opacity: 0.5,
-        transform: "rotate(30deg)",
-        boxSizing: "border-box",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-    };
-
-    const orbitInnerStyle = {
-        width: "100%",
-        height: "100%",
-        borderRadius: "9999px",
-        borderWidth: "3px",
-        borderStyle: "solid",
-        borderColor: "transparent",
-        borderTopColor: "rgba(34,211,238,1)",
-        borderLeftColor: "rgba(34,211,238,1)",
-        boxSizing: "border-box",
-    };
-
-    const coreBaseStyle = {
-        width: "3.5rem",
-        height: "3.5rem",
-        borderRadius: "9999px",
-        backgroundColor: "rgba(8,145,178,0.2)", // cyan-700/20
-        border: "1px solid rgba(34,211,238,1)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: "0.875rem",
-        fontWeight: 700,
-        color: "rgba(103,232,249,1)", // cyan-300
-        transition: "all 0.3s ease",
-    };
-
-    const coreActiveExtra = isActive
-        ? {
-            animation: "byte-pulse 1.5s ease-in-out infinite",
-            boxShadow: "0 0 15px rgba(6,182,212,1)",
-        }
-        : {};
 
     return (
-        <>
-            <style>{`
-        @keyframes byte-pulse {
-          0%   { transform: scale(1);   opacity: 1; }
-          50%  { transform: scale(1.06); opacity: 0.85; }
-          100% { transform: scale(1);   opacity: 1; }
-        }
-      `}</style>
-
-            <div
-                onClick={() => setChatOpen((prev) => !prev)}
-                style={rootStyle}
-            >
-                <div style={wrapperStyle}>
-                    <div style={orbitStyle}>
-                        <div style={orbitInnerStyle} />
-                    </div>
-                    <div style={{ ...coreBaseStyle, ...coreActiveExtra }}>
-                        Mini
-                    </div>
-                </div>
-            </div>
-
-            <AssistantChat
-                isOpen={isChatOpen}
-                onClose={() => setChatOpen(false)}
-                onSend={handleSendMessage}
-            />
-        </>
+        <div style={buttonStyle} onClick={handleClick}>
+            <div style={iconStyle}>B</div>
+        </div>
     );
 }

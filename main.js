@@ -2,6 +2,8 @@ process.on("unhandledRejection", (reason) => {
     console.error("⚠️ Unhandled Promise Rejection:", reason);
 });
 
+let chatWindow = null;
+
 const path = require("path");
 const { app, BrowserWindow, ipcMain } = require("electron");
 const { spawn, exec } = require("child_process");
@@ -337,4 +339,33 @@ ipcMain.on("launch-bambu-studio", () => {
 
 ipcMain.on("launch-freecad", () => {
     exec('open -a /Applications/FreeCAD.app');
+});
+
+ipcMain.on("open-chat-window", () => {
+    if (chatWindow && !chatWindow.isDestroyed()) {
+        chatWindow.focus();
+        return;
+    }
+
+    chatWindow = new BrowserWindow({
+        width: 420,
+        height: 560,
+        resizable: true,
+        parent: mainWindow,
+        modal: false,
+        autoHideMenuBar: true,
+        backgroundColor: "#020617",
+        webPreferences: {
+            preload: path.join(__dirname, "preload.js"),
+            contextIsolation: true,
+            nodeIntegration: false,
+        },
+    });
+
+    // Point to the dedicated chat HTML (see next section)
+    chatWindow.loadFile(path.join(__dirname, "dist", "chat.html"));
+
+    chatWindow.on("closed", () => {
+        chatWindow = null;
+    });
 });

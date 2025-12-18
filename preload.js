@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     onChatServerStarted: (callback) =>
         ipcRenderer.on("chat-server-started", (_, port) => callback(port)),
 
+    openChatWindow: () => ipcRenderer.send("open-chat-window"),
     //File Explorer
     openFileExplorer: () => ipcRenderer.send("open-file-explorer"),
 
