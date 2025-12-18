@@ -8,8 +8,6 @@ const languageByExt = (ext) => {
     switch (ext) {
         case "js":
             return "javascript";
-        case "ts":
-            return "typescript";
         case "py":
             return "python";
         case "css":
@@ -105,7 +103,6 @@ function VSCodeLayout({ onBack }) {
     const languages = [
         { id: "plaintext", label: "Plain text" },
         { id: "javascript", label: "JavaScript" },
-        { id: "typescript", label: "TypeScript" },
         { id: "python", label: "Python" },
     ];
 
@@ -126,7 +123,6 @@ function VSCodeLayout({ onBack }) {
     const newFileOptions = [
         { ext: "txt", label: "Text (.txt)" },
         { ext: "js", label: "JavaScript (.js)" },
-        { ext: "ts", label: "TypeScript (.ts)" },
         { ext: "py", label: "Python (.py)" },
     ];
 
@@ -178,6 +174,29 @@ function VSCodeLayout({ onBack }) {
         reader.readAsText(fileObj, "utf-8");
         event.target.value = "";
     };
+
+    const closeFile = () =>
+    {
+        if (!activeFile) return;
+
+        setFiles((prev) => {
+            const idx = prev.findIndex((f) => f.id === activeFileId);
+            if (idx === -1) return prev;
+
+            const newFiles = prev.filter((f) => f.id !== activeFileId);
+
+            // pick next active file: prefer the one to the left, otherwise first
+            if (newFiles.length === 0) {
+                setActiveFileId(null);
+            } else {
+                const next =
+                    newFiles[idx - 1] || newFiles[0];
+                setActiveFileId(next.id);
+            }
+
+            return newFiles;
+        });
+    }
 
 
     // "Save" bedeutet hier: aktuelle Version als Datei herunterladen
@@ -286,8 +305,8 @@ function VSCodeLayout({ onBack }) {
                         Explorer
                     </div>
 
-                    {/* Open / Save */}
-                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                    {/* Open / Save / Close */}
+                    <div style={{ display: "flex", gap: "21px", flexWrap: "wrap" }}>
                         <button
                             style={buttonSmall}
                             onClick={handleOpenClick}
@@ -301,6 +320,13 @@ function VSCodeLayout({ onBack }) {
                             title="Ctrl+S"
                         >
                             Save file
+                        </button>
+                        <button
+                            style={buttonSmall}
+                            onClick={closeFile}
+                            title="Ctrl+S"
+                        >
+                            Close file
                         </button>
                     </div>
 

@@ -22,19 +22,76 @@ function startRunServer() {
     runServerApp.use(cors());
     runServerApp.use(express.json());
 
-    // /api/run Endpoint – hier kannst du später echte Code-Ausführung einbauen
     runServerApp.post("/api/run", (req, res) => {
         const { language, code, filename } = req.body || {};
         console.log("💻 /api/run request:", { language, filename });
 
-        // Platzhalter-Ausgabe
-        const output =
-            `Fake runner\n` +
-            `Language: ${language}\n` +
-            `File: ${filename}\n` +
-            `Code length: ${code ? code.length : 0}`;
+        if (typeof code !== "string") {
+            return res
+                .status(400)
+                .json({ output: "Invalid payload: code must be a string" });
+        }
 
-        res.json({ output });
+        let cmd;
+        let args;
+
+        if (language === "python") {
+            cmd = process.platform === "win32" ? "python" : "python3";
+            args = ["-c", code];
+        } else if (language === "javascript") {
+            cmd = "node";
+            args = ["-e", code]; // run JS directly in Node
+        } else {
+            return res
+                .status(400)
+                .json({ output: `Language not supported: ${language}` });
+        }
+
+        const child = spawn(cmd, args, { windowsHide: true });
+
+        let stdout = "";
+        let stderr = "";
+        const MAX_OUTPUT = 200_000;
+        const TIMEOUT_MS = 3000;
+
+        const killTimer = setTimeout(() => child.kill("SIGTERM"), TIMEOUT_MS);
+
+        const appendLimited = (target, chunk) => {
+            const text = chunk.toString();
+            if (target.length >= MAX_OUTPUT) return target;
+            const remaining = MAX_OUTPUT - target.length;
+            return target + text.slice(0, remaining);
+        };
+
+        child.stdout.on("data", (d) => {
+            stdout = appendLimited(stdout, d);
+        });
+
+        child.stderr.on("data", (d) => {
+            stderr = appendLimited(stderr, d);
+        });
+
+        child.on("error", (err) => {
+            clearTimeout(killTimer);
+            return res
+                .status(500)
+                .json({ output: `Failed to start ${cmd}: ${err.message}` });
+        });
+
+        child.on("close", (exitCode, signal) => {
+            clearTimeout(killTimer);
+
+            const combined = `${stdout}${
+                stderr ? (stdout ? "\n" : "") + stderr : ""
+            }`.trim();
+            const output = combined
+                ? combined
+                : signal
+                    ? `Process killed (${signal})`
+                    : `No output (exitCode=${exitCode})`;
+
+            return res.json({ output });
+        });
     });
 
     const port = 5000;
@@ -46,6 +103,8 @@ function startRunServer() {
         console.error("💥 Run server error:", err);
     });
 }
+
+module.exports = { startRunServer };
 
 // ------------------------------------------------------
 // Plattform erkennen
