@@ -2,9 +2,33 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 
+const STORAGE_KEY = "byte-chat-messages";
+
 function AssistantChat({ isOpen, onSend }) {
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState([]);
+
+    // load history once
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) setMessages(parsed);
+            }
+        } catch (e) {
+            console.error("Failed to load chat history:", e);
+        }
+    }, []);
+
+    // persist on every change
+    useEffect(() => {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+        } catch (e) {
+            console.error("Failed to save chat history:", e);
+        }
+    }, [messages]);
 
     if (!isOpen) return null;
 
@@ -20,6 +44,14 @@ function AssistantChat({ isOpen, onSend }) {
             const botMsg = { from: "bot", text: replyText };
             setMessages((prev) => [...prev, botMsg]);
         });
+    };
+
+    const handleCopy = async (text) => {
+        try {
+            await navigator.clipboard.writeText(text);
+        } catch (err) {
+            console.error("Copy failed:", err);
+        }
     };
 
     return (
@@ -67,21 +99,41 @@ function AssistantChat({ isOpen, onSend }) {
                         style={{
                             marginBottom: "6px",
                             textAlign: m.from === "user" ? "right" : "left",
+                            display: "flex",
+                            justifyContent:
+                                m.from === "user" ? "flex-end" : "flex-start",
                         }}
                     >
-            <span
-                style={{
-                    display: "inline-block",
-                    maxWidth: "80%",
-                    padding: "6px 8px",
-                    borderRadius: "9999px",
-                    backgroundColor:
-                        m.from === "user" ? "#0ea5e9" : "rgba(15,23,42,0.9)",
-                    color: m.from === "user" ? "#0f172a" : "#e5e7eb",
-                }}
-            >
-              {m.text}
-            </span>
+                        <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+              <span
+                  style={{
+                      display: "inline-block",
+                      maxWidth: "80%",
+                      padding: "6px 8px",
+                      borderRadius: "9999px",
+                      backgroundColor:
+                          m.from === "user" ? "#0ea5e9" : "rgba(15,23,42,0.9)",
+                      color: m.from === "user" ? "#0f172a" : "#e5e7eb",
+                  }}
+              >
+                {m.text}
+              </span>
+                            {m.from === "bot" && (
+                                <button
+                                    onClick={() => handleCopy(m.text)}
+                                    title="Copy answer"
+                                    style={{
+                                        border: "none",
+                                        backgroundColor: "transparent",
+                                        color: "#9ca3af",
+                                        cursor: "pointer",
+                                        fontSize: "11px",
+                                    }}
+                                >
+                                    ⧉
+                                </button>
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>
@@ -131,19 +183,16 @@ function AssistantChat({ isOpen, onSend }) {
 
 function ChatWindowRoot() {
     const [chatPort, setChatPort] = useState(null);
+
     useEffect(() => {
-        let mounted = true;
         (async () => {
             try {
                 const port = await window.electronAPI?.getChatPort?.();
-                if (mounted) setChatPort(port);
+                setChatPort(port);
             } catch (err) {
                 console.error("Failed to get chat port:", err);
             }
         })();
-        return () => {
-            mounted = false;
-        };
     }, []);
 
     const handleSendMessage = async (msg, addResponse) => {
@@ -160,8 +209,8 @@ function ChatWindowRoot() {
             const data = await res.json();
             addResponse(data.reply || "No response");
         } catch (err) {
-            addResponse("⚠️ Connection error.");
             console.error(err);
+            addResponse("⚠️ Connection error.");
         }
     };
 

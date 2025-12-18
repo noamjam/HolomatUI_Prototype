@@ -243,7 +243,6 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1024,
         height: 768,
-        fullscreen: true,
         frame: true,
         autoHideMenuBar: true,
         webPreferences: {
@@ -253,7 +252,7 @@ function createWindow() {
         },
     });
 
-    mainWindow.maximize();
+    mainWindow.setFullScreen(true);
     mainWindow.loadFile(path.join(__dirname, "dist", "index.html"));
     mainWindow.on("closed", () => (mainWindow = null));
 }
@@ -351,9 +350,8 @@ ipcMain.on("open-chat-window", () => {
         width: 420,
         height: 560,
         resizable: true,
-        parent: mainWindow,
-        modal: false,
         autoHideMenuBar: true,
+        alwaysOnTop: true,
         backgroundColor: "#020617",
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
