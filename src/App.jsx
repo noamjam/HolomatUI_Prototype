@@ -20,6 +20,7 @@ import Minesweeper from "./components/Minesweeper";
 import WeatherApp from "./components/Weather.jsx";
 import VSCodeLayout from "./components/VSCodeLayout.jsx";
 import BambuStudio from "./components/BambuStudio";
+import CalendarApp from "./components/CalendarApp.jsx";
 
 function App() {
     const [bootDone, setBootDone] = useState(false);
@@ -44,6 +45,20 @@ function App() {
     const goHome = () => {
         setActiveGame(null);
         setCurrentApp(null);
+    };
+
+    const scanline = {
+        hidden: { clipPath: "inset(0 100% 0 0)" }, // Startet rechts abgeschnitten
+        visible: {
+            clipPath: [
+                "inset(0 100% 0 0)",  // Voll links abgeschnitten
+                "inset(0 0 0 0)"      // Voll sichtbar
+            ],
+            transition: {
+                duration: 3,
+                ease: "linear"
+            }
+        }
     };
 
     return (
@@ -103,6 +118,9 @@ function App() {
                 <BambuStudio onBack={goHome} />
             )}
 
+            {currentApp === "Calendar" && (
+                <CalendarApp onBack={goHome} />
+            )}
             {/* ==== Game Collection und Spiele ==== */}
 
             {currentApp === "Game Collection" && !activeGame && (
@@ -140,11 +158,20 @@ function App() {
             {/* Startansicht, wenn keine App läuft */}
             {currentApp === null && !activeGame && (
                 <div className="p-8">
-                    <h1
-                        className="text-4xl font-bold mb-12 text-center drop-shadow-[0_0_8px_cyan]"
+                    <h1 className="text-4xl font-bold mb-12 text-center drop-shadow-[0_0_8px_cyan] overflow-hidden"
                         style={{ color: theme.textColor }}
-                    >
-                        Welcome to your futuristic workbench
+                        >
+                        {["Welcome to your futuristic workbench"].map((word, w) => (
+                            <motion.span
+                                key={w}
+                                variants={scanline}
+                                initial="hidden"
+                                animate="visible"
+                                className="inline-block mr-2 last:mr-0"
+                            >
+                                {word}
+                            </motion.span>
+                        ))}
                     </h1>
 
                     <AppCarousel

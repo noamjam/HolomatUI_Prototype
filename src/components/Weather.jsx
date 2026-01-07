@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
 
 const initialPresets = [
-    { name: "Wien", lat: 48.20849, lon: 16.37208 },
-    { name: "Berlin", lat: 52.52, lon: 13.405 },
-    { name: "London", lat: 51.509865, lon: -0.118092 },
-    { name: "New York", lat: 40.7128, lon: -74.0060 }
+    {name: "Wien", lat: 48.20849, lon: 16.37208},
+    {name: "Berlin", lat: 52.52, lon: 13.405},
+    {name: "London", lat: 51.509865, lon: -0.118092},
+    {name: "New York", lat: 40.7128, lon: -74.0060}
 ];
 
-export default function WeatherApp({ onBack }) {
+export default function WeatherApp({onBack}) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [presets, setPresets] = useState(() => {
         const stored = localStorage.getItem("weather-presets");
@@ -40,7 +40,7 @@ export default function WeatherApp({ onBack }) {
 
         console.log("selectedPreset =", selectedPreset);
 
-        const { lat, lon } = selectedPreset;
+        const {lat, lon} = selectedPreset;
         if (lat == null || lon == null) {
             console.warn("selectedPreset ohne gültige Koordinaten, breche ab.");
             return;
@@ -121,7 +121,7 @@ export default function WeatherApp({ onBack }) {
 
         if (res.results && res.results.length > 0) {
             const city = res.results[0];
-            setSelectedPreset({ name: city.name, lat: city.latitude, lon: city.longitude });
+            setSelectedPreset({name: city.name, lat: city.latitude, lon: city.longitude});
             setSearchResult(city);
         } else {
             setError("Stadt nicht gefunden!");
@@ -149,6 +149,7 @@ export default function WeatherApp({ onBack }) {
         setSearchResult(null);
         setSearchCity("");
     };
+
     function getBackgroundStyleForWeather(code) {
         if (code == null) {
             return {
@@ -207,17 +208,18 @@ export default function WeatherApp({ onBack }) {
                 "radial-gradient(circle at top, #38bdf8 0, #0f172a 55%, #020617 100%)",
         };
     }
+
     const weatherCode = weather?.current?.weathercode ?? null;
     const isRain =
         (weatherCode >= 51 && weatherCode <= 67) ||
         (weatherCode >= 80 && weatherCode <= 82);
 
     const raindrops = isRain
-        ? Array.from({ length: 40 }, (_, i) => {
+        ? Array.from({length: 40}, (_, i) => {
             const left = Math.random() * 100;          // % von links
             const delay = Math.random() * 1.5;
             const duration = 1 + Math.random() * 2;
-            return { id: i, left, delay, duration };
+            return {id: i, left, delay, duration};
         })
         : [];
     return (
@@ -578,7 +580,7 @@ export default function WeatherApp({ onBack }) {
                                 e.currentTarget.style.backgroundColor = "rgba(2,6,23,0.6)";
                             }}
                         >
-                            <span style={{ fontSize: "1rem" }}>⬅</span>
+                            <span style={{fontSize: "1rem"}}>⬅</span>
                             <span>Zurück</span>
                         </button>
                     </header>
@@ -928,7 +930,7 @@ export default function WeatherApp({ onBack }) {
 
                                         const dayLabel = new Date(dateStr).toLocaleDateString(
                                             "de-DE",
-                                            { weekday: "short" },
+                                            {weekday: "short"},
                                         );
 
                                         return (
@@ -968,7 +970,7 @@ export default function WeatherApp({ onBack }) {
                                                     {code != null ? (
                                                         <>
                                                             <span>{getWeatherEmoji(code)}</span>
-                                                            <span style={{ opacity: 0.85 }}>
+                                                            <span style={{opacity: 0.85}}>
                                                             {translateWeatherCode(code)}
                                                           </span>
                                                         </>
@@ -1024,10 +1026,10 @@ export default function WeatherApp({ onBack }) {
                                                         color: "rgba(226,232,240,0.9)",
                                                     }}
                                                 >
-                          <span style={{ opacity: 0.9 }}>
+                          <span style={{opacity: 0.9}}>
                             {Math.round(min)}°C
                           </span>
-                                                    <span style={{ opacity: 0.9 }}>
+                                                    <span style={{opacity: 0.9}}>
                             {Math.round(max)}°C
                           </span>
                                                 </div>
@@ -1086,6 +1088,7 @@ function translateWeatherCode(code) {
         61: "Leichter Regen",
         63: "Mäßiger Regen",
         65: "Starker Regen",
+        71: "Schnee",
         80: "Regen-Schauer",
         95: "Gewitter",
 // ... ergänzbar!
