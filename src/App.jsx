@@ -19,6 +19,7 @@ import FreeCAD from "./components/FreeCAD";
 import Minesweeper from "./components/Minesweeper";
 import WeatherApp from "./components/Weather.jsx";
 import VSCodeLayout from "./components/VSCodeLayout.jsx";
+import BambuStudio from "./components/BambuStudio";
 
 function App() {
     const [bootDone, setBootDone] = useState(false);
@@ -95,6 +96,11 @@ function App() {
             {/* Neuer VS-Code-ähnlicher Texteditor */}
             {currentApp === "Text Editor" && (
                 <VSCodeLayout onBack={goHome} />
+            )}
+
+            {/* Bambu Studio */}
+            {currentApp === "Bambu Studio" && (
+                <BambuStudio onBack={goHome} />
             )}
 
             {/* ==== Game Collection und Spiele ==== */}
