@@ -1,8 +1,7 @@
+// main.js
 process.on("unhandledRejection", (reason) => {
     console.error("⚠️ Unhandled Promise Rejection:", reason);
 });
-
-let chatWindow = null;
 
 const path = require("path");
 const { app, BrowserWindow, ipcMain } = require("electron");
@@ -10,7 +9,7 @@ const { spawn, exec } = require("child_process");
 const net = require("net");
 const os = require("os");
 
-// 🚀 Express-Code-Runner-Server ---------------------------------
+// Express Run-Server (Code Runner)
 const express = require("express");
 const cors = require("cors");
 
@@ -25,8 +24,8 @@ function startRunServer() {
     runServerApp.use(express.json());
 
     runServerApp.post("/api/run", (req, res) => {
-        const { language, code, filename } = req.body || {};
-        console.log("💻 /api/run request:", { language, filename });
+        const { language, code } = req.body || {};
+        console.log("💻 /api/run request:", { language });
 
         if (typeof code !== "string") {
             return res
@@ -42,7 +41,7 @@ function startRunServer() {
             args = ["-c", code];
         } else if (language === "javascript") {
             cmd = "node";
-            args = ["-e", code]; // run JS directly in Node
+            args = ["-e", code];
         } else {
             return res
                 .status(400)
@@ -82,7 +81,6 @@ function startRunServer() {
 
         child.on("close", (exitCode, signal) => {
             clearTimeout(killTimer);
-
             const combined = `${stdout}${
                 stderr ? (stdout ? "\n" : "") + stderr : ""
             }`.trim();
@@ -106,13 +104,8 @@ function startRunServer() {
     });
 }
 
-module.exports = { startRunServer };
-
-// ------------------------------------------------------
-// Plattform erkennen
-// ------------------------------------------------------
-const platform = os.platform(); // 'win32', 'darwin', 'linux'
-
+// Plattform
+const platform = os.platform();
 if (platform === "win32") {
     console.log("Running on Windows → Disabling hardware acceleration");
     app.disableHardwareAcceleration();
@@ -124,64 +117,92 @@ let ollamaProcess = null;
 let byteProcess = null;
 let chatProcess = null;
 let mainWindow = null;
+let chatWindow = null;
 global.chatPort = null;
 
-// ------------------------------------------------------
-// Ollama Autostart
-// ------------------------------------------------------
+// Ollama Autostart (robuster curl-Check)
 function startOllamaServer() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         console.log("🧩 Starting Ollama background server...");
 
-        const check = require("child_process").spawn("curl", ["-s", "http://127.0.0.1:11434/api/tags"]);
+        let check;
+        try {
+            check = spawn("curl", [
+                "-s",
+                "http://127.0.0.1:11434/api/tags",
+            ]);
+        } catch (err) {
+            console.warn("⚠️ curl spawn failed, starting ollama directly:", err);
+        }
+
+        if (!check) {
+            startOllamaBinary(resolve);
+            return;
+        }
 
         let output = "";
         check.stdout.on("data", (d) => (output += d.toString()));
-        check.on("close", (code) => {
+
+        check.on("close", () => {
             if (output.includes("models")) {
                 console.log("✅ Ollama is already running.");
                 resolve();
                 return;
             }
-
-            ollamaProcess = spawn("ollama", ["serve"], {
-                detached: true,
-                stdio: "ignore",
-            });
-            ollamaProcess.unref();
-
-            console.log("🚀 Ollama started in background.");
-            setTimeout(resolve, 1500);
+            startOllamaBinary(resolve);
         });
 
         check.on("error", (err) => {
-            console.error("💥 Ollama check failed:", err);
-            reject(err);
+            console.warn("⚠️ curl not available or check failed:", err.message);
+            startOllamaBinary(resolve);
         });
     });
 }
 
-// ------------------------------------------------------
-// Byte Sprachassistent
-// ------------------------------------------------------
-function startByteAssistant() {
-    const scriptPath = path.resolve(__dirname, "./byte-assistant/ByteAssistant.py");
+function startOllamaBinary(resolve) {
+    const OLLAMA_BIN =
+        process.platform === "win32"
+            ? "ollama.exe"
+            : "ollama";
 
-    const pythonCmd = process.platform === "win32"
-        ? path.resolve(__dirname, "./byte-assistant/.venv/Scripts/python.exe")
-        : path.resolve(__dirname, ".venv1/bin/python");
-
-    console.log("🚀 Starting Byte assistant...");
-    byteProcess = spawn(pythonCmd, [scriptPath], { cwd: path.dirname(scriptPath) });
-
-    byteProcess.stdout.on("data", (d) => console.log(`[Byte stdout] ${d.toString().trim()}`));
-    byteProcess.stderr.on("data", (d) => console.error(`[Byte stderr] ${d.toString().trim()}`));
-    byteProcess.on("exit", (code, sig) => console.warn(`⚠️ Byte process exited — code=${code}, signal=${sig}`));
+    ollamaProcess = spawn(OLLAMA_BIN, ["serve"], {
+        detached: true,
+        stdio: "ignore",
+    });
+    ollamaProcess.unref();
+    console.log("🚀 Ollama started in background.");
+    setTimeout(resolve, 1500);
 }
 
-// ------------------------------------------------------
-// Chat Assistant
-// ------------------------------------------------------
+// Byte Sprachassistent
+function startByteAssistant() {
+    const scriptPath = path.resolve(__dirname, "./byte-assistant/ByteAssistant.py");
+    const pythonCmd =
+        process.platform === "win32"
+            ? path.resolve(__dirname, "./byte-assistant/.venv/Scripts/python.exe")
+            : path.resolve(__dirname, ".venv1/bin/python");
+
+    console.log("🚀 Starting Byte assistant...");
+    byteProcess = spawn(pythonCmd, [scriptPath], {
+        cwd: path.dirname(scriptPath),
+        env: {
+            ...process.env,
+            CHAT_PORT: String(global.chatPort || 5050),
+        },
+    });
+
+    byteProcess.stdout.on("data", (d) =>
+        console.log(`[Byte stdout] ${d.toString().trim()}`)
+    );
+    byteProcess.stderr.on("data", (d) =>
+        console.error(`[Byte stderr] ${d.toString().trim()}`)
+    );
+    byteProcess.on("exit", (code, sig) =>
+        console.warn(`⚠️ Byte process exited — code=${code}, signal=${sig}`)
+    );
+}
+
+// Freien Port finden
 async function findFreePort(startPort = 5050) {
     return new Promise((resolve) => {
         const server = net.createServer();
@@ -194,15 +215,19 @@ async function findFreePort(startPort = 5050) {
     });
 }
 
+// Chat Assistant (FastAPI/Uvicorn)
 async function startChatAssistant() {
     try {
-        const scriptPath = path.resolve(__dirname, "./byte-assistant/ByteAssistant.py");
+        const scriptPath = path.resolve(
+            __dirname,
+            "./byte-assistant/ChatAssistant.py"
+        );
+        const pythonCmd =
+            process.platform === "win32"
+                ? path.resolve(__dirname, "./byte-assistant/.venv/Scripts/python.exe")
+                : path.resolve(__dirname, ".venv1/bin/python");
 
-        const pythonCmd = process.platform === "win32"
-            ? path.resolve(__dirname, "./byte-assistant/.venv/Scripts/python.exe")
-            : path.resolve(__dirname, ".venv1/bin/python");
         const freePort = await findFreePort(5050);
-
         global.chatPort = freePort;
         console.log(`💬 Using free port ${freePort} for ChatAssistant`);
 
@@ -215,7 +240,6 @@ async function startChatAssistant() {
         chatProcess.stdout.on("data", (data) => {
             const line = data.toString().trim();
             console.log(`[Chat stdout] ${line}`);
-
             if (line.includes("Uvicorn running") || line.includes("Running on")) {
                 console.log(`✅ Chat server started on port ${freePort}`);
                 if (mainWindow?.webContents) {
@@ -236,9 +260,7 @@ async function startChatAssistant() {
     }
 }
 
-// ------------------------------------------------------
 // Electron Window
-// ------------------------------------------------------
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1024,
@@ -257,17 +279,13 @@ function createWindow() {
     mainWindow.on("closed", () => (mainWindow = null));
 }
 
-// ------------------------------------------------------
 // Lifecycle
-// ------------------------------------------------------
 app.whenReady().then(async () => {
-    // Code-Runner-Server für /api/run starten
     startRunServer();
-
     await startOllamaServer();
+    await startChatAssistant();
     startByteAssistant();
     createWindow();
-    await startChatAssistant();
 });
 
 app.on("window-all-closed", () => {
@@ -277,15 +295,42 @@ app.on("window-all-closed", () => {
         if (chatProcess) chatProcess.kill("SIGTERM");
         if (ollamaProcess) ollamaProcess.kill("SIGTERM");
         if (runServerInstance) runServerInstance.close();
-
         app.quit();
     }
 });
 
-// ------------------------------------------------------
-// IPC Handlers
-// ------------------------------------------------------
+// IPC
 ipcMain.handle("get-chat-port", () => global.chatPort || null);
+
+ipcMain.on("open-chat-window", () => {
+    if (chatWindow && !chatWindow.isDestroyed()) {
+        chatWindow.focus();
+        return;
+    }
+
+    chatWindow = new BrowserWindow({
+        width: 420,
+        height: 560,
+        resizable: true,
+        autoHideMenuBar: true,
+        alwaysOnTop: true,
+        backgroundColor: "#020617",
+        webPreferences: {
+            preload: path.join(__dirname, "preload.js"),
+            contextIsolation: true,
+            nodeIntegration: false,
+        },
+    });
+
+    chatWindow.loadFile(path.join(__dirname, "dist", "chat.html"));
+
+    chatWindow.on("closed", () => {
+        chatWindow = null;
+    });
+});
+
+// weitere ipcMain.on(...) für Orca, FreeCAD, etc. bleiben wie gehabt
+
 
 ipcMain.on("launch-paint", () => {
     const scriptPath = path.join(__dirname, "paint.py");
@@ -355,32 +400,4 @@ ipcMain.on("launch-freecad", () => {
     {
         exec('open -a /Applications/FreeCAD.app');
     }
-});
-
-ipcMain.on("open-chat-window", () => {
-    if (chatWindow && !chatWindow.isDestroyed()) {
-        chatWindow.focus();
-        return;
-    }
-
-    chatWindow = new BrowserWindow({
-        width: 420,
-        height: 560,
-        resizable: true,
-        autoHideMenuBar: true,
-        alwaysOnTop: true,
-        backgroundColor: "#020617",
-        webPreferences: {
-            preload: path.join(__dirname, "preload.js"),
-            contextIsolation: true,
-            nodeIntegration: false,
-        },
-    });
-
-    // Point to the dedicated chat HTML (see next section)
-    chatWindow.loadFile(path.join(__dirname, "dist", "chat.html"));
-
-    chatWindow.on("closed", () => {
-        chatWindow = null;
-    });
 });

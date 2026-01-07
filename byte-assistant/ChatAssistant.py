@@ -1,85 +1,52 @@
-import asyncio
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.middleware.cors import CORSMiddleware
+# byte-assistant/ChatAssistant.py
+from fastapi import FastAPI
 from pydantic import BaseModel
-import logging
-import ollama
+import httpx
+import os
 
-# -------------------------------------------
-# Ollama integration
-# -------------------------------------------
-async def generate_response(message: str) -> str:
-    try:
-        loop = asyncio.get_event_loop()
-        # Run blocking Ollama call in a thread
-        result = ollama.chat(model="llama3.1:8b", messages=[{"role": "user", "content": message}])
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434")
+DEFAULT_MODEL = "llama3.1:8b"  # <- hier fest gesetzt
 
+app = FastAPI()
 
-        # Extract model output safely
-        if "message" in result and "content" in result["message"]:
-            return result["message"]["content"].strip()
-
-        return "Ollama returned no content."
-
-    except Exception as e:
-        logging.error(f"Ollama error: {e}")
-        return "Ollama is not responding. Make sure it's running (ollama serve)."
-
-# -------------------------------------------
-# FastAPI setup
-# -------------------------------------------
-app = FastAPI(title="Byte Chat Assistant", version="1.0.0")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# -------------------------------------------
-# Data model
-# -------------------------------------------
-class ChatMessage(BaseModel):
+class ChatRequest(BaseModel):
     message: str
 
-# -------------------------------------------
-# Health check endpoint
-# -------------------------------------------
-@app.get("/health")
-async def health_check():
-    return {"status": "ok"}
+class ChatResponse(BaseModel):
+    reply: str
 
-# -------------------------------------------
-# Chat endpoint
-# -------------------------------------------
-@app.post("/api/chat")
-async def chat_endpoint(payload: ChatMessage, request: Request):
+@app.post("/api/chat", response_model=ChatResponse)
+async def chat(req: ChatRequest):
+    prompt = (req.message or "").strip()
+    if not prompt:
+        return ChatResponse(reply="Bitte eine Nachricht eingeben.")
+
+    payload = {
+        "model": DEFAULT_MODEL,
+        "prompt": prompt,
+        "stream": False,
+    }
+
     try:
-        msg = payload.message.strip()
-        if not msg:
-            raise HTTPException(status_code=400, detail="Empty message")
-
-        logging.info(f" Received from user: {msg}")
-        reply = await generate_response(msg)
-        logging.info(f" Reply: {reply[:100]}...")
-        return {"reply": reply}
-
-    except HTTPException as e:
-        logging.warning(f" User error: {e.detail}")
-        raise e
+        async with httpx.AsyncClient(timeout=40.0) as client:
+            r = await client.post(f"{OLLAMA_HOST}/api/generate", json=payload)
+            print("Ollama status:", r.status_code)
+            print("Ollama body:", r.text[:500])
+            r.raise_for_status()
+            data = r.json()
+    except httpx.RequestError as e:
+        print("ChatAssistant connection error:", repr(e))
+        return ChatResponse(
+            reply="Ich kann das Sprachmodell nicht erreichen. Läuft Ollama auf Port 11434?"
+        )
+    except httpx.HTTPStatusError as e:
+        print("ChatAssistant HTTP error:", repr(e))
+        return ChatResponse(
+            reply=f"Das Sprachmodell hat einen Fehler gemeldet (HTTP {e.response.status_code})."
+        )
     except Exception as e:
-        logging.error(f"Internal error: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+        print("ChatAssistant unexpected error:", repr(e))
+        return ChatResponse(reply="Ein unerwarteter Fehler ist im Sprachserver aufgetreten.")
 
-# -------------------------------------------
-# Startup / Shutdown
-# -------------------------------------------
-@app.on_event("startup")
-async def on_startup():
-    logging.info("ChatAssistant API is starting...")
-
-@app.on_event("shutdown")
-async def on_shutdown():
-    logging.info("ChatAssistant API is shutting down...")
+    reply = (data.get("response") or "").strip() or "Keine Antwort vom Modell."
+    return ChatResponse(reply=reply)

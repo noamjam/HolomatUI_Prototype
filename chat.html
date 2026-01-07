@@ -1,13 +1,29 @@
-<!-- chat.html -->
+<!-- dist/chat.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <title>Byte Chat</title>
+    <meta
+            http-equiv="Content-Security-Policy"
+            content="script-src 'self'; object-src 'none';"
+    />
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: radial-gradient(circle at top, #22d3ee 0, #0f172a 40%, #020617 100%);
+        }
+        #chat-root {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
 </head>
-<body style="margin:0;">
+<body>
 <div id="chat-root"></div>
-<!-- Vite ersetzt dies beim Build durch dist/chat-xxxxx.js -->
-<script type="module" src="/src/chat-renderer.jsx"></script>
+<script type="module" src="./src/chat-renderer.jsx"></script>
 </body>
 </html>

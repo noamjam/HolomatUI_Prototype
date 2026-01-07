@@ -1,4 +1,6 @@
+// src/App.jsx
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { themes } from "./themes";
 
 import PaintView from "./components/PaintView";
@@ -24,40 +26,39 @@ import CalendarApp from "./components/CalendarApp.jsx";
 
 function App() {
     const [bootDone, setBootDone] = useState(false);
-    const [currentApp, setCurrentApp] = useState(null); // Name der aktuell laufenden App
+    const [currentApp, setCurrentApp] = useState(null);
     const [startInGrid, setStartInGrid] = useState(false);
     const [theme, setTheme] = useState(themes.default);
-    const [activeGame, setActiveGame] = useState(null); // einzelnes Spiel innerhalb der Game Collection
+    const [activeGame, setActiveGame] = useState(null);
     const isActive = useByteStatus();
-
 
     useEffect(() => {
         const saved = localStorage.getItem("theme") || "default";
         setTheme(themes[saved] || themes.default);
     }, []);
 
-    // Boot-Screen zuerst anzeigen
     if (!bootDone) {
         return <BootScreen onFinish={() => setBootDone(true)} />;
     }
 
-    // Helper: zurück ins Hauptmenü
     const goHome = () => {
         setActiveGame(null);
         setCurrentApp(null);
     };
 
     const scanline = {
-        hidden: { clipPath: "inset(0 100% 0 0)" }, // Startet rechts abgeschnitten
+        hidden: { clipPath: "inset(0 100% 0 0)" },
         visible: {
-            clipPath: [
-                "inset(0 100% 0 0)",  // Voll links abgeschnitten
-                "inset(0 0 0 0)"      // Voll sichtbar
-            ],
-            transition: {
-                duration: 3,
-                ease: "linear"
-            }
+            clipPath: ["inset(0 100% 0 0)", "inset(0 0 0 0)"],
+            transition: { duration: 3, ease: "linear" },
+        },
+    };
+
+    const handleOpenChat = () => {
+        try {
+            window.electronAPI?.openChatWindow?.();
+        } catch (err) {
+            console.error("Failed to open chat window:", err);
         }
     };
 
@@ -70,58 +71,18 @@ function App() {
                 backgroundAttachment: "fixed",
             }}
         >
-            {/* Einzelne Apps */}
-
-            {currentApp === "Paint" && (
-                <PaintView onBack={goHome} />
-            )}
-
-            {currentApp === "Files" && (
-                <FileView onBack={goHome} />
-            )}
-
-            {currentApp === "Settings" && (
-                <SettingsView onBack={goHome} />
-            )}
-
-            {currentApp === "3D Viewer" && (
-                <ThreeViewer onBack={goHome} />
-            )}
-
-            {currentApp === "MusicLibrary" && (
-                <MusicLibrary onBack={goHome} />
-            )}
-
-            {currentApp === "OrcaSlicer" && (
-                <OrcaSlicer onBack={goHome} />
-            )}
-
-            {currentApp === "Solar System" && (
-                <SolarSystem onBack={goHome} />
-            )}
-
-            {currentApp === "FreeCAD" && (
-                <FreeCAD onBack={goHome} />
-            )}
-
-            {currentApp === "Weather" && (
-                <WeatherApp onBack={goHome} />
-            )}
-
-            {/* Neuer VS-Code-ähnlicher Texteditor */}
-            {currentApp === "Text Editor" && (
-                <VSCodeLayout onBack={goHome} />
-            )}
-
-            {/* Bambu Studio */}
-            {currentApp === "Bambu Studio" && (
-                <BambuStudio onBack={goHome} />
-            )}
-
-            {currentApp === "Calendar" && (
-                <CalendarApp onBack={goHome} />
-            )}
-            {/* ==== Game Collection und Spiele ==== */}
+            {currentApp === "Paint" && <PaintView onBack={goHome} />}
+            {currentApp === "Files" && <FileView onBack={goHome} />}
+            {currentApp === "Settings" && <SettingsView onBack={goHome} />}
+            {currentApp === "3D Viewer" && <ThreeViewer onBack={goHome} />}
+            {currentApp === "MusicLibrary" && <MusicLibrary onBack={goHome} />}
+            {currentApp === "OrcaSlicer" && <OrcaSlicer onBack={goHome} />}
+            {currentApp === "Solar System" && <SolarSystem onBack={goHome} />}
+            {currentApp === "FreeCAD" && <FreeCAD onBack={goHome} />}
+            {currentApp === "Weather" && <WeatherApp onBack={goHome} />}
+            {currentApp === "Text Editor" && <VSCodeLayout onBack={goHome} />}
+            {currentApp === "Bambu Studio" && <BambuStudio onBack={goHome} />}
+            {currentApp === "Calender App" && <CalendarApp onBack={goHome} />}
 
             {currentApp === "Game Collection" && !activeGame && (
                 <GameCollection
@@ -135,32 +96,21 @@ function App() {
             )}
 
             {activeGame === "byte-invaders" && (
-                <SpaceInvaders
-                    onBack={() => setActiveGame(null)}
-                    onHome={goHome}
-                />
+                <SpaceInvaders onBack={() => setActiveGame(null)} onHome={goHome} />
             )}
-
             {activeGame === "snake-game" && (
-                <SnakeGame
-                    onBack={() => setActiveGame(null)}
-                    onHome={goHome}
-                />
+                <SnakeGame onBack={() => setActiveGame(null)} onHome={goHome} />
             )}
-
             {activeGame === "Minesweeper" && (
-                <Minesweeper
-                    onBack={() => setActiveGame(null)}
-                    onHome={goHome}
-                />
+                <Minesweeper onBack={() => setActiveGame(null)} onHome={goHome} />
             )}
 
-            {/* Startansicht, wenn keine App läuft */}
             {currentApp === null && !activeGame && (
                 <div className="p-8">
-                    <h1 className="text-4xl font-bold mb-12 text-center drop-shadow-[0_0_8px_cyan] overflow-hidden"
+                    <h1
+                        className="text-4xl font-bold mb-12 text-center drop-shadow-[0_0_8px_cyan] overflow-hidden"
                         style={{ color: theme.textColor }}
-                        >
+                    >
                         {["Welcome to your futuristic workbench"].map((word, w) => (
                             <motion.span
                                 key={w}
@@ -184,8 +134,7 @@ function App() {
                 </div>
             )}
 
-            {/* Byte-Indikator immer sichtbar */}
-            <ByteIndicator isActive={isActive} />
+            <ByteIndicator isActive={isActive} onToggleChat={handleOpenChat} />
         </div>
     );
 }

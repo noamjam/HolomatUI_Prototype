@@ -8,7 +8,6 @@ function AssistantChat({ isOpen, onSend }) {
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState([]);
 
-    // load history once
     useEffect(() => {
         try {
             const raw = localStorage.getItem(STORAGE_KEY);
@@ -21,7 +20,6 @@ function AssistantChat({ isOpen, onSend }) {
         }
     }, []);
 
-    // persist on every change
     useEffect(() => {
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));

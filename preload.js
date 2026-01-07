@@ -19,6 +19,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
         return await ipcRenderer.invoke("get-chat-port");
     },
 
+
     //Orca Slicer
     launchOrcaSlicer: ()=> ipcRenderer.send("launch-orca-slicer"),
 
