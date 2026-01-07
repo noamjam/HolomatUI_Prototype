@@ -13,7 +13,8 @@ const apps = [
     "FreeCAD",
     "Weather",
     "Text Editor",
-    "Calendar"
+    "Bambu Studio",
+    "Calender App"
 ];
 
 const wrapperStyle = {

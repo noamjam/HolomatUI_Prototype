@@ -2,6 +2,7 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
+
     //Paint
     launchPaint: () => ipcRenderer.send("launch-paint"),
 
@@ -9,6 +10,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     onChatServerStarted: (callback) =>
         ipcRenderer.on("chat-server-started", (_, port) => callback(port)),
 
+    openChatWindow: () => ipcRenderer.send("open-chat-window"),
     //File Explorer
     openFileExplorer: () => ipcRenderer.send("open-file-explorer"),
 
@@ -20,9 +22,13 @@ contextBridge.exposeInMainWorld("electronAPI", {
     //Orca Slicer
     launchOrcaSlicer: ()=> ipcRenderer.send("launch-orca-slicer"),
 
+    //Bambu Studio
+    launchBambuStudio: () => ipcRenderer.send("launch-bambu-studio"),
+
     launchFreeCAD: () => ipcRenderer.send('launch-freecad'),
     // 🔄 Optional generic messaging
     sendMessage: (channel, data) => ipcRenderer.send(channel, data),
     onMessage: (channel, func) =>
         ipcRenderer.on(channel, (_, ...args) => func(...args)),
+
 });

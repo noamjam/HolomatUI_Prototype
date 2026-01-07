@@ -29,6 +29,10 @@ PORT = 8765
 DEVICE_INDEX = 0
 CHAT_API_URL = "http://127.0.0.1:5050/api/chat"  # replace if your main process chooses a different port
 
+#Timing
+DELAY_AFTER_GREETING = 1.5
+DELAY_AFTER_REPLY = 2.0
+
 # Thread-executor for blocking ops
 EXECUTOR = None
 
@@ -84,7 +88,7 @@ async def status_ws_sender(status_queue: asyncio.Queue):
 
 
 # Async LLM request using aiohttp
-async def ask_llm(prompt: str, api_url: str = CHAT_API_URL, timeout: int = 20) -> str:
+async def ask_llm(prompt: str, api_url: str = CHAT_API_URL, timeout: int = 40) -> str:
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(api_url, json={"message": prompt}, timeout=timeout) as resp:
@@ -128,27 +132,45 @@ async def run_assistant(status_queue: asyncio.Queue):
             if TRIGGER in text:
                 print("[Status] Activated")
                 await status_queue.put("active")
-                # prompt the user
+
+                # Greeting
                 await speak("Hallo, wie kann ich helfen?")
-                # then listen for the user's follow-up utterance
+
+                # Small pause so the user can think before speaking
+                await asyncio.sleep(DELAY_AFTER_GREETING)
+
+                # Listen for the user's follow‑up utterance
                 with mic as source:
-                    audio2 = recognizer.listen(source, timeout=5, phrase_time_limit=8)
+                    print("[Mic] Listening for follow-up...")
+                    audio2 = recognizer.listen(
+                        source,
+                        timeout=5,          # you can increase this too, e.g. 8–10
+                        phrase_time_limit=8
+                    )
+
                 try:
                     followup = recognizer.recognize_google(audio2, language="de-DE")
                     print(f"[Follow-up] {followup}")
                     await status_queue.put("thinking")
-                    # query LLM
+
+                    # Query LLM
                     reply = await ask_llm(followup)
                     print(f"[LLM Reply] {reply}")
                     await speak(reply)
+
+                    # Pause after the answer so you don't immediately get re‑triggered
+                    await asyncio.sleep(DELAY_AFTER_REPLY)
+
                     await status_queue.put("active")
                 except sr.UnknownValueError:
                     print("[Info] Could not understand follow-up.")
                     await speak("Ich habe dich leider nicht verstanden.")
+                    await asyncio.sleep(DELAY_AFTER_REPLY)
                     await status_queue.put("active")
                 except Exception as e:
                     print(f"[Error] during follow-up: {e}")
                     await speak("Ein Fehler ist aufgetreten.")
+                    await asyncio.sleep(DELAY_AFTER_REPLY)
                     await status_queue.put("standby")
 
             elif DEACTIVATE in text:

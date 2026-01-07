@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { themes } from "./themes";
-import { motion } from "framer-motion";
 
 import PaintView from "./components/PaintView";
 import FileView from "./components/FileView";
@@ -20,6 +19,7 @@ import FreeCAD from "./components/FreeCAD";
 import Minesweeper from "./components/Minesweeper";
 import WeatherApp from "./components/Weather.jsx";
 import VSCodeLayout from "./components/VSCodeLayout.jsx";
+import BambuStudio from "./components/BambuStudio";
 import CalendarApp from "./components/CalendarApp.jsx";
 
 function App() {
@@ -71,6 +71,7 @@ function App() {
             }}
         >
             {/* Einzelne Apps */}
+
             {currentApp === "Paint" && (
                 <PaintView onBack={goHome} />
             )}
@@ -110,6 +111,11 @@ function App() {
             {/* Neuer VS-Code-ähnlicher Texteditor */}
             {currentApp === "Text Editor" && (
                 <VSCodeLayout onBack={goHome} />
+            )}
+
+            {/* Bambu Studio */}
+            {currentApp === "Bambu Studio" && (
+                <BambuStudio onBack={goHome} />
             )}
 
             {currentApp === "Calendar" && (
