@@ -4,7 +4,7 @@ import { themes } from "../themes";
 
 export default function BootScreen({ onFinish }) {
     const [theme, setTheme] = useState(themes.default);
-    const fullText = "Holomat Prototype start...";
+    const fullText = "Welcome to Holomat !";
     const [displayedText, setDisplayedText] = useState("");
     const [hasPressedOnce, setHasPressedOnce] = useState(false);
     const [skipped, setSkipped] = useState(false);
@@ -49,6 +49,10 @@ export default function BootScreen({ onFinish }) {
     // Wenn geskippt, Animationen sofort „fertig“ darstellen (optional)
     const baseTransition = { duration: skipped ? 0 : 4, ease: "easeInOut" };
 
+    const letter = {
+        hidden: { x: 30, opacity: 0, filter: "blur(8px)" },
+        show: { x: 0, opacity: 1, filter: "blur(0px)" }
+    };
     return (
         <motion.div
             className="fixed inset-0 flex flex-col justify-between items-center h-screen text-white py-16"
@@ -83,7 +87,18 @@ export default function BootScreen({ onFinish }) {
                 }}
                 className="text-6xl font-bold tracking-wide"
             >
-                {displayedText}
+                {displayedText.split("").map((ch, i) => (
+                    <motion.span
+                        key={`${ch}-${i}`}
+                        variants={letter}
+                        initial="hidden"
+                        animate="show"
+                        transition={{ duration: 0.25, ease: "easeOut" }}
+                        style={{ display: "inline-block" }}
+                    >
+                        {ch === " " ? "\u00A0" : ch}
+                    </motion.span>
+                ))}
                 <span className="animate-blink">|</span>
             </motion.h1>
 
