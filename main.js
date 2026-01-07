@@ -337,7 +337,24 @@ ipcMain.on("launch-bambu-studio", () => {
 });
 
 ipcMain.on("launch-freecad", () => {
-    exec('open -a /Applications/FreeCAD.app');
+    if (process.platform === "win32")
+    {
+        const FreeCADpath = path.resolve(
+            "C:\\Users\\noahm\\AppData\\Local\\Programs\\FreeCAD 1.0\\bin\\freecad.exe"
+        );
+        const child = spawn(FreeCADpath, [], {
+            detached: true,
+            stdio: "ignore",
+        });
+        child.on("error", (err) => {
+            console.error(`Failed to start FreeCAD: ${err.message}`);
+        });
+        child.unref();
+    }
+    if (process.platform === "darwin")
+    {
+        exec('open -a /Applications/FreeCAD.app');
+    }
 });
 
 ipcMain.on("open-chat-window", () => {
