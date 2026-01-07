@@ -2,13 +2,115 @@ process.on("unhandledRejection", (reason) => {
     console.error("⚠️ Unhandled Promise Rejection:", reason);
 });
 
+let chatWindow = null;
+
 const path = require("path");
 const { app, BrowserWindow, ipcMain } = require("electron");
 const { spawn, exec } = require("child_process");
 const net = require("net");
 const os = require("os");
 
+// 🚀 Express-Code-Runner-Server ---------------------------------
+const express = require("express");
+const cors = require("cors");
+
+let runServerApp = null;
+let runServerInstance = null;
+
+function startRunServer() {
+    if (runServerInstance) return;
+
+    runServerApp = express();
+    runServerApp.use(cors());
+    runServerApp.use(express.json());
+
+    runServerApp.post("/api/run", (req, res) => {
+        const { language, code, filename } = req.body || {};
+        console.log("💻 /api/run request:", { language, filename });
+
+        if (typeof code !== "string") {
+            return res
+                .status(400)
+                .json({ output: "Invalid payload: code must be a string" });
+        }
+
+        let cmd;
+        let args;
+
+        if (language === "python") {
+            cmd = process.platform === "win32" ? "python" : "python3";
+            args = ["-c", code];
+        } else if (language === "javascript") {
+            cmd = "node";
+            args = ["-e", code]; // run JS directly in Node
+        } else {
+            return res
+                .status(400)
+                .json({ output: `Language not supported: ${language}` });
+        }
+
+        const child = spawn(cmd, args, { windowsHide: true });
+
+        let stdout = "";
+        let stderr = "";
+        const MAX_OUTPUT = 200_000;
+        const TIMEOUT_MS = 3000;
+
+        const killTimer = setTimeout(() => child.kill("SIGTERM"), TIMEOUT_MS);
+
+        const appendLimited = (target, chunk) => {
+            const text = chunk.toString();
+            if (target.length >= MAX_OUTPUT) return target;
+            const remaining = MAX_OUTPUT - target.length;
+            return target + text.slice(0, remaining);
+        };
+
+        child.stdout.on("data", (d) => {
+            stdout = appendLimited(stdout, d);
+        });
+
+        child.stderr.on("data", (d) => {
+            stderr = appendLimited(stderr, d);
+        });
+
+        child.on("error", (err) => {
+            clearTimeout(killTimer);
+            return res
+                .status(500)
+                .json({ output: `Failed to start ${cmd}: ${err.message}` });
+        });
+
+        child.on("close", (exitCode, signal) => {
+            clearTimeout(killTimer);
+
+            const combined = `${stdout}${
+                stderr ? (stdout ? "\n" : "") + stderr : ""
+            }`.trim();
+            const output = combined
+                ? combined
+                : signal
+                    ? `Process killed (${signal})`
+                    : `No output (exitCode=${exitCode})`;
+
+            return res.json({ output });
+        });
+    });
+
+    const port = 5000;
+    runServerInstance = runServerApp.listen(port, "127.0.0.1", () => {
+        console.log(`✅ Run server listening on http://127.0.0.1:${port}`);
+    });
+
+    runServerInstance.on("error", (err) => {
+        console.error("💥 Run server error:", err);
+    });
+}
+
+module.exports = { startRunServer };
+
+// ------------------------------------------------------
 // Plattform erkennen
+// ------------------------------------------------------
 const platform = os.platform(); // 'win32', 'darwin', 'linux'
 
 if (platform === "win32") {
@@ -31,7 +133,6 @@ function startOllamaServer() {
     return new Promise((resolve, reject) => {
         console.log("🧩 Starting Ollama background server...");
 
-        // Prüfen ob Ollama schon läuft
         const check = require("child_process").spawn("curl", ["-s", "http://127.0.0.1:11434/api/tags"]);
 
         let output = "";
@@ -43,15 +144,14 @@ function startOllamaServer() {
                 return;
             }
 
-            // Wenn nicht läuft → starten
             ollamaProcess = spawn("ollama", ["serve"], {
                 detached: true,
-                stdio: "ignore", // läuft still im Hintergrund
+                stdio: "ignore",
             });
             ollamaProcess.unref();
 
             console.log("🚀 Ollama started in background.");
-            setTimeout(resolve, 1500); // gib ihm kurz Zeit zum Starten
+            setTimeout(resolve, 1500);
         });
 
         check.on("error", (err) => {
@@ -60,6 +160,7 @@ function startOllamaServer() {
         });
     });
 }
+
 // ------------------------------------------------------
 // Byte Sprachassistent
 // ------------------------------------------------------
@@ -142,9 +243,8 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1024,
         height: 768,
-        fullscreen: true,   // remove this
-        frame: true,          // Fensterrahmen behalten …
-        autoHideMenuBar: true, // … aber Menüleiste ausblenden
+        frame: true,
+        autoHideMenuBar: true,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
             contextIsolation: true,
@@ -152,10 +252,7 @@ function createWindow() {
         },
     });
 
-    mainWindow.maximize(); // open the window maximized
-    // optional: prevent resizing smaller afterwards:
-    // mainWindow.setMinimumSize(1024, 768);
-
+    mainWindow.setFullScreen(true);
     mainWindow.loadFile(path.join(__dirname, "dist", "index.html"));
     mainWindow.on("closed", () => (mainWindow = null));
 }
@@ -164,6 +261,9 @@ function createWindow() {
 // Lifecycle
 // ------------------------------------------------------
 app.whenReady().then(async () => {
+    // Code-Runner-Server für /api/run starten
+    startRunServer();
+
     await startOllamaServer();
     startByteAssistant();
     createWindow();
@@ -176,6 +276,7 @@ app.on("window-all-closed", () => {
         if (byteProcess) byteProcess.kill("SIGTERM");
         if (chatProcess) chatProcess.kill("SIGTERM");
         if (ollamaProcess) ollamaProcess.kill("SIGTERM");
+        if (runServerInstance) runServerInstance.close();
 
         app.quit();
     }
@@ -216,10 +317,70 @@ ipcMain.on("launch-orca-slicer", () => {
     child.on("error", (err) => {
         console.error(`Failed to start Orca Slicer: ${err.message}`);
     });
-    // optional: Prozess unabhängig weiterlaufen lassen
     child.unref();
 });
 
-ipcMain.on('launch-freecad', () => {
-    exec('open -a /Applications/FreeCAD.app'); // macOS-kompatibler Start!
+
+ipcMain.on("launch-bambu-studio", () => {
+    const slicerPath = path.resolve(
+        "C:\\Program Files\\Bambu Studio\\bambu-studio.exe"
+    );
+    console.log(`Starting Bambu Studio: ${slicerPath}`);
+    const child = spawn(slicerPath, [], {
+        detached: true,
+        stdio: "ignore",
+    });
+    child.on("error", (err) => {
+        console.error(`Failed to start Bambu Studio: ${err.message}`);
+    });
+    child.unref();
+});
+
+ipcMain.on("launch-freecad", () => {
+    if (process.platform === "win32")
+    {
+        const FreeCADpath = path.resolve(
+            "C:\\Users\\noahm\\AppData\\Local\\Programs\\FreeCAD 1.0\\bin\\freecad.exe"
+        );
+        const child = spawn(FreeCADpath, [], {
+            detached: true,
+            stdio: "ignore",
+        });
+        child.on("error", (err) => {
+            console.error(`Failed to start FreeCAD: ${err.message}`);
+        });
+        child.unref();
+    }
+    if (process.platform === "darwin")
+    {
+        exec('open -a /Applications/FreeCAD.app');
+    }
+});
+
+ipcMain.on("open-chat-window", () => {
+    if (chatWindow && !chatWindow.isDestroyed()) {
+        chatWindow.focus();
+        return;
+    }
+
+    chatWindow = new BrowserWindow({
+        width: 420,
+        height: 560,
+        resizable: true,
+        autoHideMenuBar: true,
+        alwaysOnTop: true,
+        backgroundColor: "#020617",
+        webPreferences: {
+            preload: path.join(__dirname, "preload.js"),
+            contextIsolation: true,
+            nodeIntegration: false,
+        },
+    });
+
+    // Point to the dedicated chat HTML (see next section)
+    chatWindow.loadFile(path.join(__dirname, "dist", "chat.html"));
+
+    chatWindow.on("closed", () => {
+        chatWindow = null;
+    });
 });
