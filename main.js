@@ -329,9 +329,6 @@ ipcMain.on("open-chat-window", () => {
     });
 });
 
-// weitere ipcMain.on(...) für Orca, FreeCAD, etc. bleiben wie gehabt
-
-
 ipcMain.on("launch-paint", () => {
     const scriptPath = path.join(__dirname, "paint.py");
     exec(`python "${scriptPath}"`, (err, stdout, stderr) => {

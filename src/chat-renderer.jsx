@@ -52,6 +52,11 @@ function AssistantChat({ isOpen, onSend }) {
         }
     };
 
+    const DeleteChatContent = () => {
+        setMessages([]);
+        localStorage.removeItem(STORAGE_KEY);
+    };
+
     return (
         <div
             style={{
@@ -173,6 +178,21 @@ function AssistantChat({ isOpen, onSend }) {
                     }}
                 >
                     Send
+                </button>
+
+                <button
+                    onClick={DeleteChatContent}
+                    style={{
+                        padding: "6px 12px",
+                        borderRadius: "9999px",
+                        border: "none",
+                        backgroundColor: "#22c55e",
+                        color: "#022c22",
+                        fontSize: "13px",
+                        cursor: "pointer",
+                    }}
+                >
+                    Clear the Chat
                 </button>
             </div>
         </div>
