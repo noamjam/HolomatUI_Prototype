@@ -14,7 +14,8 @@ const apps = [
     "Weather",
     "Text Editor",
     "Bambu Studio",
-    "Calender App"
+    "Calender App",
+    "Image Editor",
 ];
 
 const wrapperStyle = {
