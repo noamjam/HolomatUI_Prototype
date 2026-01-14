@@ -51,7 +51,7 @@ export default function WeatherApp({onBack}) {
 
         fetch(
             `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-            `&current_weather=true` +
+            `&current_weather=true` + `&hourly=temperature_2m,precipitation,weathercode` +
             `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,weathercode` +
             `&timezone=auto&forecast_days=8`,
         )
@@ -60,6 +60,7 @@ export default function WeatherApp({onBack}) {
                 setWeather({
                     current: data.current_weather,
                     daily: data.daily,
+                    hourly: data.hourly,
                 });
                 setLoading(false);
             })
@@ -445,19 +446,19 @@ export default function WeatherApp({onBack}) {
                 </form>
             </aside>
 
-            {/* RECHTE SEITE: CARD */}
+            {/* CARD */}
             <div
                 style={{
                     display: "flex",
                     flex: 1,
-                    alignItems: "center",       // vertikal mittig
+                    alignItems: "center",
                     justifyContent: "center",
                     padding: "1.5rem",
                 }}
             >
                 <div
                     style={{
-                        width: isSidebarOpen ? 1020 : 1200,
+                        width: 1000,
                         height: 860,
                         marginRight: isSidebarOpen ? 40 : 0,
                         marginTop: 24,
@@ -742,6 +743,7 @@ export default function WeatherApp({onBack}) {
                                 </button>
                             </div>
 
+
                             {/* Tageswerte-Kacheln */}
                             {weather.daily && (
                                 <div
@@ -887,12 +889,87 @@ export default function WeatherApp({onBack}) {
                                                 fontWeight: 600,
                                             }}
                                         >
-                      {weather.daily.precipitation_sum[0]} mm
-                    </span>
+                                  {weather.daily.precipitation_sum[0]} mm
+                                </span>
                                     </div>
                                 </div>
                             )}
+                            {weather.hourly && (
+                                <div
+                                    style={{
+                                        marginTop: "1.25rem",
+                                        marginBottom: "0.75rem",
+                                        padding: "0.6rem 0.5rem",
+                                        borderRadius: 24,
+                                        backgroundColor: "rgba(15,23,42,0.7)",
+                                        border: "1px solid rgba(51,65,85,0.9)",
+                                        boxShadow:
+                                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(148,163,184,0.18)",
+                                        display: "flex",
+                                        gap: "0.5rem",
+                                        overflowX: "auto",
+                                    }}
+                                >
+                                    {(() => {
+                                        const now = new Date();
+                                        const times = weather.hourly.time;
 
+                                        // Index der ersten Stunde, die >= jetzt ist
+                                        let startIndex = times.findIndex(t => new Date(t) >= now);
+                                        if (startIndex === -1) startIndex = 0; // Fallback
+
+                                        return times.slice(startIndex, startIndex + 12).map((timeStr, idx) => {
+                                            const realIndex = startIndex + idx;
+                                            const temp = weather.hourly.temperature_2m[realIndex];
+                                            const code = weather.hourly.weathercode
+                                                ? weather.hourly.weathercode[realIndex]
+                                                : null;
+
+                                            const hourLabel = new Date(timeStr).toLocaleTimeString("de-DE", {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                            });
+                                        return (
+                                            <div
+                                                key={timeStr}
+                                                style={{
+                                                    minWidth: 90,
+                                                    borderRadius: 16,
+                                                    padding: "0.45rem 0.55rem",
+                                                    backgroundColor: "rgba(15,23,42,0.9)",
+                                                    border: "1px solid rgba(71,85,105,0.9)",
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    gap: "0.25rem",
+                                                    alignItems: "center",
+                                                }}
+                                            >
+                                                <div
+                                                    style={{
+                                                        fontSize: "11px",
+                                                        color: "rgba(148,163,184,0.9)",
+                                                    }}
+                                                >
+                                                    {hourLabel} Uhr
+                                                </div>
+                                                <div style={{ fontSize: "0.85rem", color: "rgba(226,232,240,0.9)" }}>
+                                                    {code != null ? getWeatherEmoji(code) : "·"}
+                                                </div>
+                                                <div
+                                                    style={{
+                                                        fontSize: "0.85rem",
+                                                        fontWeight: 600,
+                                                        color: "rgba(226,232,240,0.95)",
+                                                    }}
+                                                >
+                                                    {Math.round(temp)}°C
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                })()}
+                                </div>
+                            )}
                             {/* MEHRTAGES-VORHERSAGE */}
                             {weather.daily && (
                                 <div
@@ -1065,9 +1142,10 @@ function getWeatherEmoji(code) {
     if (code === 1 || code === 2) return "🌤️";    // meist klar / teils bewölkt
     if (code === 3) return "☁️";                  // bewölkt
     if (code === 45 || code === 48) return "🌫️"; // Nebel
-    if (code >= 51 && code <= 55) return "🌦️";    // Niesel
+    if (code >= 51 && code <= 57) return "🌦️";    // Niesel
     if (code >= 61 && code <= 65) return "🌧️";    // Regen
-    if (code >= 71 && code <= 77) return "🌨️";    // Schnee
+    if (code >= 68 && code <= 69) return "🌨️"     // Schneeregen
+    if (code >= 71 && code <= 77) return "❄️";    // Schnee
     if (code >= 80 && code <= 82) return "🌧️";    // Regenschauer
     if (code >= 95) return "⛈️";                 // Gewitter
     return "�";                                  // Fallback
@@ -1088,10 +1166,13 @@ function translateWeatherCode(code) {
         61: "Leichter Regen",
         63: "Mäßiger Regen",
         65: "Starker Regen",
+        68: "Schnee Regen",
+        69: "Schnee Regen",
         71: "Schnee",
+        73: "Schnee",
+        77: "Schnee",
         80: "Regen-Schauer",
         95: "Gewitter",
-// ... ergänzbar!
     };
     return weatherCodes[code] || `Code${code}`;
 };
