@@ -1065,9 +1065,10 @@ function getWeatherEmoji(code) {
     if (code === 1 || code === 2) return "🌤️";    // meist klar / teils bewölkt
     if (code === 3) return "☁️";                  // bewölkt
     if (code === 45 || code === 48) return "🌫️"; // Nebel
-    if (code >= 51 && code <= 55) return "🌦️";    // Niesel
+    if (code >= 51 && code <= 57) return "🌦️";    // Niesel
     if (code >= 61 && code <= 65) return "🌧️";    // Regen
-    if (code >= 71 && code <= 77) return "🌨️";    // Schnee
+    if (code >= 68 && code <= 69) return "🌨️"     // Schneeregen
+    if (code >= 71 && code <= 77) return "❄️";    // Schnee
     if (code >= 80 && code <= 82) return "🌧️";    // Regenschauer
     if (code >= 95) return "⛈️";                 // Gewitter
     return "�";                                  // Fallback
@@ -1088,10 +1089,13 @@ function translateWeatherCode(code) {
         61: "Leichter Regen",
         63: "Mäßiger Regen",
         65: "Starker Regen",
+        68: "Schnee Regen",
+        69: "Schnee Regen",
         71: "Schnee",
+        73: "Schnee",
+        77: "Schnee",
         80: "Regen-Schauer",
         95: "Gewitter",
-// ... ergänzbar!
     };
     return weatherCodes[code] || `Code${code}`;
 };
