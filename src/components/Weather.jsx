@@ -457,7 +457,7 @@ export default function WeatherApp({onBack}) {
             >
                 <div
                     style={{
-                        width: isSidebarOpen ? 1020 : 1200,
+                        width: 1020,
                         height: 860,
                         marginRight: isSidebarOpen ? 40 : 0,
                         marginTop: 24,
