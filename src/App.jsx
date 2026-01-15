@@ -23,6 +23,7 @@ import WeatherApp from "./components/Weather.jsx";
 import VSCodeLayout from "./components/VSCodeLayout.jsx";
 import BambuStudio from "./components/BambuStudio";
 import CalendarApp from "./components/CalendarApp.jsx";
+import ImageEditor from "./components/ImageEditor.jsx";
 
 function App() {
     const [bootDone, setBootDone] = useState(false);
@@ -71,7 +72,9 @@ function App() {
                 backgroundAttachment: "fixed",
             }}
         >
+            {/* Apps */}
             {currentApp === "Paint" && <PaintView onBack={goHome} />}
+            {currentApp === "Image Editor" && <ImageEditor onBack={goHome} />}
             {currentApp === "Files" && <FileView onBack={goHome} />}
             {currentApp === "Settings" && <SettingsView onBack={goHome} />}
             {currentApp === "3D Viewer" && <ThreeViewer onBack={goHome} />}
@@ -84,6 +87,7 @@ function App() {
             {currentApp === "Bambu Studio" && <BambuStudio onBack={goHome} />}
             {currentApp === "Calender App" && <CalendarApp onBack={goHome} />}
 
+            {/* Game Collection */}
             {currentApp === "Game Collection" && !activeGame && (
                 <GameCollection
                     onBack={goHome}
@@ -105,6 +109,7 @@ function App() {
                 <Minesweeper onBack={() => setActiveGame(null)} onHome={goHome} />
             )}
 
+            {/* Home-Screen */}
             {currentApp === null && !activeGame && (
                 <div className="p-8">
                     <h1
@@ -134,6 +139,7 @@ function App() {
                 </div>
             )}
 
+            {/* Byte-Indicator / Chat */}
             <ByteIndicator isActive={isActive} onToggleChat={handleOpenChat} />
         </div>
     );

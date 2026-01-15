@@ -14,7 +14,8 @@ const apps = [
     "Weather",
     "Text Editor",
     "Bambu Studio",
-    "Calender App"
+    "Calender App",
+    "Image Editor",
 ];
 
 const wrapperStyle = {
@@ -87,25 +88,25 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
     const rotateRight = () =>
         setCurrent((prev) => (prev + 1) % apps.length);
 
-    const handlePanEnd = (event, info) => {
+    // Nur horizontal: App wechseln
+    const handlePanEndCarousel = (event, info) => {
         const offsetX = info.offset.x;
         const velocityX = info.velocity.x;
+
+        if (Math.abs(offsetX) > 30 || Math.abs(velocityX) > 300) {
+            if (offsetX < 0 || velocityX < -300) rotateRight();
+            else if (offsetX > 0 || velocityX > 300) rotateLeft();
+        }
+    };
+
+    // Optional: vertikaler Swipe NUR im Grid → zurück ins Karussell
+    const handlePanEndGrid = (event, info) => {
         const offsetY = info.offset.y;
         const velocityY = info.velocity.y;
 
-        // Horizontal swipe → change app
-        if (Math.abs(offsetX) > Math.abs(offsetY)) {
-            if (offsetX < -30 || velocityX < -300) rotateRight();
-            else if (offsetX > 30 || velocityX > 300) rotateLeft();
-        } else {
-            // Vertical swipe → toggle grid
-            if (offsetY < -50 || velocityY < -300) {
-                console.log("Swipe up → open grid");
-                setIsGrid(true);
-            } else if (offsetY > 50 || velocityY > 300) {
-                console.log("Swipe down → back to carousel");
-                setIsGrid(false);
-            }
+        if (offsetY > 80 || velocityY > 400) {
+            // Swipe nach unten → zurück zum Carousel
+            setIsGrid(false);
         }
     };
 
@@ -120,9 +121,48 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
 
     return (
         <div style={wrapperStyle}>
-            {/* gesture surface: reacts to pans, but does NOT drag itself */}
+            {/* Toggle-Leiste unten */}
+            <div
+                style={{
+                    position: "fixed",
+                    bottom: "0.5rem",
+                    left: "50%",
+                    transform: "translate(-50%, 4px)",
+                    display: "flex",
+                    gap: "0.5rem",
+                    zIndex: 999,
+                }}
+            >
+                <button
+                    onClick={() => setIsGrid(false)}
+                    style={{
+                        padding: "0.5rem 1rem",
+                        borderRadius: "999px",
+                        border: "1px solid #22d3ee",
+                        background: !isGrid ? "#0f172a" : "transparent",
+                        color: "#e5e7eb",
+                    }}
+                >
+                    Carousel
+                </button>
+                <button
+                    onClick={() => setIsGrid(true)}
+                    style={{
+                        padding: "0.5rem 1rem",
+                        borderRadius: "999px",
+                        border: "1px solid #22d3ee",
+                        background: isGrid ? "#0f172a" : "transparent",
+                        color: "#e5e7eb",
+                    }}
+                >
+                    Grid
+                </button>
+            </div>
+
+
+            {/* Gestenfläche + Inhalt */}
             <motion.div
-                onPanEnd={handlePanEnd}
+                // WICHTIG: touchAction none, damit du volle Kontrolle über Gesten hast
                 style={{
                     position: "relative",
                     width: "100%",
@@ -135,62 +175,82 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
                 }}
             >
                 {isGrid ? (
-                    <div style={gridContainerStyle}>
-                        {(() => {
-                            const rows = [];
-                            const appsPerRow = 5;
+                    // Grid: optionaler Swipe nach unten zum Schließen
+                    <motion.div
+                        onPanEnd={handlePanEndGrid}
+                        style={{ width: "100%", height: "100%" }}
+                    >
+                        <div style={gridContainerStyle}>
+                            {(() => {
+                                const rows = [];
+                                const appsPerRow = 5;
 
-                            for (let i = 0; i < apps.length; i += appsPerRow) {
-                                const rowApps = apps.slice(i, i + appsPerRow);
-                                rows.push(
-                                    <div key={i} style={gridRowStyle}>
-                                        {rowApps.map((app) => (
-                                            <motion.button
-                                                key={app}
-                                                onClick={() => onSelect(app, true)}
-                                                whileHover={{ scale: 1.1 }}
-                                                whileTap={{ scale: 0.95 }}
-                                                style={bubbleBaseStyle}
-                                            >
-                                                {app}
-                                            </motion.button>
-                                        ))}
-                                    </div>
-                                );
-                            }
-                            return rows;
-                        })()}
-                    </div>
+                                for (let i = 0; i < apps.length; i += appsPerRow) {
+                                    const rowApps = apps.slice(i, i + appsPerRow);
+                                    rows.push(
+                                        <div key={i} style={gridRowStyle}>
+                                            {rowApps.map((app) => (
+                                                <motion.button
+                                                    key={app}
+                                                    onClick={() => onSelect(app, true)}
+                                                    whileHover={{ scale: 1.1 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    style={bubbleBaseStyle}
+                                                >
+                                                    {app}
+                                                </motion.button>
+                                            ))}
+                                        </div>
+                                    );
+                                }
+                                return rows;
+                            })()}
+                        </div>
+                    </motion.div>
                 ) : (
-                    <div style={carouselContainerStyle}>
-                        {apps.map((app, i) => {
-                            const rel = getRelativeIndex(i);
-                            if (rel === null) return null;
+                    // Carousel: nur horizontaler Swipe für App-Wechsel
+                    <motion.div
+                        onPanEnd={handlePanEndCarousel}
+                        style={{ width: "100%", height: "100%" }}
+                    >
+                        <div style={carouselContainerStyle}>
+                            {apps.map((app, i) => {
+                                const rel = getRelativeIndex(i);
+                                if (rel === null) return null;
 
-                            const translateX = rel * 80;
-                            const rotateY = rel * -1;
-                            const scale = rel === 0 ? 1.1 : 0.95;
-                            const zIndex = rel === 0 ? 10 : 5;
+                                const translateX = rel * 80;
+                                const rotateY = rel * -1;
+                                const scale = rel === 0 ? 1.1 : 0.95;
+                                const zIndex = rel === 0 ? 10 : 5;
 
-                            return (
-                                <motion.div
-                                    key={app}
-                                    animate={{ x: translateX, scale, rotateY }}
-                                    transition={{ type: "spring", stiffness: 80, damping: 30 }}
-                                    style={{ position: "absolute", pointerEvents: "auto", zIndex }}
-                                >
-                                    <motion.button
-                                        onClick={() => onSelect(app, false)}
-                                        whileHover={{ scale: 1.1 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        style={bubbleBaseStyle}
+                                return (
+                                    <motion.div
+                                        key={app}
+                                        animate={{ x: translateX, scale, rotateY }}
+                                        transition={{
+                                            type: "spring",
+                                            stiffness: 80,
+                                            damping: 30,
+                                        }}
+                                        style={{
+                                            position: "absolute",
+                                            pointerEvents: "auto",
+                                            zIndex,
+                                        }}
                                     >
-                                        {app}
-                                    </motion.button>
-                                </motion.div>
-                            );
-                        })}
-                    </div>
+                                        <motion.button
+                                            onClick={() => onSelect(app, false)}
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            style={bubbleBaseStyle}
+                                        >
+                                            {app}
+                                        </motion.button>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    </motion.div>
                 )}
             </motion.div>
         </div>
