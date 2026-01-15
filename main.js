@@ -16,6 +16,24 @@ const cors = require("cors");
 let runServerApp = null;
 let runServerInstance = null;
 
+// Hilfsfunktion: Python-Befehl pro Plattform + optionales Override
+function getPythonCommand() {
+    // Erlaube manuelles Setzen, z.B. PYTHON=/Users/du/.pyenv/shims/python
+    const envPython = process.env.PYTHON;
+    if (envPython && envPython.trim().length > 0) {
+        return envPython.trim();
+    }
+
+    // Plattformabhängiger Fallback
+    if (process.platform === "win32") {
+        return "python";
+    }
+
+    // macOS heißt process.platform === "darwin"
+    // Linux / andere Unix-ähnliche Systeme ebenfalls python3
+    return "python3";
+}
+
 function startRunServer() {
     if (runServerInstance) return;
 
@@ -37,7 +55,7 @@ function startRunServer() {
         let args;
 
         if (language === "python") {
-            cmd = process.platform === "win32" ? "python" : "python3";
+            cmd = getPythonCommand();
             args = ["-c", code];
         } else if (language === "javascript") {
             cmd = "node";
@@ -48,7 +66,10 @@ function startRunServer() {
                 .json({ output: `Language not supported: ${language}` });
         }
 
-        const child = spawn(cmd, args, { windowsHide: true });
+        const child = spawn(cmd, args, {
+            windowsHide: process.platform === "win32",
+            env: process.env,
+        });
 
         let stdout = "";
         let stderr = "";
@@ -104,8 +125,8 @@ function startRunServer() {
     });
 }
 
-// Plattform
-const platform = os.platform();
+// Plattform-Handling
+const platform = os.platform(); // 'win32', 'darwin', 'linux', ...[web:16][web:23][web:26]
 if (platform === "win32") {
     console.log("Running on Windows → Disabling hardware acceleration");
     app.disableHardwareAcceleration();
@@ -127,10 +148,7 @@ function startOllamaServer() {
 
         let check;
         try {
-            check = spawn("curl", [
-                "-s",
-                "http://127.0.0.1:11434/api/tags",
-            ]);
+            check = spawn("curl", ["-s", "http://127.0.0.1:11434/api/tags"]);
         } catch (err) {
             console.warn("⚠️ curl spawn failed, starting ollama directly:", err);
         }
@@ -177,6 +195,8 @@ function startOllamaBinary(resolve) {
 // Byte Sprachassistent
 function startByteAssistant() {
     const scriptPath = path.resolve(__dirname, "./byte-assistant/ByteAssistant.py");
+
+    // Hier gerne später auch getPythonCommand() verwenden, falls du Byte globales Python nutzen lassen willst
     const pythonCmd =
         process.platform === "win32"
             ? path.resolve(__dirname, "./byte-assistant/.venv/Scripts/python.exe")
@@ -222,6 +242,8 @@ async function startChatAssistant() {
             __dirname,
             "./byte-assistant/ChatAssistant.py"
         );
+
+        // Auch hier ggf. später auf getPythonCommand() umstellen, wenn nicht venv-gebunden
         const pythonCmd =
             process.platform === "win32"
                 ? path.resolve(__dirname, "./byte-assistant/.venv/Scripts/python.exe")
@@ -331,7 +353,8 @@ ipcMain.on("open-chat-window", () => {
 
 ipcMain.on("launch-paint", () => {
     const scriptPath = path.join(__dirname, "paint.py");
-    exec(`python "${scriptPath}"`, (err, stdout, stderr) => {
+    const pythonCmd = getPythonCommand();
+    exec(`"${pythonCmd}" "${scriptPath}"`, (err, stdout, stderr) => {
         if (err) console.error(`❌ Paint error: ${err.message}`);
         if (stdout) console.log(`[Paint stdout] ${stdout.trim()}`);
         if (stderr) console.error(`[Paint stderr] ${stderr.trim()}`);
@@ -347,6 +370,7 @@ ipcMain.on("open-file-explorer", () => {
     });
 });
 
+// Windows-spezifische Slicer (werden auf macOS/Linux einfach fehlschlagen, wenn aufgerufen)
 ipcMain.on("launch-orca-slicer", () => {
     const slicerPath = path.resolve(
         "C:\\Program Files\\FlashForge\\Orca-Flashforge\\orca-flashforge.exe"
@@ -361,7 +385,6 @@ ipcMain.on("launch-orca-slicer", () => {
     });
     child.unref();
 });
-
 
 ipcMain.on("launch-bambu-studio", () => {
     const slicerPath = path.resolve(
@@ -379,8 +402,7 @@ ipcMain.on("launch-bambu-studio", () => {
 });
 
 ipcMain.on("launch-freecad", () => {
-    if (process.platform === "win32")
-    {
+    if (process.platform === "win32") {
         const FreeCADpath = path.resolve(
             "C:\\Users\\noahm\\AppData\\Local\\Programs\\FreeCAD 1.0\\bin\\freecad.exe"
         );
@@ -393,8 +415,7 @@ ipcMain.on("launch-freecad", () => {
         });
         child.unref();
     }
-    if (process.platform === "darwin")
-    {
+    if (process.platform === "darwin") {
         exec('open -a /Applications/FreeCAD.app');
     }
 });
