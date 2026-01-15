@@ -4,9 +4,10 @@ import { OrbitControls, Environment, TransformControls } from '@react-three/drei
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 import { ThreeMFLoader } from 'three/examples/jsm/loaders/3MFLoader';
+import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import * as THREE from 'three';
 
-function EditableModel({ file, mode, orbitControlsRef }) {
+function EditableModel({ file, mode, orbitControlsRef, onObjectReady }) {
     const ref = useRef();
     const transformControlsRef = useRef();
     const [object, setObject] = useState(null);
@@ -96,14 +97,21 @@ function EditableModel({ file, mode, orbitControlsRef }) {
 
             obj.position.set(0, 0, 0);
             setObject(obj);
+
+            if (onObjectReady) {
+                onObjectReady(obj);
+            }
         };
         loadModel();
-    }, [file]);
+    }, [file,onObjectReady]);
 
     if (!object) return null;
 
     return (
-        <TransformControls ref={transformControlsRef} object={ref.current} mode={mode}>
+        <TransformControls
+            ref={transformControlsRef}
+            mode={mode}
+        >
             <primitive ref={ref} object={object} />
         </TransformControls>
     );
@@ -113,12 +121,44 @@ export default function ThreeViewer({ onBack }) {
     const [file, setFile] = useState(null);
     const [mode, setMode] = useState('translate');
     const orbitControlsRef = useRef();
+    const objectRef = useRef(null);
 
     const handleFile = (e) => {
         const f = e.target.files[0];
         if (f) setFile(f);
     };
 
+    const handleObjectReady = (obj) => {
+        objectRef.current = obj;
+    }
+
+    const handleSave = () => {
+        if (!objectRef.current) return;
+
+        const exporter = new GLTFExporter();
+        exporter.parse(
+            objectRef.current,
+            (gltf) => {
+                const json = JSON.stringify(gltf);
+                const blob = new Blob([json], { type: 'model/gltf+json' });
+
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = file?.name
+                    ? file.name.replace(/\.[^/.]+$/, '') + '_edited.gltf'
+                    : 'model_edited.gltf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            },
+            (error) => {
+                console.error('GLTF export error:', error);
+            },
+            {binary: false}
+        )
+    }
     return (
         <div className="fixed inset-0 z-10 bg-black text-white font-orbitron">
             {/* UI-Toolbar */}
@@ -294,6 +334,41 @@ export default function ThreeViewer({ onBack }) {
                     >
                         <span style={{ fontSize: "1rem" }}></span>
                         ↔️ Scale</button>
+                    <button
+                        onClick={handleSave}
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                            borderRadius: 16,
+                            backgroundColor: "rgba(2,6,23,0.6)",
+                            padding: "0.5rem 1.25rem",
+                            fontSize: "0.75rem",
+                            fontWeight: 500,
+                            border: "1px solid rgba(71,85,105,0.7)",
+                            boxShadow:
+                                "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
+                            color: "#e5e7eb",
+                            cursor: "pointer",
+                            transform: "translateY(0)",
+                            transition:
+                                "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
+                        }}
+                        onMouseEnter={e => {
+                            e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
+                            e.currentTarget.style.boxShadow =
+                                "0 22px 55px rgba(15,23,42,1), inset 0 1px 0 rgba(248,250,252,0.18)";
+                            e.currentTarget.style.backgroundColor = "rgba(15,23,42,0.9)";
+                        }}
+                        onMouseLeave={e => {
+                            e.currentTarget.style.transform = "translateY(0) scale(1)";
+                            e.currentTarget.style.boxShadow =
+                                "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)";
+                            e.currentTarget.style.backgroundColor = "rgba(2,6,23,0.6)";
+                        }}
+                    >
+                        💾 Save
+                    </button>
                 </div>
             </div>
 
@@ -314,7 +389,8 @@ export default function ThreeViewer({ onBack }) {
                         <EditableModel
                             file={file}
                             mode={mode}
-                            orbitControlsRef={orbitControlsRef} // 🔥 NEU: Ref übergeben
+                            orbitControlsRef={orbitControlsRef}
+                            onObjectReady={handleObjectReady}
                         />
                     )}
                 </Suspense>
