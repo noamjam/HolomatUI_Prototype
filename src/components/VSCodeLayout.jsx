@@ -61,8 +61,9 @@ function VSCodeLayout({ onBack }) {
     // ---- Run code, show popup output ----
     const runCode = async () => {
         if (!activeFile) return;
+
         try {
-            const res = await fetch("http://localhost:5000/api/run", {
+            const res = await fetch("http://127.0.0.1:5000/api/run", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -71,8 +72,25 @@ function VSCodeLayout({ onBack }) {
                     filename: activeFile.name,
                 }),
             });
-            const data = await res.json();
-            setRunOutput(data.output ?? "No output");
+
+            const contentType = res.headers.get("content-type") || "";
+
+            // Wenn keine JSON-Antwort oder HTTP-Fehler -> als Text anzeigen
+            if (!res.ok || !contentType.includes("application/json")) {
+                const text = await res.text().catch(() => "");
+                const msg =
+                    `Run failed (status ${res.status})\n` +
+                    (text ? text : "No body / non-JSON response");
+                console.error("Run error response:", msg);
+                setRunOutput(msg);
+                setShowRunOutput(true);
+                return;
+            }
+
+            const data = await res.json(); // hier ist sicher JSON
+            setRunOutput(
+                data.output ?? data.error ?? "No output (empty JSON response)"
+            );
             setShowRunOutput(true);
         } catch (err) {
             console.error("Run error", err);
