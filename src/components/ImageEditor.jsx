@@ -9,30 +9,35 @@ const ImageEditor = ({ onBack }) => {
 
     useEffect(() => {
         if (!editorRootRef.current) return;
-        if (instanceRef.current) return; // schon initialisiert
+        if (instanceRef.current) return;
+
+        // Body-Scroll deaktivieren, solange der Editor offen ist
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
 
         const darkTheme = {
-            'common.bi.backgroundColor': 'transparent',
-            'common.backgroundColor': 'transparent',
-            'common.border': '0px solid transparent',
+            "common.bi.backgroundColor": "transparent",
+            "common.backgroundColor": "#111827",
+            "common.border": "0px solid transparent",
 
-            'menu.normalIcon.path': '',
-            'menu.activeIcon.path': '',
-            'menu.normalIcon.name': 'menu-normal-icon',
-            'menu.activeIcon.name': 'menu-active-icon',
+            "menu.normalIcon.path": "",
+            "menu.activeIcon.path": "",
+            "menu.normalIcon.name": "menu-normal-icon",
+            "menu.activeIcon.name": "menu-active-icon",
 
-            'menu.iconSize.width': '24px',
-            'menu.iconSize.height': '24px',
+            "menu.iconSize.width": "24px",
+            "menu.iconSize.height": "24px",
 
-            'submenu.backgroundColor': '#020617',
-            'submenu.partition.color': '#0f172a',
+            "submenu.backgroundColor": "#020617",
+            "submenu.partition.color": "#0f172a",
 
-            'submenu.normalLabel.color': '#e5e7eb',
-            'submenu.activeLabel.color': '#22d3ee',
+            "submenu.normalLabel.color": "#e5e7eb",
+            "submenu.activeLabel.color": "#22d3ee",
 
-            'downloadButton.backgroundColor': '#22d3ee',
-            'downloadButton.borderRadius': '9999px',
-            'downloadButton.color': '#000000',};
+            "downloadButton.backgroundColor": "#22d3ee",
+            "downloadButton.borderRadius": "9999px",
+            "downloadButton.color": "#000000",
+        };
 
         instanceRef.current = new ImageEditorLib(editorRootRef.current, {
             includeUI: {
@@ -41,13 +46,25 @@ const ImageEditor = ({ onBack }) => {
                     name: "SampleImage",
                 },
                 theme: darkTheme,
-                menu: ["crop", "flip", "rotate", "draw", "shape", "icon", "text", "filter"],
+                menu: [
+                    "crop",
+                    "flip",
+                    "rotate",
+                    "draw",
+                    "shape",
+                    "icon",
+                    "text",
+                    "filter",
+                ],
                 initMenu: "filter",
-                uiSize: { width: "100%", height: "800px" },
+                uiSize: {
+                    width: "100%",
+                    height: "100%", // nimmt die volle Höhe des Containers
+                },
                 menuBarPosition: "bottom",
             },
-            cssMaxWidth: 1000,
-            cssMaxHeight: 800,
+            cssMaxWidth: 4000,
+            cssMaxHeight: 4000,
             selectionStyle: {
                 cornerSize: 20,
                 rotatingPointOffset: 70,
@@ -62,22 +79,79 @@ const ImageEditor = ({ onBack }) => {
         };
     }, []);
 
-
     return (
-        <div className="p-6 h-full flex justify-center items-center">
-            <div className="bg-black/70 rounded-xl shadow-2xl border border-cyan-500/40 w-full max-w-5xl">
-                <div className="flex justify-between items-center px-4 py-2 border-b border-cyan-500/30">
-                    <h2 className="text-lg font-bold">Image Editor</h2>
-                    <button
-                        className="px-3 py-1 bg-cyan-500 text-black rounded"
-                        onClick={onBack}
-                    >
+        <>
+            <style>
+                {`
+        /* Ganze Seite des Editors soll 100vh haben */
+        .image-editor-page-full {
+          height: 100vh;
+          width: 100vw;
+          display: flex;
+          flex-direction: column;
+          padding: 0;
+          margin: 0;
+        }
+
+        .image-editor-header-bar {
+          flex: 0 0 auto;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 16px;
+          background: linear-gradient(to right, #06b6d4, #3b82f6);
+          color: #e5e7eb;
+        }
+
+        .image-editor-title {
+          font-size: 1rem;
+          font-weight: 700;
+        }
+
+        .image-editor-back-button {
+          padding: 4px 12px;
+          background-color: #0f172a;
+          color: #e5e7eb;
+          border-radius: 9999px;
+          font-weight: 600;
+          border: none;
+          cursor: pointer;
+          transition: background-color 150ms ease-in-out, transform 150ms ease-in-out;
+        }
+
+        .image-editor-back-button:hover {
+          background-color: #020617;
+          transform: translateY(-1px);
+        }
+
+        /* Der Bereich, in dem Toast UI lebt, füllt den Rest komplett */
+        .image-editor-main {
+          flex: 1 1 auto;
+          min-height: 0;
+          min-width: 0;
+        }
+
+        /* Root-Container für Toast UI: 100% vom verfügbaren Hauptbereich */
+        .image-editor-root-full {
+          width: 100%;
+          height: 100%;
+        }
+      `}
+            </style>
+
+            <div className="image-editor-page-full">
+                <div className="image-editor-header-bar">
+                    <span className="image-editor-title">Image Editor</span>
+                    <button className="image-editor-back-button" onClick={onBack}>
                         Zurück
                     </button>
                 </div>
-                <div ref={editorRootRef} className="h-[600px]" />
+
+                <div className="image-editor-main">
+                    <div ref={editorRootRef} className="image-editor-root-full" />
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 
