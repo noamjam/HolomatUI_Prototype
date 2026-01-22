@@ -218,16 +218,38 @@ function ChatWindowRoot() {
             addResponse("⚠️ Chat server not ready.");
             return;
         }
+
         try {
             const res = await fetch(`http://127.0.0.1:${chatPort}/api/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: msg }),
             });
-            const data = await res.json();
+
+            const contentType = res.headers.get("content-type") || "";
+
+            if (!res.ok || !contentType.includes("application/json")) {
+                const text = await res.text().catch(() => "");
+                console.error("Chat error response:", res.status, text);
+                addResponse(`⚠️ Chat error (${res.status}).`);
+                return;
+            }
+
+            const data = await res.json(); // { reply: string, command?: {...} }
+
+            // Show assistant reply
             addResponse(data.reply || "No response");
+
+            // NEW: forward command to Electron main (if present)
+            if (data.command && window.electronAPI?.executeCommand) {
+                try {
+                    window.electronAPI.executeCommand(data.command);
+                } catch (e) {
+                    console.error("Failed to execute assistant command:", e);
+                }
+            }
         } catch (err) {
-            console.error(err);
+            console.error("Chat connection error:", err);
             addResponse("⚠️ Connection error.");
         }
     };
