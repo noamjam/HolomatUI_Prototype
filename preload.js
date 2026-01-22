@@ -32,4 +32,5 @@ contextBridge.exposeInMainWorld("electronAPI", {
     onMessage: (channel, func) =>
         ipcRenderer.on(channel, (_, ...args) => func(...args)),
 
+    executeCommand: (cmd) => ipcRenderer.send("assistant-command", cmd),
 });

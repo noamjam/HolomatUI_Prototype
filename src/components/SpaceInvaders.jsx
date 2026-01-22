@@ -1,12 +1,31 @@
 import React, { useRef, useEffect, useState } from "react";
 
+const styleButton = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "0.5rem",
+    borderRadius: 16,
+    backgroundColor: "rgba(2,6,23,0.6)",
+    padding: "0.5rem 1.25rem",
+    fontSize: "0.75rem",
+    fontWeight: 500,
+    border: "1px solid rgba(71,85,105,0.7)",
+    boxShadow:
+        "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
+    color: "#e5e7eb",
+    cursor: "pointer",
+    transform: "translateY(0)",
+    transition:
+        "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
+};
+
 export default function SpaceInvaders({ onBack, onHome }) {
     const canvasRef = useRef(null);
     const [isGameOver, setIsGameOver] = useState(false);
     const [score, setScore] = useState(0);
     const [level, setLevel] = useState(1);
 
-    // Refs (für stabile Werte im Loop)
     const scoreRef = useRef(0);
     const levelRef = useRef(1);
     const player = useRef({ x: 375, y: 560, w: 50, h: 20 });
@@ -17,11 +36,110 @@ export default function SpaceInvaders({ onBack, onHome }) {
     const lastShot = useRef(0);
     const animationRef = useRef(null);
     const keys = useRef({ left: false, right: false, shoot: false });
+    const touchInput = useRef({ move: 0, shooting: false });
 
     const bulletSpeed = 8;
     const shootCooldown = 300;
 
-    // === Gegner erstellen ===
+    const layoutStyles = {
+        root: {
+            position: "fixed",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "black",
+            color: "white",
+            fontFamily:
+                "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+            zIndex: 50,
+        },
+        backButton: {
+            ...styleButton,
+            position: "absolute",
+            top: 16,
+            left: 16,
+        },
+        title: {
+            fontSize: "28px",
+            fontWeight: "bold",
+            color: "#22d3ee",
+            marginBottom: 16,
+            textShadow: "0 0 6px #22d3ee",
+        },
+        canvas: {
+            border: "1px solid #22d3ee",
+            borderRadius: 12,
+            backgroundColor: "black",
+            touchAction: "none",
+        },
+        infoText: {
+            marginTop: 24,
+            color: "#9ca3af",
+            fontSize: "13px",
+        },
+        touchBarWrapper: {
+            marginTop: 32,
+            width: 800,
+            display: "flex",
+            justifyContent: "center",
+            userSelect: "none",
+        },
+        touchBarInner: {
+            display: "flex",
+            gap: 24,
+            width: "100%",
+            maxWidth: 820,
+        },
+        touchButton: {
+            ...styleButton,
+            flex: 1,
+            justifyContent: "center",
+        },
+        touchButtonShoot: {
+            ...styleButton,
+            flex: 1,
+            justifyContent: "center",
+            backgroundColor: "#b91c1c",
+            border: "1px solid #b91c1c",
+        },
+        overlay: {
+            position: "absolute",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.9)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+        },
+        overlayTitle: {
+            fontSize: "36px",
+            fontWeight: "bold",
+            marginBottom: 24,
+        },
+        overlayScore: {
+            fontSize: "18px",
+            marginBottom: 16,
+        },
+        overlayButton: {
+            ...styleButton,
+            marginBottom: 8,
+        },
+        overlayButtonGray: {
+            ...styleButton,
+            marginBottom: 8,
+            backgroundColor: "#4b5563",
+            border: "1px solid #4b5563",
+        },
+        overlayButtonRed: {
+            ...styleButton,
+            backgroundColor: "#b91c1c",
+            border: "1px solid #b91c1c",
+        },
+    };
+
     const spawnEnemies = () => {
         const newEnemies = [];
         const rows = 4;
@@ -44,7 +162,6 @@ export default function SpaceInvaders({ onBack, onHome }) {
         enemies.current = newEnemies;
     };
 
-    // === Spiel resetten ===
     const resetGame = () => {
         player.current = { x: 375, y: 560, w: 50, h: 20 };
         bullets.current = [];
@@ -55,9 +172,9 @@ export default function SpaceInvaders({ onBack, onHome }) {
         levelRef.current = 1;
         setScore(0);
         setLevel(1);
+        touchInput.current = { move: 0, shooting: false };
     };
 
-    // === Steuerung ===
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === "ArrowLeft" || e.key === "a") keys.current.left = true;
@@ -77,22 +194,29 @@ export default function SpaceInvaders({ onBack, onHome }) {
         };
     }, []);
 
-    // === Hauptloop ===
     const gameLoop = (timestamp) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext("2d");
 
-        // Hintergrund
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         const p = player.current;
-        if (keys.current.left) p.x = Math.max(0, p.x - 6);
-        if (keys.current.right) p.x = Math.min(800 - p.w, p.x + 6);
 
-        // Schießen
-        if (keys.current.shoot && timestamp - lastShot.current > shootCooldown) {
+        const moveDir =
+            (keys.current.right ? 1 : 0) -
+            (keys.current.left ? 1 : 0) +
+            touchInput.current.move;
+
+        if (moveDir < 0) {
+            p.x = Math.max(0, p.x - 6);
+        } else if (moveDir > 0) {
+            p.x = Math.min(800 - p.w, p.x + 6);
+        }
+
+        const isShooting = keys.current.shoot || touchInput.current.shooting;
+        if (isShooting && timestamp - lastShot.current > shootCooldown) {
             bullets.current.push({
                 x: p.x + p.w / 2 - 2,
                 y: p.y - 10,
@@ -102,12 +226,10 @@ export default function SpaceInvaders({ onBack, onHome }) {
             lastShot.current = timestamp;
         }
 
-        // Bullets bewegen
         bullets.current = bullets.current
             .map((b) => ({ ...b, y: b.y - bulletSpeed }))
             .filter((b) => b.y > 0);
 
-        // Gegner bewegen
         let shiftDown = false;
         for (let e of enemies.current) {
             if (!e.alive) continue;
@@ -119,7 +241,6 @@ export default function SpaceInvaders({ onBack, onHome }) {
             for (let e of enemies.current) e.y += 20;
         }
 
-        // Bullet-Kollisionen
         for (let b of bullets.current) {
             for (let e of enemies.current) {
                 if (!e.alive) continue;
@@ -138,7 +259,6 @@ export default function SpaceInvaders({ onBack, onHome }) {
         }
         bullets.current = bullets.current.filter((b) => !b.hit);
 
-        // Spieler tot?
         for (let e of enemies.current) {
             if (!e.alive) continue;
             if (
@@ -153,7 +273,6 @@ export default function SpaceInvaders({ onBack, onHome }) {
             }
         }
 
-        // Alle Gegner tot → neues Level
         if (enemies.current.every((e) => !e.alive)) {
             levelRef.current += 1;
             enemySpeed.current += 1;
@@ -161,7 +280,6 @@ export default function SpaceInvaders({ onBack, onHome }) {
             spawnEnemies();
         }
 
-        // Zeichnen
         ctx.fillStyle = "cyan";
         ctx.fillRect(p.x, p.y, p.w, p.h);
 
@@ -197,48 +315,90 @@ export default function SpaceInvaders({ onBack, onHome }) {
     }, []);
 
     return (
-        <div className="fixed inset-0 flex flex-col items-center justify-center bg-black text-white">
-            <button
-                onClick={onBack}
-                className="absolute top-4 left-4 bg-cyan-700 px-3 py-2 rounded hover:bg-cyan-500 transition"
-            >
+        <div style={layoutStyles.root}>
+            <button onClick={onBack} style={layoutStyles.backButton}>
                 ⬅ Back
             </button>
 
-            <h1 className="text-3xl font-bold text-cyan-400 mb-4 drop-shadow-[0_0_6px_cyan]">
-                Byte Invaders
-            </h1>
+            <h1 style={layoutStyles.title}>Byte Invaders</h1>
 
             <canvas
                 ref={canvasRef}
                 width={800}
                 height={600}
-                className="border border-cyan-400 rounded bg-black"
+                style={layoutStyles.canvas}
             />
 
-            <p className="mt-4 text-gray-400 text-sm">
-                Steuerung: A / D oder Pfeiltasten · Schuss: Leertaste
+            <p style={layoutStyles.infoText}>
+                Steuerung: A / D oder Pfeiltasten · Schuss: Leertaste ·
+                Auf Touch-Geräten: Leiste unten verwenden
             </p>
 
+            <div style={layoutStyles.touchBarWrapper}>
+                <div style={layoutStyles.touchBarInner}>
+                    <button
+                        style={layoutStyles.touchButton}
+                        onTouchStart={(e) => {
+                            e.preventDefault();
+                            touchInput.current.move = -1;
+                        }}
+                        onTouchEnd={(e) => {
+                            e.preventDefault();
+                            touchInput.current.move = 0;
+                        }}
+                    >
+                        ◀ Links
+                    </button>
+                    <button
+                        style={layoutStyles.touchButton}
+                        onTouchStart={(e) => {
+                            e.preventDefault();
+                            touchInput.current.move = 1;
+                        }}
+                        onTouchEnd={(e) => {
+                            e.preventDefault();
+                            touchInput.current.move = 0;
+                        }}
+                    >
+                        Rechts ▶
+                    </button>
+                    <button
+                        style={layoutStyles.touchButtonShoot}
+                        onTouchStart={(e) => {
+                            e.preventDefault();
+                            touchInput.current.shooting = true;
+                        }}
+                        onTouchEnd={(e) => {
+                            e.preventDefault();
+                            touchInput.current.shooting = false;
+                        }}
+                    >
+                        🔫 Schuss
+                    </button>
+                </div>
+            </div>
+
             {isGameOver && (
-                <div className="absolute inset-0 bg-black/90 flex flex-col justify-center items-center text-white">
-                    <h1 className="text-4xl font-bold mb-6">GAME OVER</h1>
-                    <p className="mb-4 text-lg">Score: {scoreRef.current}</p>
+                <div style={layoutStyles.overlay}>
+                    <h1 style={layoutStyles.overlayTitle}>GAME OVER</h1>
+                    <p style={layoutStyles.overlayScore}>
+                        Score: {scoreRef.current}
+                    </p>
                     <button
                         onClick={handleRestart}
-                        className="bg-cyan-600 px-4 py-2 rounded mb-3 hover:bg-cyan-500"
+                        style={layoutStyles.overlayButton}
                     >
                         Restart
                     </button>
                     <button
                         onClick={onBack}
-                        className="bg-gray-600 px-4 py-2 rounded mb-3 hover:bg-gray-500"
+                        style={layoutStyles.overlayButtonGray}
                     >
                         Game Collection
                     </button>
                     <button
                         onClick={onHome}
-                        className="bg-red-600 px-4 py-2 rounded hover:bg-red-500"
+                        style={layoutStyles.overlayButtonRed}
                     >
                         Home Menu
                     </button>

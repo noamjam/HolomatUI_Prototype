@@ -20,6 +20,7 @@ const net = require("net");
 const os = require("os");
 const express = require("express");
 const cors = require("cors");
+const {dialog} = require("electron");
 
 // ------------------------------------------------------
 // Hilfsfunktionen
@@ -518,30 +519,41 @@ ipcMain.on("launch-orca-slicer", () => {
 });
 
 ipcMain.on("launch-bambu-studio", () => {
-    if (process.platform !== "win32") {
-        console.warn("ℹ️ Bambu Studio only configured for Windows.");
-        return;
-    }
     try {
-        const slicerPath = path.resolve(
-            "C:\\Program Files\\Bambu Studio\\bambu-studio.exe"
-        );
-        console.log(`Starting Bambu Studio: ${slicerPath}`);
-        const child = safeSpawn(slicerPath, [], {
-            detached: true,
-            stdio: "ignore",
-        });
-        if (child) {
-            try {
-                child.unref();
-            } catch (e) {
-                console.warn("⚠️ Failed to unref Bambu Studio:", e.message);
+        if (process.platform === "win32") {
+            // Windows: installed in "C:\Program Files\Bambu Studio"
+            const slicerPath = path.resolve(
+                "C:\\Program Files\\Bambu Studio\\bambu-studio.exe"
+            );
+            console.log(`Starting Bambu Studio (Windows): ${slicerPath}`);
+            const child = safeSpawn(slicerPath, [], {
+                detached: true,
+                stdio: "ignore",
+            });
+            if (child) {
+                try {
+                    child.unref();
+                } catch (e) {
+                    console.warn("⚠️ Failed to unref Bambu Studio (Win):", e.message);
+                }
             }
+        } else if (process.platform === "darwin") {
+            // macOS: installed as /Applications/BambuStudio.app
+            const cmd = 'open -a "/Applications/BambuStudio.app"';
+            console.log("Starting Bambu Studio (macOS) with:", cmd);
+            exec(cmd, (err) => {
+                if (err) {
+                    console.error("❌ Bambu Studio (macOS) error:", err);
+                }
+            });
+        } else {
+            console.warn("ℹ️ Bambu Studio launcher not configured for this platform.");
         }
     } catch (err) {
         console.error("💥 launch-bambu-studio threw:", err);
     }
 });
+
 
 ipcMain.on("launch-freecad", () => {
     try {
@@ -569,5 +581,101 @@ ipcMain.on("launch-freecad", () => {
         }
     } catch (err) {
         console.error("💥 launch-freecad threw:", err);
+    }
+});
+
+ipcMain.on("assistant-command", async(event, cmd) => {
+
+    if(!cmd || typeof cmd.tool != "string") return;
+
+    const { response } = await dialog.showMessageBox({
+        type: "question",
+        buttons: ["Allow", "Cancel"],
+        defaultId: 0,
+        cancelId: 1,
+        message: `Assistant wants to run: ${cmd.tool}. Continue?`,
+    });
+
+    if(response !== 0) return;
+
+    switch(cmd.tool)
+    {
+        case "open_freecad":
+            if (process.platform === "win32") {
+                const FreeCADpath = path.resolve(
+                    "C:\\Users\\noahm\\AppData\\Local\\Programs\\FreeCAD 1.0\\bin\\freecad.exe"
+                );
+                const child = safeSpawn(FreeCADpath, [], {
+                    detached: true,
+                    stdio: "ignore",
+                });
+                if (child) child.unref();
+            } else if (process.platform === "darwin") {
+                exec('open -a /Applications/FreeCAD.app');
+            }
+            break;
+
+        case "open_BambuStudio":
+            if (process.platform === "win32") {
+                // Windows: installed in "C:\Program Files\Bambu Studio"
+                const slicerPath = path.resolve(
+                    "C:\\Program Files\\Bambu Studio\\bambu-studio.exe"
+                );
+                console.log(`Starting Bambu Studio (Windows): ${slicerPath}`);
+                const child = safeSpawn(slicerPath, [], {
+                    detached: true,
+                    stdio: "ignore",
+                });
+                if (child) {
+                    try {
+                        child.unref();
+                    } catch (e) {
+                        console.warn("⚠️ Failed to unref Bambu Studio (Win):", e.message);
+                    }
+                }
+            } else if (process.platform === "darwin") {
+                // macOS: installed as /Applications/BambuStudio.app
+                const cmd = 'open -a "/Applications/BambuStudio.app"';
+                console.log("Starting Bambu Studio (macOS) with:", cmd);
+                exec(cmd, (err) => {
+                    if (err) {
+                        console.error("❌ Bambu Studio (macOS) error:", err);
+                    }
+                });
+            }
+            break;
+        case "open_OrcaSlicer":
+            if (process.platform === "win32") {
+                const slicerPath = path.resolve(
+                    "C:\\Program Files\\FlashForge\\Orca-Flashforge\\orca-flashforge.exe"
+                );
+                console.log(`Starting Orca Slicer: ${slicerPath}`);
+                const child = safeSpawn(slicerPath, [], {
+                    detached: true,
+                    stdio: "ignore",
+                });
+                if (child) {
+                    try {
+                        child.unref();
+                    } catch (e) {
+                        console.warn("⚠️ Failed to unref Orca Slicer:", e.message);
+                    }
+                }
+            }
+            else if (process.platform === "darwin") {
+                // macOS: installed as /Applications/OrcaSlicer.app
+                const cmd = 'open -a "/Applications/OrcaSlicer.app"';
+                console.log("Starting Orca Slicer (macOS) with:", cmd);
+                exec(cmd, (err) => {
+                    if (err) {
+                        console.error("❌ OrcaSlicer (macOS) error:", err);
+                    }
+                });
+            }
+            break;
+        // later: open_orca_slicer, etc.
+
+        default:
+            console.warn("Unknown assistant tool:", cmd.tool);
     }
 });
