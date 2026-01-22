@@ -116,6 +116,24 @@ function EditableModel({ file, mode, orbitControlsRef, onObjectReady }) {
         </TransformControls>
     );
 }
+    const styleButton = {
+        display: "flex",
+        alignItems: "center",
+        gap: "0.5rem",
+        borderRadius: 16,
+        backgroundColor: "rgba(2,6,23,0.6)",
+        padding: "0.5rem 1.25rem",
+        fontSize: "0.75rem",
+        fontWeight: 500,
+        border: "1px solid rgba(71,85,105,0.7)",
+        boxShadow:
+            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
+        color: "#e5e7eb",
+        cursor: "pointer",
+        transform: "translateY(0)",
+        transition:
+            "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
+    };
 
 export default function ThreeViewer({ onBack }) {
     const [file, setFile] = useState(null);
@@ -165,24 +183,7 @@ export default function ThreeViewer({ onBack }) {
             <div className="absolute top-4 left-4 z-20 flex gap-2">
                 <button
                     onClick={onBack}
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        borderRadius: 16,
-                        backgroundColor: "rgba(2,6,23,0.6)",
-                        padding: "0.5rem 1.25rem",
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        border: "1px solid rgba(71,85,105,0.7)",
-                        boxShadow:
-                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
-                        color: "#e5e7eb",
-                        cursor: "pointer",
-                        transform: "translateY(0)",
-                        transition:
-                            "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
-                    }}
+                    style={styleButton}
                     onMouseEnter={e => {
                         e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
                         e.currentTarget.style.boxShadow =
@@ -203,24 +204,7 @@ export default function ThreeViewer({ onBack }) {
                     type="file"
                     accept=".glb,.gltf,.stl,.3mf"
                     onChange={handleFile}
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        borderRadius: 16,
-                        backgroundColor: "rgba(2,6,23,0.6)",
-                        padding: "0.5rem 1.25rem",
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        border: "1px solid rgba(71,85,105,0.7)",
-                        boxShadow:
-                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
-                        color: "#e5e7eb",
-                        cursor: "pointer",
-                        transform: "translateY(0)",
-                        transition:
-                            "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
-                    }}
+                    style={styleButton}
                     onMouseEnter={e => {
                         e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
                         e.currentTarget.style.boxShadow =
@@ -235,24 +219,8 @@ export default function ThreeViewer({ onBack }) {
                     }}
                 />
                 <div className="flex gap-2">
-                    <button onClick={() => setMode('translate')} style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        borderRadius: 16,
-                        backgroundColor: "rgba(2,6,23,0.6)",
-                        padding: "0.5rem 1.25rem",
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        border: "1px solid rgba(71,85,105,0.7)",
-                        boxShadow:
-                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
-                        color: "#e5e7eb",
-                        cursor: "pointer",
-                        transform: "translateY(0)",
-                        transition:
-                            "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
-                    }}
+                    <button onClick={() => setMode('translate')}
+                            style={styleButton}
                             onMouseEnter={e => {
                                 e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
                                 e.currentTarget.style.boxShadow =
@@ -268,24 +236,8 @@ export default function ThreeViewer({ onBack }) {
                     >
                         <span style={{ fontSize: "1rem" }}></span>🧲 Move
                     </button>
-                    <button onClick={() => setMode('rotate')} style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        borderRadius: 16,
-                        backgroundColor: "rgba(2,6,23,0.6)",
-                        padding: "0.5rem 1.25rem",
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        border: "1px solid rgba(71,85,105,0.7)",
-                        boxShadow:
-                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
-                        color: "#e5e7eb",
-                        cursor: "pointer",
-                        transform: "translateY(0)",
-                        transition:
-                            "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
-                    }}
+                    <button onClick={() => setMode('rotate')}
+                            style={styleButton}
                             onMouseEnter={e => {
                                 e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
                                 e.currentTarget.style.boxShadow =
@@ -301,24 +253,8 @@ export default function ThreeViewer({ onBack }) {
                     >
                         <span style={{ fontSize: "1rem" }}></span>🔁 Rotate
                     </button>
-                    <button onClick={() => setMode('scale')} style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        borderRadius: 16,
-                        backgroundColor: "rgba(2,6,23,0.6)",
-                        padding: "0.5rem 1.25rem",
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        border: "1px solid rgba(71,85,105,0.7)",
-                        boxShadow:
-                            "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
-                        color: "#e5e7eb",
-                        cursor: "pointer",
-                        transform: "translateY(0)",
-                        transition:
-                            "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
-                    }}
+                    <button onClick={() => setMode('scale')}
+                            style={styleButton}
                             onMouseEnter={e => {
                                 e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
                                 e.currentTarget.style.boxShadow =
@@ -336,24 +272,7 @@ export default function ThreeViewer({ onBack }) {
                         ↔️ Scale</button>
                     <button
                         onClick={handleSave}
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.5rem",
-                            borderRadius: 16,
-                            backgroundColor: "rgba(2,6,23,0.6)",
-                            padding: "0.5rem 1.25rem",
-                            fontSize: "0.75rem",
-                            fontWeight: 500,
-                            border: "1px solid rgba(71,85,105,0.7)",
-                            boxShadow:
-                                "0 18px 40px rgba(15,23,42,0.95), inset 0 1px 0 rgba(248,250,252,0.14)",
-                            color: "#e5e7eb",
-                            cursor: "pointer",
-                            transform: "translateY(0)",
-                            transition:
-                                "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
-                        }}
+                        style={styleButton}
                         onMouseEnter={e => {
                             e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
                             e.currentTarget.style.boxShadow =

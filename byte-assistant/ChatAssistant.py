@@ -3,17 +3,23 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import httpx
 import os
+from typing import Optional, Dict, Any
 
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434")
 DEFAULT_MODEL = "llama3.1:8b"
 
 app = FastAPI()
 
+class Command(BaseModel):
+    tool: str
+    args: Dict[str, Any] = {}
+
 class ChatRequest(BaseModel):
     message: str
 
 class ChatResponse(BaseModel):
     reply: str
+    command: Optional[Command] = None
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest):
@@ -27,8 +33,7 @@ async def chat(req: ChatRequest):
         "stream": False,
     }
 
-    # More generous and explicit timeout: (connect, read)
-    timeout = httpx.Timeout(60.0)  # 60s total timeout
+    timeout = httpx.Timeout(120.0)  # 120s total timeout
 
     try:
         async with httpx.AsyncClient(timeout=timeout) as client:
@@ -39,7 +44,6 @@ async def chat(req: ChatRequest):
             data = r.json()
 
     except httpx.ReadTimeout as e:
-        # This is your intermittent "ChatAssistant connection error: ReadTimeout('')" case
         print("ChatAssistant connection error (ReadTimeout):", repr(e))
         return ChatResponse(
             reply="Das Sprachmodell hat zu lange gebraucht und die Anfrage ist abgelaufen. "
@@ -47,7 +51,6 @@ async def chat(req: ChatRequest):
         )
 
     except httpx.RequestError as e:
-        # Networking / connection issues (DNS, refused, etc.)
         print("ChatAssistant connection error:", repr(e))
         return ChatResponse(
             reply="Ich kann das Sprachmodell nicht erreichen. Läuft Ollama auf Port 11434?"
@@ -65,5 +68,28 @@ async def chat(req: ChatRequest):
             reply="Ein unerwarteter Fehler ist im Sprachserver aufgetreten."
         )
 
+    # ----- decide reply + optional command -----
     reply = (data.get("response") or "").strip() or "Keine Antwort vom Modell."
-    return ChatResponse(reply=reply)
+
+    text = prompt.lower()
+    command: Optional[Command] = None
+
+    # Simple keyword trigger for testing
+    if "freecad" in text or "starte freecad" in text:
+        command = Command(tool="open_freecad", args={})
+        if not reply:
+            reply = "Ich öffne jetzt FreeCAD für dich."
+
+    if "bambustudio" in text or "starte bambustudio" in text or "bambu studio" in text or "starte bambu studio" in text:
+        command = Command(tool="open_BambuStudio", args={})
+        if not reply:
+            reply = "Ich öffne jetzt BambuStudio für dich."
+
+    if "orcaslicer" in text or "starte orcaslicer" in text or "orca slicer" in text or "starte orca slicer" in text:
+        command = Command(tool="open_OrcaSlicer", args={})
+        if not reply:
+            reply = "Ich öffne jetzt OrcaSlicer für dich."
+
+    print("DEBUG command:", command)
+    return ChatResponse(reply=reply, command=command)
+
