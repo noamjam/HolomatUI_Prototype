@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import {themes} from "../themes";
 
 const apps = [
     "Paint",
@@ -57,25 +58,29 @@ const carouselContainerStyle = {
     zIndex: 0,
 };
 
-const bubbleBaseStyle = {
+const bubbleBaseStyle = (theme) => ({
     width: "8rem",
     height: "8rem",
     borderRadius: "9999px",
-    backgroundColor: "rgba(8,145,178,0.3)",
+    backgroundColor: theme
+        ? `${theme.textColor}33` // 33 = ~20% Alpha in Hex
+        : "rgba(8,145,178,0.3)",
     color: "#ffffff",
     fontSize: "1.25rem",
     fontWeight: 600,
-    border: "1px solid #22d3ee",
+    border: theme ? `1px solid ${theme.textColor}` : "1px solid #22d3ee",
     backdropFilter: "blur(10px)",
     transition: "box-shadow 0.3s ease",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     textAlign: "center",
-    boxShadow: "0 0 20px rgba(0,255,255,0.6)",
-};
+    boxShadow: theme
+        ? `0 0 20px ${theme.textColor}`
+        : "0 0 20px rgba(0,255,255,0.6)",
+});
 
-export default function AppCarousel({ onSelect, startInGrid = false }) {
+export default function AppCarousel({ onSelect, startInGrid = false, theme }) {
     const [current, setCurrent] = useState(0);
     const [isGrid, setIsGrid] = useState(startInGrid);
 
@@ -195,7 +200,7 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
                                                     onClick={() => onSelect(app, true)}
                                                     whileHover={{ scale: 1.1 }}
                                                     whileTap={{ scale: 0.95 }}
-                                                    style={bubbleBaseStyle}
+                                                    style={bubbleBaseStyle(theme)}
                                                 >
                                                     {app}
                                                 </motion.button>
@@ -242,7 +247,7 @@ export default function AppCarousel({ onSelect, startInGrid = false }) {
                                             onClick={() => onSelect(app, false)}
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.95 }}
-                                            style={bubbleBaseStyle}
+                                            style={bubbleBaseStyle(theme)}
                                         >
                                             {app}
                                         </motion.button>

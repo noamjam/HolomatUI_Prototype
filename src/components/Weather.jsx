@@ -1146,7 +1146,7 @@ function getWeatherEmoji(code) {
     if (code >= 61 && code <= 65) return "🌧️";    // Regen
     if (code >= 68 && code <= 69) return "🌨️"     // Schneeregen
     if (code >= 71 && code <= 77) return "❄️";    // Schnee
-    if (code >= 80 && code <= 82) return "🌧️";    // Regenschauer
+    if (code >= 80 && code <= 86) return "🌧️";    // Regenschauer
     if (code >= 95) return "⛈️";                 // Gewitter
     return "�";                                  // Fallback
 }
@@ -1172,6 +1172,7 @@ function translateWeatherCode(code) {
         73: "Schnee",
         77: "Schnee",
         80: "Regen-Schauer",
+        85: "Regen-Schauer",
         95: "Gewitter",
     };
     return weatherCodes[code] || `Code${code}`;

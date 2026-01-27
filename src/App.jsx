@@ -65,10 +65,9 @@ function App() {
 
     return (
         <div
-            className="min-h-screen text-white font-orbitron relative overflow-hidden"
+            className="min-h-screen text-white font-orbitron relative overflow-hidden animated-gradient-bg"
             style={{
                 backgroundImage: theme.bgGradient,
-                backgroundSize: "cover",
                 backgroundAttachment: "fixed",
             }}
         >
@@ -113,8 +112,8 @@ function App() {
             {currentApp === null && !activeGame && (
                 <div className="p-8">
                     <h1
-                        className="text-4xl font-bold mb-12 text-center drop-shadow-[0_0_8px_cyan] overflow-hidden"
-                        style={{ color: theme.textColor }}
+                        className="text-4xl font-bold mb-12 text-center overflow-hidden"
+                        style={{ color: theme.textColor, textShadow: `0 0 8px ${theme.textColor}` }}
                     >
                         {["Welcome to your futuristic workbench"].map((word, w) => (
                             <motion.span
@@ -135,6 +134,7 @@ function App() {
                             setCurrentApp(app);
                         }}
                         startInGrid={startInGrid}
+                        theme={theme}
                     />
                 </div>
             )}
