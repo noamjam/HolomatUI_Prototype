@@ -47,7 +47,7 @@ export default function BootScreen({ onFinish }) {
     }, [skipped]);
 
     // Wenn geskippt, Animationen sofort „fertig“ darstellen (optional)
-    const baseTransition = { duration: skipped ? 0 : 4, ease: "easeInOut" };
+    const baseTransition = { duration: skipped ? 0 :4, ease: "easeInOut" };
 
     const letter = {
         hidden: { x: 30, opacity: 0, filter: "blur(8px)" },
@@ -101,8 +101,6 @@ export default function BootScreen({ onFinish }) {
                 ))}
                 <span className="animate-blink">|</span>
             </motion.h1>
-
-            {/* Popup unten rechts */}
             {hasPressedOnce && !skipped && (
                 <div className="fixed bottom-4 left-4 bg-black/70 text-white text-sm px-4 py-2 rounded shadow-lg">
                     Nochmal drücken, um zu überspringen
