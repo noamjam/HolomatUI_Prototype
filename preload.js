@@ -1,7 +1,26 @@
 // preload.js — Expose safe Electron APIs to renderer
 const { contextBridge, ipcRenderer } = require("electron");
-
+let browserUpdateHandler = null;
 contextBridge.exposeInMainWorld("electronAPI", {
+
+        showBrowser: () => ipcRenderer.invoke("browser:show"),
+        hideBrowser: () => ipcRenderer.invoke("browser:hide"),
+        setBrowserUrl: (url) => ipcRenderer.invoke("browser:set-url", url),
+        browserBack: () => ipcRenderer.invoke("browser:back"),
+        browserForward: () => ipcRenderer.invoke("browser:forward"),
+        browserReload: () => ipcRenderer.invoke("browser:reload"),
+
+        onBrowserUpdate: (callback) => {
+            browserUpdateHandler = callback;
+            ipcRenderer.on("browser:update", (_event, payload) => {
+                if (browserUpdateHandler) browserUpdateHandler(payload);
+            });
+        },
+
+        clearBrowserListeners: () => {
+            ipcRenderer.removeAllListeners("browser:update");
+            browserUpdateHandler = null;
+        },
 
     //Paint
     launchPaint: () => ipcRenderer.send("launch-paint"),

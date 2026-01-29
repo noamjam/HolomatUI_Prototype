@@ -14,7 +14,7 @@ process.on("uncaughtException", (err) => {
 // Imports
 // ------------------------------------------------------
 const path = require("path");
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, BrowserView, ipcMain } = require("electron");
 const { spawn, exec } = require("child_process");
 const net = require("net");
 const os = require("os");
@@ -25,6 +25,62 @@ const {dialog} = require("electron");
 // ------------------------------------------------------
 // Hilfsfunktionen
 // ------------------------------------------------------
+let browserView;
+// Größe anpassen (damit BrowserView elegant unter eurem UI liegt)
+function updateBrowserViewBounds() {
+    if (!mainWindow || !browserView) return;
+    const [winWidth, winHeight] = mainWindow.getContentSize();
+
+    const topBarHeight = 195;   // bis unter deine URL-Leiste
+    const horizontalMargin = Math.max(0, (winWidth - 1450) / 2 + 32);
+
+    browserView.setBounds({
+        x: Math.floor(horizontalMargin),
+        y: topBarHeight,
+        width: Math.floor(winWidth - horizontalMargin * 2),
+        height: Math.floor(winHeight - topBarHeight - 60),
+    });
+}
+
+// IPC: ein-/ausblenden
+ipcMain.handle("browser:show", () => {
+    console.log("browser:show called");
+    if (!mainWindow || !browserView) return;
+    mainWindow.setBrowserView(browserView);
+    updateBrowserViewBounds();
+});
+
+ipcMain.handle("browser:hide", () => {
+    if (!mainWindow) return;
+    mainWindow.setBrowserView(null);
+});
+
+// URL laden
+ipcMain.handle("browser:set-url", (event, url) => {
+    console.log("browser:set-url called:", url);
+    if (!browserView) return;
+    browserView.webContents.loadURL(url);
+});
+
+// Navigation
+ipcMain.handle("browser:back", () => {
+    if (browserView && browserView.webContents.canGoBack()) {
+        browserView.webContents.goBack();
+    }
+});
+
+ipcMain.handle("browser:forward", () => {
+    if (browserView && browserView.webContents.canGoForward()) {
+        browserView.webContents.goForward();
+    }
+});
+
+ipcMain.handle("browser:reload", () => {
+    if (browserView) {
+        browserView.webContents.reload();
+    }
+});
+
 function safeSpawn(cmd, args = [], options = {}) {
     try {
         const child = spawn(cmd, args, options);
@@ -375,6 +431,7 @@ function createWindow() {
             width: 1024,
             height: 768,
             frame: true,
+            roundedCorners: true,
             autoHideMenuBar: true,
             webPreferences: {
                 preload: path.join(__dirname, "preload.js"),
@@ -385,6 +442,29 @@ function createWindow() {
 
         mainWindow.setFullScreen(true);
         mainWindow.loadFile(path.join(__dirname, "dist", "index.html"));
+
+        browserView = new BrowserView({
+            webPreferences: {
+                preload: path.join(__dirname, "browser-preload.js"),
+            },
+        });
+
+        browserView.webContents.on("did-start-loading", () => {
+            mainWindow.webContents.send("browser:update", { isLoading: true });
+        });
+
+        browserView.webContents.on("did-stop-loading", () => {
+            mainWindow.webContents.send("browser:update", {
+                isLoading: false,
+                title: browserView.webContents.getTitle(),
+            });
+        });
+
+        mainWindow.on("resize", () => {
+            if (mainWindow.getBrowserView() === browserView) {
+                updateBrowserViewBounds();
+            }
+        });
 
         mainWindow.on("closed", () => {
             mainWindow = null;

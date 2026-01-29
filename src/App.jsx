@@ -24,6 +24,7 @@ import VSCodeLayout from "./components/VSCodeLayout.jsx";
 import BambuStudio from "./components/BambuStudio";
 import CalendarApp from "./components/CalendarApp.jsx";
 import ImageEditor from "./components/ImageEditor.jsx";
+import BrowserApp from "./components/BrowserApp.jsx";
 
 function App() {
     const [bootDone, setBootDone] = useState(false);
@@ -85,6 +86,7 @@ function App() {
             {currentApp === "Text Editor" && <VSCodeLayout onBack={goHome} />}
             {currentApp === "Bambu Studio" && <BambuStudio onBack={goHome} />}
             {currentApp === "Calender App" && <CalendarApp onBack={goHome} />}
+            {currentApp === "BrowserApp" && <BrowserApp onBack={goHome} />}
 
             {/* Game Collection */}
             {currentApp === "Game Collection" && !activeGame && (
