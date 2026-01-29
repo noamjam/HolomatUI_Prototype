@@ -24,6 +24,7 @@ import VSCodeLayout from "./components/VSCodeLayout.jsx";
 import BambuStudio from "./components/BambuStudio";
 import CalendarApp from "./components/CalendarApp.jsx";
 import ImageEditor from "./components/ImageEditor.jsx";
+import { MarkdownEditorShell } from "./components/MarkdownEditorShell";
 
 function App() {
     const [bootDone, setBootDone] = useState(false);
@@ -31,6 +32,7 @@ function App() {
     const [startInGrid, setStartInGrid] = useState(false);
     const [theme, setTheme] = useState(themes.default);
     const [activeGame, setActiveGame] = useState(null);
+    const [content, setContent] = useState("# Neues Markdown-Dokument");
     const isActive = useByteStatus();
 
     useEffect(() => {
@@ -46,6 +48,35 @@ function App() {
         setActiveGame(null);
         setCurrentApp(null);
     };
+
+
+    const handleSave = async (value) => {
+        setContent(value);
+
+        try {
+            const result = await window.electronAPI?.saveMarkdown(value);
+            if (result?.canceled) {
+                console.log("Save canceled");
+            } else {
+                console.log("Saved to", result.filePath);
+            }
+        } catch (err) {
+            console.error("Save failed:", err);
+        }
+    };
+
+    const handleOpen = async () => {
+        try {
+            const result = await window.electronAPI?.openMarkdown();
+            if (result?.canceled) return null;
+            setContent(result.content || "");
+            return result.content || "";
+        } catch (err) {
+            console.error("Open failed:", err);
+            return null;
+        }
+    };
+
 
     const scanline = {
         hidden: { clipPath: "inset(0 100% 0 0)" },
@@ -85,6 +116,15 @@ function App() {
             {currentApp === "Text Editor" && <VSCodeLayout onBack={goHome} />}
             {currentApp === "Bambu Studio" && <BambuStudio onBack={goHome} />}
             {currentApp === "Calender App" && <CalendarApp onBack={goHome} />}
+            {currentApp === "Markdown Editor" && (
+                <MarkdownEditorShell
+                    initialValue={content}
+                    onSave={handleSave}
+                    onOpen={handleOpen}   // NEU
+                    title="Notes.md"
+                    onBack={goHome}
+                />
+            )}
 
             {/* Game Collection */}
             {currentApp === "Game Collection" && !activeGame && (
@@ -113,7 +153,10 @@ function App() {
                 <div className="p-8">
                     <h1
                         className="text-4xl font-bold mb-12 text-center overflow-hidden"
-                        style={{ color: theme.textColor, textShadow: `0 0 8px ${theme.textColor}` }}
+                        style={{
+                            color: theme.textColor,
+                            textShadow: `0 0 8px ${theme.textColor}`,
+                        }}
                     >
                         {["Welcome to your futuristic workbench"].map((word, w) => (
                             <motion.span
