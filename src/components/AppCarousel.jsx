@@ -26,7 +26,7 @@ const wrapperStyle = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    height: "480px",
+    height: "680px",
     overflow: "hidden",
     width: "100%",
 };
@@ -35,7 +35,7 @@ const gridContainerStyle = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    maxHeight: "480px",
+    maxHeight: "680px",
     paddingTop: "1.5rem",
     paddingBottom: "1.5rem",
     overflowY: "hidden",
@@ -122,7 +122,10 @@ export default function AppCarousel({ onSelect, startInGrid = false, theme }) {
         const diff = (i - current + len) % len;
         if (diff === 0) return 0;
         if (diff === 1 || diff === -len + 1) return 1;
+        if (diff === 2 || diff === -len + 2) return 2;
         if (diff === len - 1 || diff === -1) return -1;
+        if (diff === len - 2 || diff === -2) return -2;
+
         return null;
     };
 
@@ -225,10 +228,10 @@ export default function AppCarousel({ onSelect, startInGrid = false, theme }) {
                                 const rel = getRelativeIndex(i);
                                 if (rel === null) return null;
 
-                                const translateX = rel * 80;
-                                const rotateY = rel * -1;
-                                const scale = rel === 0 ? 1.1 : 0.95;
-                                const zIndex = rel === 0 ? 10 : 5;
+                                const translateX = rel * 105;
+                                const rotateY = rel * -4;
+                                const scale = rel === 0 ? 1.1 : 0.9;
+                                const zIndex = 10 - Math.abs(rel);
 
                                 return (
                                     <motion.div
