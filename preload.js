@@ -52,4 +52,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
         ipcRenderer.on(channel, (_, ...args) => func(...args)),
 
     executeCommand: (cmd) => ipcRenderer.send("assistant-command", cmd),
+
+    saveMarkdown: (content) =>
+        ipcRenderer.invoke("save-markdown-dialog", content),
+    openMarkdown: () =>
+        ipcRenderer.invoke("open-markdown-dialog"),
 });

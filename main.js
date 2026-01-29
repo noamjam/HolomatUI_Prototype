@@ -18,9 +18,9 @@ const { app, BrowserWindow, BrowserView, ipcMain } = require("electron");
 const { spawn, exec } = require("child_process");
 const net = require("net");
 const os = require("os");
+const fs = require("fs");
 const express = require("express");
 const cors = require("cors");
-const {dialog} = require("electron");
 
 // ------------------------------------------------------
 // Hilfsfunktionen
@@ -102,7 +102,7 @@ function getPythonCommand() {
     if (process.platform === "win32") {
         return "python";
     }
-    return "python3"; // macOS + Linux
+    return "python3";
 }
 
 // ------------------------------------------------------
@@ -206,12 +206,10 @@ function startRunServer() {
         }
     });
 
-    // Catch-all 404
     runServerApp.use((req, res) => {
         res.status(404).json({ error: "Not found" });
     });
 
-    // Error-Middleware
     runServerApp.use((err, req, res, next) => {
         console.error("💥 Express error:", err);
         res.status(500).json({ error: "Internal server error" });
@@ -232,9 +230,44 @@ function startRunServer() {
 }
 
 // ------------------------------------------------------
+// Upload-Server (Markdown Bild-Uploads)
+// ------------------------------------------------------
+let uploadServerProcess = null;
+
+function startUploadServer() {
+    if (uploadServerProcess) {
+        console.log("ℹ️ Upload server already running.");
+        return;
+    }
+
+    const serverPath = path.join(__dirname, "server.js");
+
+    uploadServerProcess = safeSpawn(process.execPath, [serverPath], {
+        cwd: __dirname,
+        windowsHide: process.platform === "win32",
+    });
+
+    if (!uploadServerProcess) {
+        console.error("❌ Failed to start upload server.");
+        return;
+    }
+
+    uploadServerProcess.stdout?.on("data", (d) =>
+        console.log(`[Upload stdout] ${d.toString().trim()}`)
+    );
+    uploadServerProcess.stderr?.on("data", (d) =>
+        console.error(`[Upload stderr] ${d.toString().trim()}`)
+    );
+    uploadServerProcess.on("exit", (code, sig) => {
+        console.warn(`⚠️ Upload server exited — code=${code}, signal=${sig}`);
+        uploadServerProcess = null;
+    });
+}
+
+// ------------------------------------------------------
 // Plattform-Handling
 // ------------------------------------------------------
-const platform = os.platform(); // 'win32', 'darwin', 'linux', ...[web:20][web:26]
+const platform = os.platform();
 if (platform === "win32") {
     console.log("Running on Windows → Disabling hardware acceleration");
     app.disableHardwareAcceleration();
@@ -480,6 +513,7 @@ function createWindow() {
 app.whenReady().then(async () => {
     try {
         startRunServer();
+        startUploadServer();
         await startOllamaServer();
         await startChatAssistant();
         startByteAssistant();
@@ -497,6 +531,7 @@ app.on("window-all-closed", () => {
             if (chatProcess) chatProcess.kill("SIGTERM");
             if (ollamaProcess) ollamaProcess.kill("SIGTERM");
             if (runServerInstance) runServerInstance.close();
+            if (uploadServerProcess) uploadServerProcess.kill("SIGTERM");
         } catch (err) {
             console.error("⚠️ Error while cleaning up processes:", err);
         }
@@ -571,7 +606,6 @@ ipcMain.on("open-file-explorer", () => {
     }
 });
 
-// Windows-spezifische Slicer – auf anderen Plattformen einfach loggen
 ipcMain.on("launch-orca-slicer", () => {
     if (process.platform !== "win32") {
         console.warn("ℹ️ Orca Slicer only configured for Windows.");
@@ -601,7 +635,6 @@ ipcMain.on("launch-orca-slicer", () => {
 ipcMain.on("launch-bambu-studio", () => {
     try {
         if (process.platform === "win32") {
-            // Windows: installed in "C:\Program Files\Bambu Studio"
             const slicerPath = path.resolve(
                 "C:\\Program Files\\Bambu Studio\\bambu-studio.exe"
             );
@@ -618,7 +651,6 @@ ipcMain.on("launch-bambu-studio", () => {
                 }
             }
         } else if (process.platform === "darwin") {
-            // macOS: installed as /Applications/BambuStudio.app
             const cmd = 'open -a "/Applications/BambuStudio.app"';
             console.log("Starting Bambu Studio (macOS) with:", cmd);
             exec(cmd, (err) => {
@@ -633,7 +665,6 @@ ipcMain.on("launch-bambu-studio", () => {
         console.error("💥 launch-bambu-studio threw:", err);
     }
 });
-
 
 ipcMain.on("launch-freecad", () => {
     try {
@@ -664,9 +695,8 @@ ipcMain.on("launch-freecad", () => {
     }
 });
 
-ipcMain.on("assistant-command", async(event, cmd) => {
-
-    if(!cmd || typeof cmd.tool != "string") return;
+ipcMain.on("assistant-command", async (event, cmd) => {
+    if (!cmd || typeof cmd.tool != "string") return;
 
     const { response } = await dialog.showMessageBox({
         type: "question",
@@ -676,10 +706,9 @@ ipcMain.on("assistant-command", async(event, cmd) => {
         message: `Assistant wants to run: ${cmd.tool}. Continue?`,
     });
 
-    if(response !== 0) return;
+    if (response !== 0) return;
 
-    switch(cmd.tool)
-    {
+    switch (cmd.tool) {
         case "open_freecad":
             if (process.platform === "win32") {
                 const FreeCADpath = path.resolve(
@@ -697,7 +726,6 @@ ipcMain.on("assistant-command", async(event, cmd) => {
 
         case "open_BambuStudio":
             if (process.platform === "win32") {
-                // Windows: installed in "C:\Program Files\Bambu Studio"
                 const slicerPath = path.resolve(
                     "C:\\Program Files\\Bambu Studio\\bambu-studio.exe"
                 );
@@ -714,48 +742,92 @@ ipcMain.on("assistant-command", async(event, cmd) => {
                     }
                 }
             } else if (process.platform === "darwin") {
-                // macOS: installed as /Applications/BambuStudio.app
-                const cmd = 'open -a "/Applications/BambuStudio.app"';
-                console.log("Starting Bambu Studio (macOS) with:", cmd);
-                exec(cmd, (err) => {
+                const cmd2 = 'open -a "/Applications/BambuStudio.app"';
+                console.log("Starting Bambu Studio (macOS) with:", cmd2);
+                exec(cmd2, (err) => {
                     if (err) {
                         console.error("❌ Bambu Studio (macOS) error:", err);
                     }
                 });
             }
             break;
+
         case "open_OrcaSlicer":
             if (process.platform === "win32") {
-                const slicerPath = path.resolve(
+                const slicerPath2 = path.resolve(
                     "C:\\Program Files\\FlashForge\\Orca-Flashforge\\orca-flashforge.exe"
                 );
-                console.log(`Starting Orca Slicer: ${slicerPath}`);
-                const child = safeSpawn(slicerPath, [], {
+                console.log(`Starting Orca Slicer: ${slicerPath2}`);
+                const child2 = safeSpawn(slicerPath2, [], {
                     detached: true,
                     stdio: "ignore",
                 });
-                if (child) {
+                if (child2) {
                     try {
-                        child.unref();
+                        child2.unref();
                     } catch (e) {
                         console.warn("⚠️ Failed to unref Orca Slicer:", e.message);
                     }
                 }
-            }
-            else if (process.platform === "darwin") {
-                // macOS: installed as /Applications/OrcaSlicer.app
-                const cmd = 'open -a "/Applications/OrcaSlicer.app"';
-                console.log("Starting Orca Slicer (macOS) with:", cmd);
-                exec(cmd, (err) => {
+            } else if (process.platform === "darwin") {
+                const cmd3 = 'open -a "/Applications/OrcaSlicer.app"';
+                console.log("Starting Orca Slicer (macOS) with:", cmd3);
+                exec(cmd3, (err) => {
                     if (err) {
                         console.error("❌ OrcaSlicer (macOS) error:", err);
                     }
                 });
             }
             break;
-        // later: open_orca_slicer, etc.
 
         default:
             console.warn("Unknown assistant tool:", cmd.tool);
+    }
+});
+
+ipcMain.handle("save-markdown-dialog", async (event, content) => {
+    try {
+        const { canceled, filePath } = await dialog.showSaveDialog({
+            title: "Save Markdown",
+            defaultPath: "Notes.md",
+            filters: [
+                { name: "Markdown", extensions: ["md"] },
+                { name: "All Files", extensions: ["*"] },
+            ],
+        });
+
+        if (canceled || !filePath) {
+            return { canceled: true };
+        }
+
+        fs.writeFileSync(filePath, content || "", "utf8");
+        return { canceled: false, filePath };
+    } catch (err) {
+        console.error("💥 save-markdown-dialog error:", err);
+        return { canceled: true, error: err.message };
+    }
+});
+
+ipcMain.handle("open-markdown-dialog", async () => {
+    try {
+        const { canceled, filePaths } = await dialog.showOpenDialog({
+            title: "Open Markdown",
+            filters: [
+                { name: "Markdown", extensions: ["md"] },
+                { name: "All Files", extensions: ["*"] },
+            ],
+            properties: ["openFile"],
+        });
+
+        if (canceled || !filePaths || filePaths.length === 0) {
+            return { canceled: true };
+        }
+
+        const filePath = filePaths[0];
+        const content = fs.readFileSync(filePath, "utf8");
+        return { canceled: false, filePath, content };
+    } catch (err) {
+        console.error("💥 open-markdown-dialog error:", err);
+        return { canceled: true, error: err.message };
     }
 });

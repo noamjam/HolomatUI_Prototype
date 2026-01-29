@@ -18,6 +18,7 @@ const apps = [
     "Calender App",
     "Image Editor",
     "BrowserApp",
+    "Markdown Editor",
 ];
 
 const wrapperStyle = {
