@@ -25,6 +25,7 @@
     "react-markdown": "^10.1.0",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
+
     "three": "^0.153.0",
     "tui-image-editor": "^3.15.3"
   },

@@ -14,7 +14,7 @@ process.on("uncaughtException", (err) => {
 // Imports
 // ------------------------------------------------------
 const path = require("path");
-const { app, BrowserWindow, BrowserView, ipcMain } = require("electron");
+const { app, BrowserWindow, BrowserView, ipcMain, dialog } = require("electron");
 const { spawn, exec } = require("child_process");
 const net = require("net");
 const os = require("os");
