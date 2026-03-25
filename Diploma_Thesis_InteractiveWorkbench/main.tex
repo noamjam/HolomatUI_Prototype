@@ -19,6 +19,8 @@
 \usepackage{parskip}
 \usepackage{enumitem}
 \usepackage{float}  
+\usepackage{caption}
+\renewcommand{\figurename}{Illustration}
 
 % Titelblatt-Setup
 \title{DIPLOMARBEIT \\ Interactive Workbench}
@@ -656,10 +658,10 @@ The FreeCAD integration was one of the first places in the project where cross-p
 \subparagraph{Bambu Studio} \mbox{} \\
 Bambu Studio was added on 18 December 2025 as a third slicer integration, targeting Bambu Lab's own 3D printing ecosystem. The implementation follows the same structure as OrcaSlicer and FreeCAD but was notable for introducing a concrete bug during development. The initial version of BambuStudio.jsx called window.electronAPI.launchBambuStudio() directly inside an if condition that was checking for the function's existence. Because calling a function returns its return value — in this case undefined — the condition always evaluated to false, meaning the slicer never actually launched and the "Electron bridge not available" error alert was displayed every time even though the bridge was working correctly. The fix was straightforward: check for the function's existence first, and then call it separately inside the block if it is present. Like the other integrations, the spawned process is detached and unreferenced so it runs independently of the workbench.
 
-\newpage
 \subparagraph{Stability Improvements and the safeSpawn Pattern} \mbox{} \\
 On 7 January 2026, a broader stability pass was made specifically targeting all external application launches. The diary notes that a more failsafe main.js platform query was introduced and applied uniformly to every non-natively developed application — BambuStudio, FreeCAD, and OrcaSlicer — rather than having each integration handle its own error cases inconsistently. This consolidation reduced code duplication and made the launch behaviour more predictable across the three integrations. A safeSpawn helper was also introduced as a wrapper around the raw Node.js childprocess.spawn call, providing centralised error handling for cases such as a missing executable, an incorrect path, or a system-level permission error. Rather than crashing the Electron main process or silently failing, safeSpawn catches these errors and logs them clearly, making the source of a failed launch much easier to diagnose.
 
+\newpage
 \subparagraph{AI-Triggered Launching} \mbox{} \\
 Beyond being accessible as tiles in the app carousel, all three external applications were later wired into the workbench's AI assistant as part of a broader effort to make the platform feel more interactive and voice-driven. On 21 January 2026, the Python ChatAssistant.py backend was extended with a Command data model and a keyword scanning step that runs on every incoming user prompt. If the text contains trigger phrases such as "freecad", "starte freecad", "bambu studio", or "starte bambustudio", the assistant constructs a Command object identifying the target application and returns it alongside the normal language model reply. The frontend then forwards this command to main.js via the executeCommand IPC bridge. Before executing, the main process shows the user a native confirmation dialog — "Assistant wants to run: openfreecad. Continue?" — requiring an explicit Allow before spawning the process. This consent step was a deliberate design decision to prevent the AI from silently launching applications without the user's awareness. By the end of January 2026, this voice-triggered launch mechanism was confirmed working for OrcaSlicer, FreeCAD, and Bambu Studio.
 
@@ -709,7 +711,13 @@ Looking back along the path of development however, there were several events an
 
 Time proved to be one of the most valuable and limited resources throughout the entire development process. Every decision that led us to an unexpected problem forced us to spend additional time on bug fixing and troubleshooting, which in turn stole time that could have been used more productively elsewhere in the development. This was particularly felt during the development of certain applications, where the addition of a single new feature would often cause two or more new bugs to appear in its place. This pattern made the development noticeably slower and considerably more exhausting at times, as progress felt difficult to sustain when every step forward seemed to bring new obstacles along with it.
 
+As expected with such a big and complex project, motivation and teamwork play a major part in the successfull development, even when it comes to the smallest projects.
+Nevertheless, a project of such complexity and extent needs to be treated as such. Thankfully, we prepared for such events as the previously mentioned "Division of tasks" helped us not lose intereset as there was always something to improve, bug- fix or something completely new to develop. 
+On the other hand, no project nor teamwork is a smooth sailing experience, which we also noticed in ways like a lack of variety in work, which came progressivly more tiring and boring. 
+
 Attendance and health also took noticeable amount of time from us, although we managed to recover some of that time by working overtime in private. 
+
+Nevertheless we pursued through all the trouble and inconsistencies in motivation and performance. 
 \newpage
 \subsection{Development Issues}
 During the development process, several technical challenges emerged that significantly influenced both workflow and time management.
@@ -717,6 +725,12 @@ During the development process, several technical challenges emerged that signif
 One of the primary difficulties concerned frontend styling. As outlined in Section 5.1.2 “Frontend Software Development”, the initial implementation did not consistently rely on structured CSS from the beginning. Instead, styling decisions evolved incrementally during development. This approach led to inconsistencies and additional refactoring effort later in the project. A more systematic styling strategy from the outset would have reduced redundancy and improved development efficiency.
 
 Another major challenge involved the integration of the AI assistant. The implementation required interaction between JavaScript-based frontend components and Python-based backend processes. This cross-environment communication resulted in recurring issues, including connection errors and execution inconsistencies when running Python scripts. Resolving these problems required substantial debugging effort and resource allocation, particularly in ensuring stable inter-process communication.
+
+The biggest challenge faced in the development of our workbench was the idea to make everything touch input capable, which led to numerous problems.
+This idea challenged us to find ways to interact with the workbench in ways that some would say are unnatural such as buttons where most would expect a slider or something similar. 
+This can be seen in the byte invaders game where this idea forced us to develop a new movement methodology, moving away from event triggered movements through swipes and simple presses to buttons whom can be activated via touch inputs.
+
+Portability and compatibility also slowed down the development as they requiered intensiv care and caution to guarantee a stable project on both windows and other platforms. More on this can be found in the section "Technical Specifications". 
 
 Furthermore and definitely worth mentioning, were the problems we encountered with GitHub. GitHub, while being a major part of planning, managing and hosting our project, did not come without it problems. As our project grew, we resorted to hosting both a GitHub repository as well as a project. At first, we did not give them enough of credit and care which later let to issues when merging our rather long-lived development branches, which at that point were to different and required manual merging which led to problems more than once. 
 
