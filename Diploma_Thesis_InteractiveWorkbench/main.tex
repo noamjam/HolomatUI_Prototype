@@ -23,17 +23,17 @@
 \renewcommand{\figurename}{Illustration}
 
 % Titelblatt-Setup
-\title{DIPLOMARBEIT \\ Interactive Workbench}
+\title{Diploma Thesis \\ Interactive Workbench}
 \author{
-  Ausgeführt im Schuljahr 2025/26 \\
-  von \\
+  Done in Schoolyears 2025/26 \\
+  by \\
   Noah Maringer 5BHEL \\
   Stenitzer Alexander 5BHEL \\
   \vspace{1cm} \\
-  Betreut von \\
-  Gerald Senarclens de Grancy
+  Advisor \\
+  Professor Gerald Senarclens de Grancy
 }
-\date{Vorgelegt am 07. April 2026}
+\date{Presented on the 07th of April 2026}
 
 % Header/Footer
 \pagestyle{fancy}
@@ -54,17 +54,23 @@
 % Hauptteil basierend auf Gliederung
 \section{General Introduction}
 \subsection{Introduction}
-The diploma thesis “Interactive Workbench” is a new and improved way to interact with technology at the touch of your fingers. 
-Current graphical user interfaces(GUI) are clumsy and not user friendly with way too many layers of inputs which also makes them hard to use with touchscreen devices. This diploma thesis is meant to improve that by bringing to live a new touch-optimized GUI that simplifies workflows by minimizing layers and enabling intuitive interactions while maintaining functionality and portability. 
+Modern graphical user interfaces were designed primarily for mouse and keyboard interaction, a paradigm that has remained largely unchanged for decades. While this model is well-suited to traditional desktop environments, it introduces significant friction when applied to touchscreen devices, where layered menus, small click targets, and complex navigation hierarchies translate poorly to finger-based input. As touch-enabled laptops and interactive displays become increasingly common in both private and professional settings, the demand for interfaces that treat touch as a first-class input method — rather than an afterthought — continues to grow.
 
-Built with React and JavaScript for the frontend, Ollama AI for smart features, and a backend for fast and seamless operations, it runs on touch- enabled laptops across Windows, macOS and Linux.
+Beyond the challenge of touch compatibility, modern workflows often require users to switch between multiple disconnected tools to complete a single task — moving from a 3D viewer to a slicer, from a text editor to an AI assistant, and back again. Each transition introduces overhead, breaks concentration, and adds unnecessary complexity to what should be a fluid creative or productive process.
 
+The "Interactive Workbench" was developed to address both of these problems. The goal was to create a touch-optimized, unified digital environment that consolidates practical tools into a single coherent interface, reducing both the friction of touch interaction and the overhead of switching between applications. The system was designed from the ground up with gesture-based input as the primary interaction model, while maintaining full compatibility with conventional mouse and keyboard input for devices without touchscreen support.
+
+This thesis documents the motivation behind the project, the technical decisions and architectural choices made during development, the iterative refinements applied throughout, and an honest reflection on the challenges encountered and the limitations that remain in the current implementation.
+
+\newpage
 \subsection{Achieved Specifications}
-These apps cover a broad spectrum of practical domains, from production planning and 3D design tools for rapid prototyping, to software development environments and even casual games for downtime entertainment.
-Users engage through intuitive, simplified gestures—like swipes, pinches, and taps—across minimal interface layers, creating seamless end-to-end workflows from initial concept sketching to full execution.
-The workbench supports cross-platform compatibility on Windows, macOS, and Linux, developed and debugged using WebStorm IDE, ensuring consistent performance on various touch-sensitive laptops without platform-specific glitches. Reliable usability was validated through rigorous, iterative testing with independent users in high-risk failure scenarios, such as multi-gesture sequences, AI-assisted feature calls via Ollama LLM, and heavy app loads.
-Early tests uncovered issues in app compatibility, feature responsiveness (e.g., drag-and-drop gestures), and cross-OS stability, which were systematically resolved—resulting in a more robust version with 95 +percent task completion rates and under 10-second response times in final benchmarks.
-This process followed standard UI testing best practices, including task-oriented sessions, gesture verification, and think-aloud protocols, confirming the GUI's intuitive design and low error rates for both experts and novices.
+The final implementation of the Interactive Workbench delivers a modular, cross-platform application that runs on Windows, macOS, and Linux, developed and tested using the WebStorm IDE across multiple hardware configurations. The system provides a range of self-developed applications covering practical domains including 3D model visualization, AI-assisted interaction, document editing, code execution, image editing, and casual gaming, all accessible through a unified touch-optimized interface.
+
+User interaction is centered on gesture-based input — including taps, swipes, pinches, and drag operations — supported consistently across all integrated applications. For devices without touchscreen capability, full mouse and keyboard support ensures accessibility across different hardware configurations.
+
+Cross-platform stability and usability were validated through iterative testing with independent users across a range of scenarios, including multi-gesture sequences, AI-assisted feature calls, and concurrent application loads. Issues identified during testing — including gesture recognition inconsistencies, cross-platform rendering differences, and inter-process communication errors — were systematically addressed throughout development. Final benchmarks recorded task completion rates above 95 percent and response times under ten seconds across tested workflows.
+
+Almost all data processing, including AI inference and voice recognition, is executed locally on the user's device. No personal data is collected or transmitted to external servers, ensuring a sufficient standard of privacy and data security for the intended use cases of private, educational, and maker-space environments.
 
 \newpage
 \section{User Manual}
@@ -129,7 +135,6 @@ The main task of this diploma project was the development of a touch‑input‑c
 \newpage
 \subsection{Technical Specifications}
 % Füge hier Inhalte ein
-This header provides interesting information about different technical relevant topics and hence is that important. techniques used to fulfill our main task.
 \subsubsection{Programming Languages and Frameworks}
 The primary programming language used in this diploma project is JavaScript, in combination with the React framework and reusable React components. In addition, HTML and CSS are employed for structure and styling to give the workbench a clear, lively and well‑organized visual appearance. Centralized CSS style classes can be defined once and imported into multiple applications, which enables a largely uniform design language across the entire system.
 
@@ -503,12 +508,13 @@ These limitations were accepted as design trade-offs in order to maintain the li
   \label{fig:MD}
 \end{figure}
 
-\newpage
+
 \subsubsection{3D- Viewer}
 \paragraph{Initial Implementation}\mbox{} \\
 The 3D Viewer was assigned to Noah in the initial division of work and was present in the AppCarousel from at least 22 October 2025 onward. It is implemented as a React component named ThreeViewer.jsx and follows the same routing pattern as all other workbench applications, being opened and closed via the currentApp state in App.jsx.
 The initial version of the viewer was deliberately minimal. It provided a basic 3D rendering environment in which a user could load and view a 3D model, but interaction was limited. Only the GLB file format was supported for import, there were no transformation tools to manipulate objects, and the scene had no grid or spatial reference to help orient the user. The camera could be orbited around the loaded model using standard mouse controls, but that was the extent of the functionality.
 
+\newpage
 \paragraph{Iterative Refinement}\mbox{} \\
 The viewer was substantially expanded over the course of development. The final implementation relies on @react-three/fiber as the React rendering layer on top of Three.js, and makes use of the @react-three/drei helper library for higher-level controls. The full-screen Canvas component from @react-three/fiber serves as the rendering surface, configured with a perspective camera positioned at (3, 3, 3) with a 60-degree field of view.
 File format support was broadened considerably. Where the first version only accepted GLB files, the final component supports four formats: GLB and GLTF files are loaded via Three.js's GLTFLoader, STL files via the STLLoader, and 3MF files via the ThreeMFLoader. Each format triggers a different loading path inside an async loadModel function. STL files, which carry only raw geometry and no material information, are automatically paired with a default grey MeshStandardMaterial so that they render correctly without requiring the user to supply any additional data. All other formats are loaded directly as Three.js scene objects. Once loaded, the model is placed at the world origin and stored both in local state and in a objectRef for later access by the export function.
@@ -707,108 +713,78 @@ The design had to be redone several times- why? How? Problems like the design ch
 
 \newpage
 \section{Discussion}
-The final installment of our Workbench offers a wide variety of applications and use cases, ranging from 3D manufacturing and software development to a number of other practical functionalities, making it a versatile and capable platform for its intended environment.
+The final implementation of the Interactive Workbench fulfills the core objectives defined at the outset of the project, delivering a modular, touch-optimized digital environment that consolidates a broad range of practical tools within a single unified interface. The platform covers domains ranging from 3D manufacturing and software development to AI-assisted interaction and casual entertainment, demonstrating both the versatility of the chosen architecture and the feasibility of the underlying concept.
 
-Looking back along the path of development however, there were several events and situations that had us reconsider our choices and decisions, requiring the team to adapt and adjust the direction of the project at various points throughout the process. While the development journey was not without its difficulties, it is worth noting that there were many problems we encountered, but none that we were ultimately not able to work through. Every challenge that arose was met and resolved in one way or another, which speaks to the dedication and persistence of the team involved.
+The development process was not without significant challenges. Throughout the project, time proved to be one of the most constrained resources. Technical difficulties — particularly those arising from cross-environment integration and touch input compatibility — frequently required unplanned debugging effort, which reduced the time available for feature development. A recurring pattern emerged in which the introduction of a new feature would expose previously hidden issues elsewhere in the system, making sustained progress difficult at certain stages of development. Despite this, every challenge encountered was ultimately resolved, and no issue proved permanently blocking to the project's completion.
 
-Time proved to be one of the most valuable and limited resources throughout the entire development process. Every decision that led us to an unexpected problem forced us to spend additional time on bug fixing and troubleshooting, which in turn stole time that could have been used more productively elsewhere in the development. This was particularly felt during the development of certain applications, where the addition of a single new feature would often cause two or more new bugs to appear in its place. This pattern made the development noticeably slower and considerably more exhausting at times, as progress felt difficult to sustain when every step forward seemed to bring new obstacles along with it.
-
-As expected with such a big and complex project, motivation and teamwork play a major part in the successfull development, even when it comes to the smallest projects.
-Nevertheless, a project of such complexity and extent needs to be treated as such. Thankfully, we prepared for such events as the previously mentioned "Division of tasks" helped us not lose intereset as there was always something to improve, bug- fix or something completely new to develop. 
-On the other hand, no project nor teamwork is a smooth sailing experience, which we also noticed in ways like a lack of variety in work, which came progressivly more tiring and boring. 
-
-Attendance and health also took noticeable amount of time from us, although we managed to recover some of that time by working overtime in private. 
+Workload distribution and team coordination, managed through GitHub's project and repository tooling, played an important role in maintaining progress throughout the development period. The structured division of responsibilities ensured that there was always active development taking place across different components of the system, which helped sustain momentum even during more demanding phases of the project. That said, coordinating a project of this complexity as a two-person team introduced its own difficulties, and periods of reduced availability due to attendance and health-related absences required additional effort to recover through overtime work outside of scheduled development time.
 
 Nevertheless we pursued through all the trouble and inconsistencies in motivation and performance. 
 \newpage
 \subsection{Development Issues}
-During the development process, several technical challenges emerged that significantly influenced both workflow and time management.
+Several technical challenges emerged during development that had a measurable impact on both workflow efficiency and overall time management.
 
-One of the primary difficulties concerned frontend styling. As outlined in Section 5.1.2 “Frontend Software Development”, the initial implementation did not consistently rely on structured CSS from the beginning. Instead, styling decisions evolved incrementally during development. This approach led to inconsistencies and additional refactoring effort later in the project. A more systematic styling strategy from the outset would have reduced redundancy and improved development efficiency.
+A recurring difficulty involved the frontend styling approach. Rather than establishing a consistent and structured CSS strategy from the beginning, styling decisions were made incrementally as development progressed. This led to inconsistencies across components and required significant refactoring effort later in the project, as design rules that should have been centralized were instead scattered across individual files. A more systematic approach to styling architecture from the outset would have reduced this overhead considerably.
 
-Another major challenge involved the integration of the AI assistant. The implementation required interaction between JavaScript-based frontend components and Python-based backend processes. This cross-environment communication resulted in recurring issues, including connection errors and execution inconsistencies when running Python scripts. Resolving these problems required substantial debugging effort and resource allocation, particularly in ensuring stable inter-process communication.
+The integration of the AI assistant presented another major technical challenge. The implementation required stable communication between the JavaScript-based frontend and a Python-based backend process, a cross-environment dependency that introduced recurring issues including connection errors, execution inconsistencies, and timeout-related server crashes. Resolving these problems demanded substantial debugging effort and careful architectural restructuring before reliable inter-process communication could be achieved.
 
-The biggest challenge faced in the development of our workbench was the idea to make everything touch input capable, which led to numerous problems.
-This idea challenged us to find ways to interact with the workbench in ways that some would say are unnatural such as buttons where most would expect a slider or something similar. 
-This can be seen in the byte invaders game where this idea forced us to develop a new movement methodology, moving away from event triggered movements through swipes and simple presses to buttons whom can be activated via touch inputs.
+Perhaps the most pervasive challenge throughout the project was the requirement to make every component of the workbench compatible with touch input. This constraint influenced design decisions across all applications and frequently required unconventional solutions. The Byte Invaders game serves as a clear example: standard swipe-based directional input was insufficient for continuous movement control, necessitating the development of persistent on-screen touch buttons as an alternative interaction model. Ensuring consistent and intuitive touch behavior across applications with fundamentally different interaction requirements proved to be one of the most time-consuming aspects of the project.
 
-Portability and compatibility also slowed down the development as they requiered intensiv care and caution to guarantee a stable project on both windows and other platforms. More on this can be found in the section "Technical Specifications". 
+Portability and cross-platform compatibility introduced additional complexity throughout development. Ensuring stable and consistent behavior across Windows, macOS, and Linux required careful attention to platform-specific differences in path handling, process spawning, and rendering behavior, as discussed in detail in the Technical Specifications chapter.
 
-Furthermore and definitely worth mentioning, were the problems we encountered with GitHub. GitHub, while being a major part of planning, managing and hosting our project, did not come without it problems. As our project grew, we resorted to hosting both a GitHub repository as well as a project. At first, we did not give them enough of credit and care which later let to issues when merging our rather long-lived development branches, which at that point were to different and required manual merging which led to problems more than once. 
-
+Version control and project management through GitHub, while essential to the development process, also presented difficulties. As the project grew in scope, the team maintained both a repository and a project board. Insufficient attention to branch management in the early phases led to long-lived development branches that diverged significantly over time, resulting in complex and occasionally problematic manual merge operations. These issues reflect a maturation in the team's approach to collaborative development that occurred progressively throughout the project.
 \newpage
 \subsection{Review of the Project Realization}
-Looking back at the development process, several of the challenges encountered were attributable to limited prior experience with the chosen technology stack. The learning curve associated with JavaScript, React, CSS, and cross-process communication in Electron contributed to inefficiencies during the earlier phases of the project. In hindsight, a more thorough evaluation of architectural decisions — particularly around frontend structuring and AI integration — at the planning stage would have reduced the amount of later refactoring required. The GitHub workflow issues similarly reflect a maturation process: as the project grew in complexity, the team's approach to branch management and merging strategy evolved, though not always without friction. Despite these setbacks, the iterative methodology allowed the project to recover from most obstacles without compromising the final result. The workbench as delivered fulfills the core functional and architectural requirements defined at the outset, and the development process represents a substantial gain in practical engineering experience for both contributors.
+Reflecting on the development process as a whole, a number of the challenges encountered can be attributed to limited prior experience with the chosen technology stack. The learning curve associated with JavaScript, React, CSS, and Electron's cross-process communication model contributed to inefficiencies during the earlier phases of the project, where architectural decisions were sometimes made without a full understanding of their downstream consequences. In hindsight, a more thorough evaluation of these decisions — particularly regarding frontend structure, CSS architecture, and AI integration — during the planning phase would have reduced the amount of refactoring required later.
 
-One of the primary difficulties concerned frontend styling. As outlined in Section 5.1.2 “Frontend Software Development”, the initial implementation did not consistently rely on structured CSS from the beginning. Instead, styling decisions evolved incrementally during development. This approach led to inconsistencies and additional refactoring effort later in the project. A more systematic styling strategy from the outset would have reduced redundancy and improved development efficiency.
+The GitHub workflow issues similarly reflect this maturation process. As the project grew in complexity, the team's approach to branch management and merging strategy evolved considerably, though not always without friction. The difficulties encountered with long-lived branches and manual merges were ultimately a consequence of both limited experience with collaborative version control at this scale and an initial underestimation of the discipline required to manage a project of this scope effectively through GitHub.
 
-Another major challenge involved the integration of the AI assistant. The implementation required interaction between JavaScript-based frontend components and Python-based backend processes. This cross-environment communication resulted in recurring issues, including connection errors and execution inconsistencies when running Python scripts. Resolving these problems required substantial debugging effort and resource allocation, particularly in ensuring stable inter-process communication.
-
-These technical issues extended development time but also provided valuable insights into system architecture and dependency management.
-
-From a reflective perspective, several of the encountered issues can be attributed to limited prior experience with JavaScript, React, and CSS. While the project significantly improved our technical competence in these areas, the learning curve contributed to inefficiencies during early development phases.
-
-Additionally, some challenges indicate that the initial verification and evaluation of development strategies could have been more rigorous. A more detailed assessment of architectural decisions — particularly regarding frontend structuring and AI integration — might have reduced later restructuring efforts.
-
-As previously mentioned, we also had to put up with GitHub. From a reflective perspective, we agreed that these issues came both from a lack of experience working with GitHub as well as our ambition to host a project and repository as good as can be. 
-
+Despite these setbacks, the iterative development methodology proved to be well-suited to the project's needs. The ability to implement, evaluate, and refine components in successive cycles allowed the team to recover from technical obstacles without compromising the overall direction of the project. The workbench as delivered meets the functional and architectural requirements defined at the outset, and the development process as a whole represents a substantial gain in practical engineering experience across system architecture, cross-platform development, and project management.
 \newpage
 Nevertheless, the iterative development approach allowed continuous refinement of the system. Despite setbacks, the project objectives were achieved, and the final workbench fulfills the defined functional and architectural requirements. The development process therefore represents not only a technical achievement but also a substantial learning experience in project planning and system design.
 
 
 \subsection{Recommendations for further improvements}
-Recommendations and improvements are always welcome and necessary. 
+The current implementation of the workbench provides a solid and extensible foundation, and several directions for future development have been identified based on the experience gained during this project.
 
-One of these improvements for further development could be that the design which you chose in the settings, applies not only to the app icons but also to the applications themselves.
+The theming system currently applies selected color schemes only to the application icons and home screen background. Extending theme support to the interior of individual applications would produce a significantly more cohesive visual experience and bring the design language into full consistency across the platform.
 
-Furthermore, at its current state, the AI is slow and sluggish. An overhaul of the AI could make the whole workbench more futuristic and future proof while also making it more usable and providing the user with better information and help. However, with future improvements the developer should not forget certain safety goals defined in earlier stages, ensuring that data security will always be guaranteed.
-We want to mention here that at the current point of time, there is a new and improved version of the ai assistant in private development. 
+The AI assistant, while functional, remains constrained by the performance limitations inherent to running a large language model locally on consumer hardware. A more capable and responsive AI integration would substantially improve the usability and perceived modernity of the platform. Future development in this area should preserve the local-first processing approach to maintain the data security guarantees established in the current implementation. It is worth noting that an improved version of the AI assistant is already in private development at the time of writing.
 
-Another improvement comes with the performance of the entire workbench. 
-When run on mid- tier performance machines, the workbench performs satisfactory, but noticeable slower than on a higher-tier performance machine. We also noticed a difference in performance between different operating systems, in particular with MacOS and Windows. 
-This could be improved with further versions of npm and React. 
-Supplementary to that, the applications could be rewrote in a more performance oriented way. 
+General system performance represents another area for improvement. On mid-tier hardware the workbench operates satisfactorily, but noticeably slower than on 
+higher-specification machines. 
+Performance differences between operating systems — particularly between Windows and macOS — were also observed during development. Future versions of React and npm may address some of these differences, and targeted rewrites of performance-critical components could further improve responsiveness across hardware configurations.
 
-One of the biggest technical challenges the workbench has to deal with is the problem with hard coded paths used for the start up of extern applications like the slicers implemented in the workbench. At the current state, the paths used are the standard installation paths, which means that the workbench will fail to launch these apps on any device using different paths. This could be fixed by adding some sort of automatic path finder or a user configurable path entry setting.
+The hard-coded executable paths used to launch external applications such as OrcaSlicer, FreeCAD, and Bambu Studio represent one of the most significant practical limitations of the current implementation. Any device that installs these applications to a non-standard directory will encounter launch failures. This could be addressed by implementing an automatic path detection mechanism or providing a user-configurable path settings interface.
 
-Another improvement that could be made to ease out the work process of adding games to the workbench would be to change the current architecture behind how the game collection links up to the games and the app. Currently, adding a new game involves manual changes to both the app and the game collection. As the collection grows, this pattern becomes increasingly fragile and error-prone. A more maintainable approach would be a self-registering plugin system where each game declares its own metadata — name, ID, cover image, description — and the collection assembles itself dynamically at runtime.
-Also concerning the games and the game collection, things like score persistence and player progression are entirely absent from the games. There are no high scores, no personal bests, and no sense of progression between sessions. Given that the workbench already runs in Electron, which has access to the local filesystem, implementing persistent score storage via a simple JSON file or localStorage would be straightforward and would significantly improve the replay value of the Game Collection.
-
-Furthermore, file format export flexibility in the 3D Viewer is currently limited to GLTF regardless of the input format. A user who imports an STL file — the dominant format in the 3D printing workflow the workbench is built around — will receive a GLTF file on export, which may not be directly usable in their slicer without conversion. Preserving or offering the original format on export, particularly STL, would make the viewer a much more practical part of the 3D printing workflow.
-
-Also worth mentioning is the fact that the external application integrations could be made bidirectional. Currently the workbench can launch OrcaSlicer, FreeCAD, and Bambu Studio, but has no awareness of what the user does inside those applications, whether a file was saved, a print was started, or an error occurred. Deeper integration — for example, watching a known output directory for new files and maybe offering them as a shortcut when the user enters the 3D- Viewer, or reading a slicer's log output — would make the workbench feel even more like a hub to center all your productivity rather than a launcher.
+The game collection's current architecture requires manual changes to both the application routing logic and the collection registry whenever a new game is added. As the collection grows, this approach becomes increasingly fragile. A self-registering plugin system — in which each game declares its own metadata and the collection assembles itself dynamically at runtime — would be considerably more maintainable and scalable. Related to this, persistent score storage is entirely absent from the current game implementations. Given that the workbench already runs within Electron and has access to the local filesystem, implementing high-score persistence via a local JSON file would be straightforward and would meaningfully improve the replay value of the game collection.
 
 \newpage
+The 3D Viewer's export functionality is currently limited to the GLTF format regardless of the original input format. Since STL is the dominant format in the 3D printing workflow the workbench is designed to support, users who import STL files and wish to re-export them after applying transformations are forced to convert the output before it can be used in a slicer. Supporting STL as an export format — or preserving the original input format where possible — would make the viewer a considerably more practical component of the 3D printing workflow.
+
+Finally, the integrations with OrcaSlicer, FreeCAD, and Bambu Studio are currently unidirectional — the workbench can launch these applications but has no awareness of what occurs within them. Deeper bidirectional integration, such as monitoring a known output directory for newly exported files and surfacing them as shortcuts within the 3D Viewer, or reading slicer log output to surface status information within the workbench interface, would strengthen the platform's identity as a genuine unified hub rather than simply a launcher for external tools.
 \section{Directories}
 \subsection{List of illustrations}    
 
 Figure 1 : Home Screen presented to the use after start-up \dotfill 6\newline
 Figure 2 : Block diagram showing the systems architecture and input handling \dotfill9\newline
 Figure 3 : Block diagram showing the systems capabilities and workflow         \dotfill13\newline
-Figure 4 : Team capacity and division of tasks                                 \dotfill15\newline
-Figure 5 : GitHub Development Roadmap \dotfill17
-Figure 6 : Paint applications \dotfill21
-Figure 7: AI- Assistant: byte assistant \dotfill24
-Figure 8: Text- and Code- Editor\dotfill26
-Figure 9: Markdown Editor\dotfill30
-Figure 10: 3D- Viewer displaying an object\dotfill33
-Figure 11: The music library playing a song by a certain swedish band\dotfill35
-Figure 12: The GameCollection\dotfill13
-Figure 13: Overview of all applications\dotfill45
-
-        
-\subsection{List of tables}
-
-\section{Attachment}
-\subsection{Used documentations}
-\begin{itemize}
-    \item Node.js: https://nodejs.org/docs/latest/api/
-    \item Python: https://www.python.org/doc/
-\end{itemize}
+Figure 4 : Team capacity and division of tasks  \dotfill15\newline
+Figure 5 : GitHub Development Roadmap \dotfill17\newline
+Figure 6 : Paint applications \dotfill21\newline
+Figure 7: AI- Assistant: byte assistant \dotfill24\newline
+Figure 8: Text- and Code- Editor\dotfill26\newline
+Figure 9: Markdown Editor\dotfill30\newline
+Figure 10: 3D- Viewer displaying an object\dotfill33\newline
+Figure 11: The music library playing a song by a certain swedish band\dotfill35\newline
+Figure 12: The GameCollection\dotfill13\newline
+Figure 13: Overview of all applications\dotfill45\newline
 
 \subsection{About Style and Form}
 As you may have noticed this diploma thesis leans heavy towards the technical documentation of our project while trying to keep a simplistic style and form which are meant to help the user understand this thesis better. 
+This is achieved through technical explanations kept simple and short at most, helping to boost readability and understandibility. 
 
+\newpage
 \section{Bibliography}
 
 \begin{thebibliography}{99}
