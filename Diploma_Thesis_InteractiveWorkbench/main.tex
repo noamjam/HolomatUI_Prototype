@@ -1,6 +1,5 @@
 \documentclass[a4paper,12pt]{article}
 \usepackage[utf8]{inputenc}
-\usepackage[ngerman]{babel}
 \usepackage{geometry}
 \geometry{
   left=2.5cm,
@@ -19,6 +18,7 @@
 \usepackage{parskip}
 \usepackage{enumitem}
 \usepackage{float}  
+\usepackage[english]{babel}
 \usepackage{caption}
 \renewcommand{\figurename}{Illustration}
 
@@ -656,7 +656,9 @@ FreeCAD was assigned to Alex and follows the same launch-and-forget integration 
 The FreeCAD integration was one of the first places in the project where cross-platform path handling was explicitly addressed. The main process checks process.platform to determine the operating system: on Windows it resolves the path to freecad.exe inside the user's local application data directory, while on macOS it uses the exec('open -a /Applications/FreeCAD.app') command to launch the application bundle through the system's standard open mechanism. This platform branching became a template that was reused across subsequent integrations.
 
 \subparagraph{Bambu Studio} \mbox{} \\
-Bambu Studio was added on 18 December 2025 as a third slicer integration, targeting Bambu Lab's own 3D printing ecosystem. The implementation follows the same structure as OrcaSlicer and FreeCAD but was notable for introducing a concrete bug during development. The initial version of BambuStudio.jsx called window.electronAPI.launchBambuStudio() directly inside an if condition that was checking for the function's existence. Because calling a function returns its return value — in this case undefined — the condition always evaluated to false, meaning the slicer never actually launched and the "Electron bridge not available" error alert was displayed every time even though the bridge was working correctly. The fix was straightforward: check for the function's existence first, and then call it separately inside the block if it is present. Like the other integrations, the spawned process is detached and unreferenced so it runs independently of the workbench.
+Bambu Studio was added on 18 December 2025 as a third slicer integration, targeting Bambu Lab's own 3D printing ecosystem. The implementation follows the same structure as OrcaSlicer and FreeCAD but was notable for introducing a concrete bug during development. The initial version of BambuStudio.jsx called 
+
+window.electronAPI.launchBambuStudio() directly inside an if condition that was checking for the function's existence. Because calling a function returns its return value — in this case undefined — the condition always evaluated to false, meaning the slicer never actually launched and the "Electron bridge not available" error alert was displayed every time even though the bridge was working correctly. The fix was straightforward: check for the function's existence first, and then call it separately inside the block if it is present. Like the other integrations, the spawned process is detached and unreferenced so it runs independently of the workbench.
 
 \subparagraph{Stability Improvements and the safeSpawn Pattern} \mbox{} \\
 On 7 January 2026, a broader stability pass was made specifically targeting all external application launches. The diary notes that a more failsafe main.js platform query was introduced and applied uniformly to every non-natively developed application — BambuStudio, FreeCAD, and OrcaSlicer — rather than having each integration handle its own error cases inconsistently. This consolidation reduced code duplication and made the launch behaviour more predictable across the three integrations. A safeSpawn helper was also introduced as a wrapper around the raw Node.js childprocess.spawn call, providing centralised error handling for cases such as a missing executable, an incorrect path, or a system-level permission error. Rather than crashing the Electron main process or silently failing, safeSpawn catches these errors and logs them clearly, making the source of a failed launch much easier to diagnose.
@@ -780,19 +782,19 @@ Also worth mentioning is the fact that the external application integrations cou
 \section{Directories}
 \subsection{List of illustrations}    
 
-Illustration 1 : Home Screen presented to the use after start-up \dotfill 6\newline
-Illustration 2 : Block diagram showing the systems architecture and input handling \dotfill9\newline
-Illustration 3 : Block diagram showing the systems capabilities and workflow         \dotfill13\newline
-Illustration 4 : Team capacity and division of tasks                                 \dotfill15\newline
-Illustration 5 : GitHub Development Roadmap \dotfill17
-Illustration 6 : Paint applications \dotfill21
-Illustration 7: AI- Assistant: byte assistant \dotfill24
-Illustration 8: Text- and Code- Editor\dotfill26
-Illustration 9: Markdown Editor\dotfill30
-Illustration 10: 3D- Viewer displaying an object\dotfill33
-Illustration 11: The music library playing a song by a certain swedish band\dotfill35
-Illustration 12: The GameCollection\dotfill13
-Illustration 13: Overview of all applications\dotfill45
+Figure 1 : Home Screen presented to the use after start-up \dotfill 6\newline
+Figure 2 : Block diagram showing the systems architecture and input handling \dotfill9\newline
+Figure 3 : Block diagram showing the systems capabilities and workflow         \dotfill13\newline
+Figure 4 : Team capacity and division of tasks                                 \dotfill15\newline
+Figure 5 : GitHub Development Roadmap \dotfill17
+Figure 6 : Paint applications \dotfill21
+Figure 7: AI- Assistant: byte assistant \dotfill24
+Figure 8: Text- and Code- Editor\dotfill26
+Figure 9: Markdown Editor\dotfill30
+Figure 10: 3D- Viewer displaying an object\dotfill33
+Figure 11: The music library playing a song by a certain swedish band\dotfill35
+Figure 12: The GameCollection\dotfill13
+Figure 13: Overview of all applications\dotfill45
 
         
 \subsection{List of tables}
