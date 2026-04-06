@@ -25,7 +25,7 @@
 % Titelblatt-Setup
 \title{Diploma Thesis \\ Interactive Workbench}
 \author{
-  Done in Schoolyears 2025/26 \\
+  2025/26 \\
   by \\
   Noah Maringer 5BHEL \\
   Stenitzer Alexander 5BHEL \\
@@ -52,7 +52,6 @@
 \newpage
 
 \section{Abstract}
-\subsection{English}
 The diploma thesis "Interactive Workbench" documents the design, development, and evaluation of a touch-optimized, unified digital environment intended to simplify and consolidate practical workflows on touch-enabled devices. Modern graphical user interfaces were designed around mouse and keyboard interaction, a paradigm that introduces significant friction when applied to touchscreen hardware. The Interactive Workbench addresses this limitation by providing a modular platform in which a range of self-developed applications — including a 3D model viewer, AI assistant, code and text editor, Markdown editor, paint application, music library, image editor, and game collection — are accessible through a single coherent interface centered on gesture-based input.
 The system is implemented as a cross-platform web application using React and JavaScript for the frontend, with a Python-based backend handling AI inference and voice recognition through a locally executed large language model. Communication between the frontend and backend is managed through a FastAPI interface and WebSocket connection, while Electron provides the desktop application layer enabling access to native operating system functionality. The workbench runs on Windows, macOS, and Linux without platform-specific adaptations, and was developed and tested using the WebStorm IDE across multiple hardware configurations.
 Development followed an agile methodology based on Scrum principles, structured into weekly iterations with continuous evaluation and refinement. Task distribution was managed through GitHub, which served as the central platform for version control, project planning, and progress tracking. The two-person development team divided responsibilities according to individual strengths while collaborating on architecturally complex components.
@@ -60,7 +59,8 @@ Key technical challenges encountered during development included establishing st
 All data processing, including AI inference and voice input, is executed locally on the user's device. No personal data is collected or transmitted to external servers, ensuring a sufficient standard of privacy and security for the intended use cases of private, educational, and maker-space environments. Iterative user testing validated the system's usability, yielding task completion rates above 95 percent and response times under ten seconds in final benchmarks.
 The thesis concludes with a reflective discussion of the development process, an honest assessment of the current implementation's limitations, and a set of concrete recommendations for future improvements, including extended theme support, improved AI performance, bidirectional external application integration, persistent game score storage, and expanded file format support in the 3D Viewer.
 
-\subsection{German}
+\newpage
+\section{Kurzfassung}
 Die Diplomarbeit „Interactive Workbench" dokumentiert den Entwurf, die Entwicklung und die Evaluierung einer touchoptimierten, einheitlichen digitalen Arbeitsumgebung, die darauf abzielt, praktische Arbeitsabläufe auf berührungsempfindlichen Geräten zu vereinfachen und zu konsolidieren. Moderne grafische Benutzeroberflächen wurden primär für die Interaktion mit Maus und Tastatur konzipiert – ein Paradigma, das bei der Verwendung auf Touchscreen-Hardware zu erheblichen Nutzungseinschränkungen führt. Die Interactive Workbench begegnet dieser Problematik durch eine modulare Plattform, auf der eine Reihe selbst entwickelter Anwendungen – darunter ein 3D-Modell-Viewer, ein KI-Assistent, ein Code- und Texteditor, ein Markdown-Editor, eine Zeichenanwendung, eine Musikbibliothek, ein Bildeditor sowie eine Spielesammlung – über eine einheitliche, gestenbasierte Benutzeroberfläche zugänglich sind.
 Das System ist als plattformübergreifende Webanwendung implementiert, wobei React und JavaScript für das Frontend eingesetzt werden und ein Python-basiertes Backend die KI-Inferenz sowie die Spracherkennung über ein lokal ausgeführtes Large Language Model übernimmt. Die Kommunikation zwischen Frontend und Backend erfolgt über eine FastAPI-Schnittstelle und eine WebSocket-Verbindung, während Electron als Desktop-Anwendungsschicht den Zugriff auf native Betriebssystemfunktionen ermöglicht. Die Workbench läuft ohne plattformspezifische Anpassungen unter Windows, macOS und Linux und wurde mithilfe der WebStorm IDE auf mehreren Hardwarekonfigurationen entwickelt und getestet.
 Die Entwicklung folgte einer agilen Methodik auf Basis von Scrum-Prinzipien, strukturiert in wöchentliche Iterationen mit kontinuierlicher Evaluierung und Verfeinerung. Die Aufgabenverteilung wurde über GitHub verwaltet, das als zentrale Plattform für Versionskontrolle, Projektplanung und Fortschrittsverfolgung diente. Das zweiköpfige Entwicklungsteam teilte die Verantwortlichkeiten entsprechend der individuellen Stärken auf und arbeitete bei architektonisch komplexen Komponenten gemeinsam.
@@ -69,8 +69,8 @@ Die gesamte Datenverarbeitung, einschließlich KI-Inferenz und Spracheingabe, er
 Die Arbeit schließt mit einer reflektierenden Diskussion des Entwicklungsprozesses, einer ehrlichen Bewertung der Einschränkungen der aktuellen Implementierung sowie einer Reihe konkreter Empfehlungen für zukünftige Verbesserungen, darunter erweiterter Designunterstützung, verbesserter KI-Leistung, bidirektionaler Integration externer Anwendungen, persistenter Spielstandspeicherung und erweiterter Dateiformatunterstützung im 3D-Viewer.
 
 % Hauptteil basierend auf Gliederung
-\section{General Introduction}
-\subsection{Introduction}
+\section{General introduction}
+\subsection{introduction}
 Modern graphical user interfaces were designed primarily for mouse and keyboard interaction, a paradigm that has remained largely unchanged for decades. While this model is well-suited to traditional desktop environments, it introduces significant friction when applied to touchscreen devices, where layered menus, small click targets, and complex navigation hierarchies translate poorly to finger-based input. As touch-enabled laptops and interactive displays become increasingly common in both private and professional settings, the demand for interfaces that treat touch as a first-class input method — rather than an afterthought — continues to grow.
 
 Beyond the challenge of touch compatibility, modern workflows often require users to switch between multiple disconnected tools to complete a single task — moving from a 3D viewer to a slicer, from a text editor to an AI assistant, and back again. Each transition introduces overhead, breaks concentration, and adds unnecessary complexity to what should be a fluid creative or productive process.
@@ -80,7 +80,7 @@ The "Interactive Workbench" was developed to address both of these problems. The
 This thesis documents the motivation behind the project, the technical decisions and architectural choices made during development, the iterative refinements applied throughout, and an honest reflection on the challenges encountered and the limitations that remain in the current implementation.
 
 \newpage
-\subsection{Achieved Specifications}
+\subsection{Achieved specifications}
 The final implementation of the Interactive Workbench delivers a modular, cross-platform application that runs on Windows, macOS, and Linux, developed and tested using the WebStorm IDE across multiple hardware configurations. The system provides a range of self-developed applications covering practical domains including 3D model visualization, AI-assisted interaction, document editing, code execution, image editing, and casual gaming, all accessible through a unified touch-optimized interface.
 
 User interaction is centered on gesture-based input — including taps, swipes, pinches, and drag operations — supported consistently across all integrated applications. For devices without touchscreen capability, full mouse and keyboard support ensures accessibility across different hardware configurations.
@@ -90,15 +90,15 @@ Cross-platform stability and usability were validated through iterative testing 
 Almost all data processing, including AI inference and voice recognition, is executed locally on the user's device. No personal data is collected or transmitted to external servers, ensuring a sufficient standard of privacy and data security for the intended use cases of private, educational, and maker-space environments.
 
 \newpage
-\section{User Manual}
+\section{User manual}
 This brief user manual aims to  introduce the user to setting up the workbench and installing it on your system. Follow the steps below to set it up the proper way. 
-\subsection{Software Requirements}
+\subsection{Software requirements}
 \begin{itemize}
     \item Operating system: Windows 10 or newer, macOS 12 or newer.
     \item For local deployment: Node.js (version 10.0.0 or higher) and access to the backend/API.
     \item Python 3.11 or higher, although the recommended version is Python 3.13.xx.
 \end{itemize}
-\subsection{Hardware Requirements}
+\subsection{Hardware requirements}
 \begin{itemize}
     \item Touch‑enabled display or laptop (recommended diagonal: 16 inches or more).
     \item Minimum screen resolution: 1920x1080.
@@ -106,7 +106,7 @@ This brief user manual aims to  introduce the user to setting up the workbench a
     \item Memory: at least 8~GB RAM (16~GB recommended).
     \item Stable network connection to access backend and AI services.
 \end{itemize}
-\subsection{First Installation}
+\subsection{First installation}
 \begin{enumerate}
     \item Open a supported browser and go to GitHub.
     \item Log in with your user name and password.
@@ -122,7 +122,7 @@ This brief user manual aims to  introduce the user to setting up the workbench a
 \end{enumerate}
 
 \newpage
-\subsection{User Guide}
+\subsection{User guide}
 Interaction with the workbench is designed to be intuitive and user-friendly. As described in Section 3.3.4 “Input and Interaction Concepts”, the system supports a range of gestures across all integrated applications, enabling comprehensive touch and gesture control. This ensures a natural and efficient interaction experience, particularly on touch-enabled devices.
 
 For devices that do not support touch input, such as systems without a touchscreen, the workbench can be fully operated using external input devices including a keyboard and mouse. This guarantees accessibility and consistent usability across different hardware configurations.
@@ -140,23 +140,23 @@ Applications are launched by selecting the corresponding icon on the home screen
 
 \newpage
 \section{Specifications}
-\subsection{General Specifications}
+\subsection{General specifications}
 % Füge hier Inhalte ein
  The “Interactive Workbench” presents an innovative and efficient System, it makes the interaction between human and machine seamless and natural. Applications like 3D-designer integrated voice assistant and more, will eliminate the need of additional monitors or the switching between Systems.
  The use case for the "Interactive Workbench" was originally only for private use. After longer development it was clear that the use case could also be spread to more public institutions like schools, maker spaces, trainings centers and so on. To meet the requirements of the user it is important to meet certain quality requirements. This can be seen in the 3D-designer and its support of mainstream formats like STL, OBJ, STEP. The overall System design which supports practicability but also appealing looks with consideration for performance. Technical  constraints as for support of all OS compatible functions and touch.
  
-\subsection{Main Task}
+\subsection{Main task}
 The main task of this diploma project was the development of a touch‑input‑centered, easy‑to‑use digital workbench that replaces fragmented, tool‑specific workflows with a unified digital environment for bringing ideas to life. The Interactive Workbench provides a modular user interface with several self‑developed applications that focus on intuitive gesture and touch interaction instead of classic mouse‑ and keyboard‑driven HMIs, in order to reduce time lost on portability and compatibility issues of conventional manufacturing tools. The software is implemented as a platform‑independent, open‑source web application, developed and tested using the WebStorm IDE on common desktop operating systems (Windows, macOS and Linux), so that a broad range of users can benefit from stable operation and consistent behavior across devices. A core part of the task was to design and iteratively refine the interaction concept, application architecture, and visual layout so that typical workflows around 3D‑printing and digital fabrication can be executed efficiently on a single central interface, and to validate this through practical test sessions with representative users.  
 
 \newpage
-\subsection{Technical Specifications}
+\subsection{Technical specifications}
 % Füge hier Inhalte ein
 \subsubsection{Programming Languages and Frameworks}
 The primary programming language used in this diploma project is JavaScript, in combination with the React framework and reusable React components. In addition, HTML and CSS are employed for structure and styling to give the workbench a clear, lively and well‑organized visual appearance. Centralized CSS style classes can be defined once and imported into multiple applications, which enables a largely uniform design language across the entire system.
 
 For the AI assistant, Python is used because of its rich ecosystem of libraries that can be combined easily within one environment. Consequently, alongside the JavaScript‑focused toolchain (npm modules, bundler, transpiler) a Python runtime is also integrated into the development setup
 
-\subsubsection{Target Platforms}
+\subsubsection{Target platforms}
 Initially, the target platform was Linux, mainly due to its openness, compatibility and strong ecosystem for web technologies. The first prototype was therefore developed as a Linux‑only application, created without a dedicated IDE by using a simple text editor in combination with npm tooling for building and running the project.
 
 After we discarded the Raspberry Pi 5 as primary hardware platform, the focus shifted to the software itself, which was then developed in WebStorm on two different Windows machines—a high‑performance Lenovo and a mid‑range Asus—to enable parallel work and to evaluate behaviour on different Windows setups. During a later hardware change we added a macOS installation as well, effectively turning the workbench into a cross‑platform application for Windows and macOS, with Linux remaining supported through its web‑based architecture.
@@ -174,7 +174,7 @@ The following block diagram displays the architecture and user input workflow us
 \end{figure}
 
 \newpage
-\subsubsection{Input and Interaction concepts}
+\subsubsection{Input and interaction concepts}
 User interaction with the Interactive Workbench is deliberately centered on direct multi‑
 touch input, complemented by full mouse and keyboard support to remain usable on any standard laptop.  The interface is optimized for finger‑based operation: large actionable areas, generous spacing and clear visuals help users recognize where interaction is possible and minimize accidental input.  A single tap (or mouse click) is used to launch applications from the home interface, confirm dialogues, and select items such as files or 3D models.
 
@@ -185,7 +185,7 @@ Within each application, the input concept follows the same principles to mainta
 To ensure consistent touch input support across the workbench, different input concepts were evaluated for each application and component. The chosen solutions were guided by the style and usage of each application's interaction model rather than applying a one for all approach. Where continuous directional input was required, as in Byte Invaders, on-screen control buttons were introduced. Where discrete directional gestures were more natural, as in Snake, swipe detection was implemented directly on the canvas. Applications built from standard DOM elements, such as Minesweeper, required no additional work as the app's native tap-to-click mapping was sufficient. This per-application strategy ensured that touch controls felt intuitive within each context while remaining consistent with the broader interaction patterns already established throughout the workbench.
 
 \newpage
-\subsubsection{Performance and Quality}
+\subsubsection{Performance and quality}
 During the workbench's development, performance and quality were established as the primary evaluation criteria. The primary objective was to ensure high system responsiveness without compromising overall software quality. The development method aimed to create a balanced relationship between technical performance, usability, maintainability, and scalability rather than focusing only on speed.
 
 Performance was evaluated from two angles. On the one hand, objective software parameters such as resource utilization, responsiveness, rendering speed, and loading times were taken into account. However, because perceived performance has a big impact on the total user experience, user satisfaction was assessed as well. Both quantifiable performance and user perception were considered because a technically quick system does not meet quality standards if it is unclear or difficult to use.
@@ -194,7 +194,7 @@ With optimization in mind, the application was created from the ground up. Modul
 
 Since the workbench is a JavaScript-based application created with React, it benefits from a component-oriented architecture that facilitates modular development and effective rendering. React modules that had already been created and refined were incorporated to cut down on redundancy and enhance maintainability. CSS was used to implement graphic components including animations, color schemes, styles, and media assets in order to retain cross-platform compatibility and consistency while preserving performance.
 
-\subsubsection{Compatible File formats and interfaces}
+\subsubsection{Compatible file formats and interfaces}
 The workbench supports a variety of files. These different formats can be found and are used across many different applications of the workbench. Generally speaking, the workbench supports 3D- Files like STL, 3MF and more, used in our 3D- Viewer, the OrcaSlicer and BambuStudio. 
 
 Considering programming languages and the available support, the workbench provides a Text- and Code editor supporting normal txt files, python files and JavaScript files. 
@@ -224,7 +224,7 @@ In terms of extensibility, the workbench provides an excellent platform. Due to 
 
 This block diagram represents the systems capabilities and workflows such as its start up and the possible interactions that allow the user to access the workbenches applications, either for productivity or gaming. 
 
-\subsection{Software Requirements}
+\subsection{Software requirements}
 The “Interactive Workbench” can run all major operating systems. For the use of the workbench some downloads are required, as some of them are required in some applications or for the overall system. 
 
 For JavaScript, no specific developer environment is required, making it easily accessible to users. However, certain features, such as custom application or advanced design functions, rely on additional libraries like React and Node.js/npm for local build or development purposes. Due to applications such as the 3D-Viewer the support of WebGL is required for 3D rendering. Furthermore, the React H5 Audio player was used to guarantee a well working music library. Our Image Editor requires the ToastUI Image Editor to work, which is another React Component that needs to be included when setting up the workbench. The weather application uses the API from open-meteo which not only provides the weather data but also accompany's the data with corresponding widgets which are directly used in the workbench. A complete overview of the dependencies of our project is provided by the package.json and package-log.json files, who work in a similar matter as the python requirements file. 
@@ -258,7 +258,7 @@ The structured allocation of responsibilities contributed significantly to stead
 
 
 \newpage
-\subsection{Solutions and Development Planning}
+\subsection{Solutions and development planning}
 \subsubsection{Solutions}
 To realize the vision of a user-friendly, stable, and secure graphical user interface, several technological and architectural decisions were evaluated during the initial design phase. The selection of tools and frameworks was guided by criteria such as platform independence, scalability, maintainability, and data security.
 
@@ -269,7 +269,7 @@ Data security and privacy were addressed through a local-first architecture. All
 
 Overall, the chosen technology stack provides a sustainable and scalable foundation for achieving usability, stability, and long-term maintainability.
 
-\subsubsection{Development Planning}
+\subsubsection{Development planning}
 The development planning phase established the methodological and structural foundation of the project. Due to the technical scope of the workbench — including AI integration, 3D visualization, and the consolidation of multiple applications within a unified graphical user interface — a systematic and forward-looking planning strategy was required from the outset.
 
 The project originated as a private prototype developed during the summer. After evaluating its technical potential and practical relevance, the concept was formalized and submitted as the official diploma project. Following approval at the end of September, the development process was aligned with clearly defined objectives, architectural guidelines, and academic requirements.
@@ -299,20 +299,20 @@ The scheduling strategy thus ensured structured progress, milestone-oriented dev
 
 
 \newpage
-\section{Project realization and Software development}
+\section{Project realization and software development}
 The software development in the given time period was based on a prototype, previously developed by us. That prototype didn't have any function and was a raw model of our GUI. Build in a Virtual Machine running a Linux distribution, we started out by making a windows port which was relatively easy thanks to the flexibility of WebStorm, our IDE of choice. 
 
-\subsection{Backend Software Development}
+\subsection{Backend software development}
 This section describes the not only the functionality but also the technical side of our applications and software offered by our workbench. 
 This section will be structured according to but not limited to the core applications of our workbench. 
 
 \subsubsection{Paint}
-\paragraph{First Iteration} \mbox{} \\
+\paragraph{First iteration} \mbox{} \\
 The first iteration introduced a simple version of a paint application which allowed the user to draw out there imagination using either touch input or with a mouse. 
 The software was engineered using JavaScript and React. To put it simply, the canvas recognizes user inputs, follows movement and places a line at the according coordinates. 
 
 \paragraph{Interaction concepts and technical functionality}
-\subparagraph{Interaction Model}\mbox{} \\
+\subparagraph{Interaction model}\mbox{} \\
 The application is based on the HTML5 canvas element and implements a real-time drawing system using event-driven interaction. User input is captured through both mouse and touch events, ensuring compatibility across desktop and touch-enabled devices. By supporting mousedown, mousemove, and mouseup events as well as their touch equivalents, the system enables continuous and platform-independent drawing interaction.
 
 The drawing logic differentiates between three operational modes: freehand drawing, straight line rendering, and circle creation. Freehand drawing is implemented as a continuous stroke process, where successive cursor positions are connected dynamically to form smooth lines. In contrast, geometric shapes are defined by an initial starting coordinate and a final endpoint, from which dimensions such as length or radius are calculated before rendering.
@@ -320,19 +320,19 @@ The drawing logic differentiates between three operational modes: freehand drawi
 This distinction between continuous and parameter-based drawing modes allows intuitive interaction while maintaining a clear internal logic structure.
 
 \newpage
-\subparagraph{State Management and Rendering Logic}\mbox{} \\
+\subparagraph{State management and rendering logic}\mbox{} \\
 The application utilizes React’s state management mechanisms to control drawing behavior, tool selection, color configuration, and stroke width. Dynamic updates to these parameters are reflected immediately in the canvas rendering context, ensuring responsive user feedback.
 
 The rendering process itself is handled directly through the 2D drawing context of the canvas element. Line smoothing is achieved by configuring rounded line caps and joins, improving visual quality and user experience. Canvas dimensions are programmatically synchronized with the rendered element size to prevent scaling distortions.
 
-\subparagraph{Undo and Redo Mechanism} \mbox{} \\
+\subparagraph{Undo and redo mechanism} \mbox{} \\
 A notable technical feature of the application is the implementation of an undo/redo system. Instead of storing individual drawing commands, the application captures complete canvas states as encoded image data after each finalized drawing action.
 
 These snapshots are stored in a history stack, enabling backward navigation through previous states. When an undo operation is triggered, the most recent state is removed and the preceding image is re-rendered onto the canvas. A complementary redo stack allows restoration of reverted states.
 
 While this approach increases memory usage compared to vector-based storage, it simplifies state restoration and ensures reliable behavior across different drawing modes.
 
-\subparagraph{Additional Functional Features}\mbox{} \\
+\subparagraph{Additional functional features}\mbox{} \\
 The application includes supplementary usability functions such as:
 \begin{itemize}
     \item Dynamic color selection
@@ -347,7 +347,7 @@ The export functionality converts the current canvas content into a Base64-encod
 The architecture of the paint application is simple as it only consists of the canvas in which the user can draw, the toolbar and the communication between both of these things and the JavaScript functions as well as the HTML/CSS styling. 
 
 \newpage
-\paragraph{Iterative Refinement}\mbox{} \\
+\paragraph{Iterative refinement}\mbox{} \\
 During its development, the paint application underwent several iterative refinements. The initial version provided only basic freehand drawing functionality and served primarily as a proof of concept for canvas-based rendering within the workbench environment. In a subsequent iteration, the application was extended with a structured toolbar, tool selection options, and improved rendering behavior, resulting in a significantly smoother and more user-friendly interaction experience.
 
 At a later stage, an attempt was made to further optimize drawing performance, particularly for direct touch input on touchscreen devices. The objective was to improve stroke smoothness and responsiveness by introducing alternative event-handling mechanisms. However, the intended implementation relied on event-handling approaches that were not fully supported within the chosen JavaScript environment and application context. This resulted in instability and inconsistent drawing behavior.
@@ -369,7 +369,7 @@ It could be improved with newer versions of React.
 \paragraph{AI Processing Module}\mbox{} \\
 The AI assistant represents one of the central backend components of the workbench. While its functional purpose and integration into the GUI have been described in previous sections, this chapter aims specifically at the development side and the technical implementation and architectural structure of the AI assistant. 
 
-\paragraph{Architectural Design}\mbox{} \\
+\paragraph{Architectural design}\mbox{} \\
 The AI module was implemented as a locally executed Python- based process, technical separated from the JavaScript frontend environment, but still ready to use at the click of a button. 
 The separation between the JavaScript frontend and the python backend was chosen to ensure modularity, maintainability, and independence from rendering layers. This helped make the workbench more stable as a complete system and also preserve responsiveness. 
 
@@ -380,7 +380,7 @@ At its current state, the AI- chat can be opened in separate React applications,
 
 Furthermore, the AI assistant can also be interacted with using voice commands. This requires a specific trigger word to be spoken. Once active, the assistant will listen and stand ready to answer the users prompts until the user tells it to go into standby mode with another trigger word. This is achieved by analyzing the user input and search it for these trigger words. In detail, the audio part is handled by the python "pyaudio" library, while the text to speech translation is handled by Googles "gTTs" service, also running locally on the users device using python. 
 
-\paragraph{Iterative Refinement}\mbox{} \\
+\paragraph{Iterative refinement}\mbox{} \\
 The AI assistant underwent substantial conceptual and architectural evolution during the course of development. In its earliest state, it functioned exclusively as a voice assistant understanding basic prompts but only to a certain extend. User input was limited to speech only, which was forwarded and processed by a LLM of the users choice, in our case ollama, before generating a response text which was then played auditory using python. While this implementation successfully demonstrated local speech recognition and model connectivity, it lacked flexibility and offered no alternative interaction modality as well as being slow, tiring to work with and not the best at understand user inputs. 
 
 A major refinement occurred with the introduction of a text-based chat interface. This addition transformed the assistant from a purely voice- driven feature into a hybrid communication system. Text input significantly improved accessibility and debugging efficiency, as prompts could now be entered and tested directly without relying on microphone input. This shift also improved reliability in situations where speech recognition produced inconsistent results. Conceptually, the assistant evolved from a voice utility into a fully integrated communication module within the workbench. This also came with the benefit of being able to return to previous chats with the ai as the chat- interface would only clear out on the users command or when shutting down the workbench. The methodology of text- based answers also introduced a lot of practical features like the option to copy and paste ai generated code directly from the chat- interface into the workbenches own text and code editor. 
@@ -394,7 +394,7 @@ Through this mechanism, the assistant gained the ability to open applications su
 
 Overall, the AI assistant evolved from a voice-only experimental feature into a modular, hybrid interaction and control system. The iterative refinements reflect not only technical improvements in stability and architecture but also a gradual expansion of scope — from answering questions to executing commands and interacting with the broader software environment. This progression illustrates a clear transition from prototype functionality toward a robust and extensible subsystem integrated deeply into the workbench ecosystem.
 
-\paragraph{Current Limitations}\mbox{} \\
+\paragraph{Current limitations}\mbox{} \\
 The biggest limitation to the performance to the ai is something that we value just as much as performance, and that is security. As a consequent of running everything locally on the users device, we lose a lot of performance as the LLM can take up to about 5GB of RAM. This means that, on lower end machines, if the ai runs, it will run relatively slow. On the other hand, assured this approach a higher level of security and safety. Another limiting factor is cost. Using well performing models with a high count of parameters, not only consumes more hardware, but is also expensive because of licensing costs. 
 
 \begin{figure}[H]
@@ -404,10 +404,10 @@ The biggest limitation to the performance to the ai is something that we value j
   \label{fig:AI}
 \end{figure}
 
-\subsubsection{Text and Code Editor}
+\subsubsection{Text and code editor}
 This section will introduce you to the text and code editor on a deeper and more technical level. We will cover its development as well as its functionality. 
 
-\paragraph{Initial Implementation and Functional Scope}\mbox{} \\
+\paragraph{Initial implementation and functional scope}\mbox{} \\
 Initially, the text and code editor was introduced as an independent productivity application within the workbench. In its first state the component provided basic text editing functionality, allowing the user to create and modify plain text within a structured graphical interface. The primary objective at this stage was the interface integration and consistency with the overall visual and interaction design of the workbench. 
 
 Early development focused on usability, responsiveness, and seamless embedding into the central GUI architecture. The editor was designed to operate as a self- contained module while maintaining 
@@ -416,8 +416,8 @@ compatibility with the navigation and application-switching logic of the workben
 Over the course of development, the scope expanded and the support offered by the application went from simple text manipulation towards a structured development- oriented editor capable of supporting simple programming workflows. 
 
 \newpage
-\paragraph{Iterative Refinement}
-\subparagraph{Extensions to Code-Oriented Functionality}\mbox{} \\
+\paragraph{Iterative refinement}
+\subparagraph{Extensions to code-oriented functionality}\mbox{} \\
 The transition from a plain text editor to a functional code editor marked a significant refinement stage. The application was extended to support structured code input for multiple programming languages, specifically Python and JavaScript. This extension required not only frontend improvements but also backend-level integration to enable actual code execution.
 
 The editor interface was enhanced to clearly separate input and output areas, enabling users to write code and directly observe execution results. This refinement transformed the application from a passive writing tool into an interactive development environment embedded within the workbench.
@@ -429,7 +429,7 @@ The syntax highlighting was achieved using the React Monaco-Code-Editor integrat
 The shift illustrates a conceptual evolution: instead of merely hosting static utilities, the workbench began to integrate active runtime capabilities.
 
 
-\subparagraph{Backend Execution Architecture and Coding Language support}\mbox{} \\
+\subparagraph{Backend execution architecture and coding language support}\mbox{} \\
 A central architectural milestone was the implementation of a dedicated execution endpoint within the Electron main process. When users request code execution, the frontend transmits the code and selected language to the backend, where a child process is spawned using the appropriate interpreter.
 
 Interpreter selection is handled dynamically depending on the operating system and programming language. For Python execution, the system selects either python or python3 depending on platform conventions. For JavaScript, a Node.js runtime is invoked. This abstraction ensures cross-platform compatibility while maintaining a unified execution interface.
@@ -439,13 +439,13 @@ The execution process is isolated from the renderer process, preserving applicat
 This separation between interface and execution logic reinforces modularity and prevents frontend instability from propagating into system-level operations.
 
 \newpage
-\paragraph{Stability, Safety, and Resource Control}\mbox{} \\
+\paragraph{Stability, safety, and resource control}\mbox{} \\
 Allowing arbitrary code execution within a desktop environment introduces potential risks regarding performance and system integrity. To address these concerns, multiple control mechanisms were implemented.
 Execution time is limited through a defined timeout mechanism. If a process exceeds the allowed runtime, it is terminated automatically. Additionally, output size is restricted to prevent excessive memory usage caused by large print statements or infinite loops. These safeguards ensure predictable system behavior even under unintended or erroneous code conditions.
 Error handling was refined to return structured and informative responses instead of generic crashes. Interpreter launch failures, missing runtime environments, unsupported language selections, or runtime exceptions are captured and displayed transparently in the output panel. This approach improves reliability and provides meaningful feedback to the user.
 Through these measures, the editor balances flexibility with operational safety.
 
-\paragraph{Current Limitations}\mbox{} \\
+\paragraph{Current limitations}\mbox{} \\
 At its current state, there are limitations to what the Editor can do. As previously mentioned, we but a lot of thought into resource control because the workbench as it is requires resources that some devices don't have. Combine that with things like the locally running LLM, you end up with a high level of stress for your hardware. So we opted to go for things like limited execution time and such. This means that a conversion to a full on IDE is highly doubtable as that would not only require a tremendous amount of time but also resources. Language support is also something to think about, because the currently supported languages, python and JavaScript have been explicitly chosen by us as they are the main languages in use in our workbench. 
 
 \begin{figure}[H]
@@ -455,20 +455,20 @@ At its current state, there are limitations to what the Editor can do. As previo
   \label{fig:IDE and plain text editor}
 \end{figure}
 
-\subsubsection{Markdown Editor}
+\subsubsection{Markdown editor}
 This section introduces the Markdown Editor and discusses its development, architectural integration, and functional capabilities within the workbench environment. The application was designed to provide a lightweight documentation and note-taking tool that integrates seamlessly with the workbench's graphical interface and application ecosystem. 
 
 The primary goal of the editor was to enable structured documentation using Markdown syntax while maintaining the interactive design philosophy of the workbench. In contrast to the text and code editor, which focuses on general writing and code execution, the Markdown editor specifically targets structured documentation workflows such as note-taking, documentation writing, and quick formatting of technical content.
 
-\paragraph{Initial Implementation and Integration into the Workbench}\mbox{} \\
+\paragraph{Initial implementation and integration into the workbench}\mbox{} \\
 The Markdown editor was introduced as a dedicated application inside the workbench’s application carousel. Similar to other applications within the system, it can be launched through the central navigation interface where each application is represented as a selectable tile.
 
 When the Markdown editor is selected, the main application state changes to render the Markdown editor interface as an overlay component within the Electron renderer process. This design follows the same architectural pattern used by other workbench applications, ensuring consistency in navigation behavior and window management.
 
 At this stage of development, the main objective was to integrate a functional editing interface capable of handling Markdown formatted text while maintaining compatibility with the workbench’s existing React-based GUI structure. The editor was therefore implemented as a modular component that communicates with the main application state while remaining functionally independent.
 
-\paragraph{Iterative Refinement}
-\subparagraph{Editor Interface and Live Preview Architecture}\mbox{} \\
+\paragraph{Iterative refinement}
+\subparagraph{Editor interface and live preview architecture}\mbox{} \\
 One of the key design decisions during development was the implementation of a dual-view editing architecture. The editor interface was divided into two primary areas: a Markdown input panel and a rendered preview panel.
 
 The left side of the interface allows users to write Markdown syntax, while the right side dynamically renders the formatted result. This live preview functionality enables users to immediately observe the structural effects of their Markdown formatting, including headings, lists, links, and other markup elements.
@@ -477,21 +477,21 @@ This architecture transforms the editor into a practical documentation environme
 
 The live preview approach significantly improves usability because it eliminates the need for external preview tools or manual rendering steps.
 
-\subparagraph{Support for Mathematical Expressions}\mbox{} \\
+\subparagraph{Support for mathematical expressions}\mbox{} \\
 During development, support for mathematical expressions was added in order to extend the editor’s usefulness for technical documentation. Mathematical formulas can be written using LaTeX-style syntax directly inside the Markdown document.
 
 When the preview panel renders the content, mathematical expressions are interpreted and displayed as formatted formulas. This allows users to include equations and scientific notation directly within their documentation, making the editor suitable for more technical writing tasks such as engineering notes or mathematical explanations.
 
 The integration of LaTeX-style rendering illustrates the workbench’s broader objective of supporting technical workflows rather than limiting applications to simple utility functionality.
 
-\subparagraph{Image Handling and Clipboard Integration}\mbox{} \\
+\subparagraph{Image handling and clipboard integration}\mbox{} \\
 Another refinement stage focused on expanding the editor’s content capabilities through image support. Users can insert images either through file upload or by pasting images directly from the clipboard.
 
 Clipboard image support significantly improves workflow efficiency because screenshots or copied images can be embedded directly into the document without requiring manual file handling. Once inserted, images are stored and referenced within the Markdown content, allowing them to appear immediately within the rendered preview.
 
 This feature makes the editor particularly useful for quick documentation tasks, such as explaining software workflows or embedding visual references in technical notes.
 
-\subparagraph{File System Integration and Document Persistence}\mbox{} \\
+\subparagraph{File system integration and document persistence}\mbox{} \\
 In order to allow persistent document storage, the Markdown editor was connected to the Electron backend through an IPC communication layer. This integration enables interaction with the native operating system file dialogs.
 
 When users choose to save a document, the frontend sends a request to the Electron main process, which opens a native save dialog and writes the Markdown content to a file with the \texttt{.md} extension. Similarly, existing Markdown files can be opened through the native file picker and loaded into the editor interface.
@@ -499,7 +499,7 @@ When users choose to save a document, the frontend sends a request to the Electr
 This architecture separates frontend interaction logic from system-level file operations. By delegating file access to the Electron main process, the application maintains a secure and stable execution environment while still providing full access to the user’s file system.
 
 \newpage
-\paragraph{Stability and Usability Considerations}\mbox{} \\
+\paragraph{Stability and usability considerations}\mbox{} \\
 During development, several adjustments were made to ensure reliable interaction between the editor interface and the workbench environment. Because the editor operates within a dynamic application switching system, special care was taken to maintain application state and prevent unintended data loss when navigating between applications.
 
 React state management was therefore used to track document content while the editor is active. This ensures that changes remain preserved during the editing session until the user explicitly saves or closes the document.
@@ -508,7 +508,7 @@ In addition, interface responsiveness and rendering performance were optimized t
 
 These refinements contribute to a stable and responsive editing experience while maintaining compatibility with the broader architecture of the Electron-based workbench.
 
-\paragraph{Current Limitations}\mbox{} \\
+\paragraph{Current limitations}\mbox{} \\
 While the Markdown editor provides a flexible environment for structured documentation and note-taking, several limitations remain in its current implementation. The editor was primarily designed as a lightweight documentation tool rather than a full-featured writing platform. As a result, advanced features commonly found in dedicated Markdown applications, such as real-time collaboration, document versioning, or integrated project management for multiple files, are not currently supported.
 
 Another limitation concerns the handling of large or highly complex documents. Although the live preview system performs efficiently for most typical use cases, documents containing numerous embedded images or extensive formatting structures may lead to slower rendering updates in the preview panel. This is primarily due to the continuous parsing and rendering process required for real-time visualization.
@@ -526,12 +526,12 @@ These limitations were accepted as design trade-offs in order to maintain the li
 
 
 \subsubsection{3D- Viewer}
-\paragraph{Initial Implementation}\mbox{} \\
+\paragraph{Initial implementation}\mbox{} \\
 The 3D Viewer was assigned to Noah in the initial division of work and was present in the AppCarousel from at least 22 October 2025 onward. It is implemented as a React component named ThreeViewer.jsx and follows the same routing pattern as all other workbench applications, being opened and closed via the currentApp state in App.jsx.
 The initial version of the viewer was deliberately minimal. It provided a basic 3D rendering environment in which a user could load and view a 3D model, but interaction was limited. Only the GLB file format was supported for import, there were no transformation tools to manipulate objects, and the scene had no grid or spatial reference to help orient the user. The camera could be orbited around the loaded model using standard mouse controls, but that was the extent of the functionality.
 
 \newpage
-\paragraph{Iterative Refinement}\mbox{} \\
+\paragraph{Iterative refinement}\mbox{} \\
 The viewer was substantially expanded over the course of development. The final implementation relies on @react-three/fiber as the React rendering layer on top of Three.js, and makes use of the @react-three/drei helper library for higher-level controls. The full-screen Canvas component from @react-three/fiber serves as the rendering surface, configured with a perspective camera positioned at (3, 3, 3) with a 60-degree field of view.
 File format support was broadened considerably. Where the first version only accepted GLB files, the final component supports four formats: GLB and GLTF files are loaded via Three.js's GLTFLoader, STL files via the STLLoader, and 3MF files via the ThreeMFLoader. Each format triggers a different loading path inside an async loadModel function. STL files, which carry only raw geometry and no material information, are automatically paired with a default grey MeshStandardMaterial so that they render correctly without requiring the user to supply any additional data. All other formats are loaded directly as Three.js scene objects. Once loaded, the model is placed at the world origin and stored both in local state and in a objectRef for later access by the export function.
 A 100 by 100 unit grid was added to the scene using Three.js's built-in gridHelper, giving the user a clear spatial reference and making it much easier to judge the scale and placement of a loaded model. This addressed the disorientation that came with the original empty black void of the early version.
@@ -542,7 +542,7 @@ As soon as the user starts dragging a transform gizmo handle — detected via th
 A save and export feature was implemented via Three.js's GLTFExporter. Regardless of the original import format, the current state of the model — including any transformations applied during the session — can be exported as a GLTF JSON file. The exported filename is derived from the original file's name with an edited suffix appended before the extension, so that the output is clearly identifiable. The process opens up the systems file explorer and allows the user to change the directory where the file will be stored too. 
 The toolbar was styled consistently with the workbench's design language, using semi-transparent dark glass-like button surfaces with subtle border highlights and smooth hover animations driven by inline style transitions. The toolbar sits in the top-left corner of the full-screen canvas and contains buttons for: navigating back to the home screen, loading a file via a file input, switching between Move / Rotate / Scale modes, and saving the model. The scene itself is lit with a combination of ambient light and a point light, supplemented by an environment map using the city preset from @react-three/drei's Environment component, which adds physically-based ambient reflections to the model surface.
 
-\paragraph{Performance and Stability Concerns}\mbox{} \\
+\paragraph{Performance and stability concerns}\mbox{} \\
 The most significant stability issue documented during development was the control conflict between OrbitControls and TransformControls, both of which compete for the same mouse input events. In the initial implementation this caused the camera to drift or jump unexpectedly whenever the user attempted to transform an object, since both systems were active simultaneously and interpreted the same drag gesture in different ways. This was not merely a minor inconvenience but a fundamental usability problem that made precise object manipulation effectively impossible. The solution — dynamically toggling OrbitControls based on keyboard modifier state and transform gizmo interaction events — resolved the conflict, but it introduced its own complexity: the viewer now maintains two interleaved event listener systems, one on the TransformControls instance and one on the document-level keyboard events, both of which must be carefully cleaned up in their respective useEffect return functions to prevent memory leaks and stale event handlers accumulating over the component's lifetime.
 From a rendering performance standpoint, the viewer uses @react-three/fiber's Canvas component which maintains a continuous WebGL render loop for as long as the component is mounted. This is appropriate for an interactive 3D editor, but it means the GPU is constantly active even when the user is not interacting with the scene. On the hardware the workbench runs on — an embedded touchscreen system rather than a dedicated workstation — this continuous rendering load is a relevant concern, particularly when other workbench applications are running concurrently in the Electron process. No frame rate cap or render-on-demand optimization was implemented, which could be a source of unnecessary resource consumption during idle periods.
 Model loading is handled asynchronously inside a useEffect hook using loader.loadAsync(), and the component wraps the model in a Suspense boundary with a null fallback, meaning the UI shows nothing while a file is being parsed. 
@@ -587,7 +587,7 @@ This is a limitation that should be addressed in a future version of the applica
 
 \newpage
 \subsubsection{Games and casual}
-\paragraph{Initial Implementation}\mbox{} \\
+\paragraph{Initial implementation}\mbox{} \\
 After some time of development, focusing entirely on applications to boost the users productivity, we decided that we also want to offer the user some element of fun and joy when using the workbench. 
 This led to the first idea of implementing games into the workbench, with development of the first game starting all the way back in mid- October 2025. 
 
@@ -598,12 +598,12 @@ The first concrete step in this development journey was the creation of a Game C
 Each game entry in the collection is represented by a cover image (icon) suiting the game component, a title, and a short description, rendered in a responsive CSS grid layout. The first (and at that point only) entry was "Byte Invaders", a retro space shooter, identified by the ID byte-invaders. The component was integrated into the main app routing (App.jsx) and added to the AppCarousel alongside the other workbench applications.
 At this stage, clicking the Byte Invaders cover image did not yet launch a game — a placeholder screen (SpaceInvaders.jsx) was implemented first, confirming that the routing and state management between GameCollection and the game screens worked correctly before any game logic was written.
 
-\paragraph{Iterative Refinement}
-\subparagraph{Game Collection}\mbox{} \\
+\paragraph{Iterative refinement}
+\subparagraph{Game collection}\mbox{} \\
 The Game Collection itself went through several iterations before reaching its final form. In the first version the game cards were purely decorative — cover images and text with no interactive behaviour. In a second iteration each card's cover image was turned into a clickable button that passes the selected game's id through an onStartGame callback prop. In App.jsx, this callback sets an activeGame state variable, which then controls which game component is conditionally rendered. This introduced a clean two-level state separation: currentApp determines which top-level workbench application is open, while activeGame determines which individual game within the collection is running. This pattern proved to be robust and extensible — adding each new game required only appending one entry to the games array inside GameCollection.jsx and one additional conditional render block in App.jsx. All three games were integrated using exactly this mechanism.
 
 \newpage
-\subparagraph{Byte Invaders}\mbox{} \\
+\subparagraph{Byte invaders}\mbox{} \\
 Byte Invaders is a Space Invaders-style retro arcade game developed by Noah. Development began on 6 November 2025 with a functional first version, followed by a significantly enhanced second iteration on 12 November 2025.
 
 The first version established all core gameplay mechanics. The game renders entirely on an HTML5 <canvas> element and is driven by a requestAnimationFrame-based game loop. The player controls a ship at the bottom of the screen using the arrow keys or the A/D keys, and fires projectiles upward with the spacebar. The enemy formation consists of a grid of 8 columns by 3 rows of rectangular enemies that march horizontally across the canvas. Whenever any enemy reaches the left or right boundary, the entire formation reverses direction and shifts one step downward toward the player. Player projectiles are subject to a 200ms shoot cooldown to prevent rapid-fire spam, and collision detection between bullets and enemies is handled through axis-aligned bounding-box (AABB) intersection checks.
@@ -623,7 +623,7 @@ Left-clicking a cell triggers handleCellClick(), which creates an immutable copy
 
 Right-clicking an unrevealed cell toggles its flagged state. Flagged cells display a icon and are protected from being accidentally revealed by both direct clicks and the recursive flood-fill. The board is rendered as a CSS grid of 32 by 32 pixel cells. Unrevealed cells appear in dark grey, revealed safe cells in light grey, and detonated mine cells in red. Adjacency numbers follow the classic Minesweeper colour convention: 1 in blue, 2 in green, and values above 2 in red. When the game concludes — either through a mine detonation or a fully cleared board — a semi-transparent overlay presents the result and offers the same three navigation options as the other games: Restart, Game Collection, and Home.
 
-\subparagraph{Solar System Simulation}\mbox{} \\
+\subparagraph{Solar system simulation}\mbox{} \\
 The Solar System simulation (SolarSystem.jsx) was developed by Alex and introduced on 12 November 2025, with moons and final textures added the following day. It uses the Three.js library to render a real-time, interactive 3D model of the solar system inside the Electron-based workbench environment.
 
 All planets are represented as Three.js mesh objects with spherical geometry, orbiting a central sun. Each planet follows a circular orbital path with its own angular velocity, set to visually plausible relative values rather than astronomically precise ones, keeping the simulation readable and engaging on screen. When the user selects a planet, the camera transitions smoothly and locks onto that body while an information box appears displaying contextual data about it. 
@@ -634,7 +634,7 @@ In the second iteration moons were added to the relevant planets, each following
 
 Unlike the games in the Game Collection, the Solar System is registered as a standalone entry in the AppCarousel array under the name "Solar System", placing it at the same level as other workbench applications such as the Paint tool, the File Manager, and the Weather app.
 
-\subparagraph{Touch Input Capability}\mbox{} \\
+\subparagraph{Touch input capability}\mbox{} \\
 All games were initially built with keyboard input only, which was insufficient for the workbench's intended use on a touchscreen monitor. Touch compatibility was addressed as a dedicated effort on 22 January 2026.
 For Snake, touch input was added via onTouchStart and onTouchEnd event handlers attached directly to the canvas element. A touchStartRef captures the coordinates of the initial touch point. When the finger is lifted, the displacement vector (dx, dy) is computed and compared against a TOUCH-THRESHOLD of 40 pixels; displacements below this value are treated as accidental taps and discarded. Valid swipes are passed to a handleSwipeDirection() function that maps the dominant axis and direction of the vector to one of the four movement directions.
 
@@ -642,7 +642,7 @@ Byte Invaders required a different approach because it relies on continuous dire
 
 Minesweeper required no dedicated touch work. Because it is built from standard DOM elements driven by click and context-menu events, the apps default behaviour of mapping touch taps to click events was sufficient for full touch compatibility without any additional code.
 \newpage
-\paragraph{Stability and Performance Concerns}\mbox{} \\
+\paragraph{Stability and performance concerns}\mbox{} \\
 The main stability concern documented during development relates to the lifecycle management of requestAnimationFrame game loops inside React components. When a game component unmounts — for instance when the player navigates back to the Game Collection — the active animation loop must be explicitly canceled to prevent it from continuing to run in the background and accessing stale or deallocated references. In the initial implementation of Byte Invaders, cancellation was handled only by an isGameOver guard at the top of each loop iteration rather than by a proper cancelAnimationFrame call. 
 
 The diary acknowledges that the correct solution is to store the most recent animation frame ID in a ref and cancel it from within the useEffect cleanup function, though this was not yet fully applied at the time of writing.
@@ -651,7 +651,7 @@ For the Solar System, the use of Three.js for continuous 3D rendering via WebGL 
 
 No specific performance issues were recorded in the diary, but this is an inherent characteristic of real-time 3D rendering in an Electron-hosted application context.
 
-\paragraph{Current Limitations}\mbox{} \\
+\paragraph{Current limitations}\mbox{} \\
 Several limitations were apparent across the game and simulation implementations at the time documented in the diary. Byte Invaders has no enemy projectiles, meaning difficulty scales solely through movement speed rather than through increased threat complexity. None of the games implement persistent score storage; all scores are held in React state and are lost when the component unmounts, with no high-score mechanism via local storage or a backend. The Game Collection's game registry is hard-coded as a static array inside GameCollection.jsx, so every new game requires a manual update to both this array and the routing logic in App.jsx — there is no dynamic registration mechanism. Touch controls are not uniform across games: Snake uses swipe gestures while Byte Invaders uses on-screen buttons, which may produce an inconsistent experience for users. The Minesweeper board dimensions and mine count are fixed constants with no difficulty settings exposed to the player. Finally, the Solar System simulation is a visual demonstration rather than a physically accurate model — orbital periods, distances, and sizes are approximated for visual clarity, and no gravitational mechanics are simulated beyond the predefined circular orbits.
 
 \begin{figure}[H]
@@ -663,7 +663,7 @@ Several limitations were apparent across the game and simulation implementations
 
 \newpage
 \subsubsection{Expandability through app integrations}
-\paragraph{Open Source Application Integrations} 
+\paragraph{Open source application integrations} 
 \subparagraph{Motivation and Approach} \mbox{} \\
 A core goal of the workbench was to serve as a practical tool for a 3D printing and engineering context. This meant that professional-grade software for slicing 3D models and designing parts needed to be accessible from within the workbench interface. The team initially considered building a slicer from scratch, but after research concluded that a functional slicer requires a team of 20 or more experienced developers and is far outside the scope of a two-person diploma project. The decision was therefore made to integrate existing open-source applications — OrcaSlicer, FreeCAD, and later Bambu Studio — directly into the workbench rather than attempting to replicate their functionality.
 This approach came with an acknowledged trade-off: none of these external applications match the workbench's visual design language. They open in their own native windows with their own UI, breaking the immersive, themed aesthetic of the rest of the platform. The team were candid in the diary about not being entirely happy with this compromise, but accepted it as the only realistic path to providing this category of functionality.
@@ -682,11 +682,11 @@ Bambu Studio was added on 18 December 2025 as a third slicer integration, target
 
 window.electronAPI.launchBambuStudio() directly inside an if condition that was checking for the function's existence. Because calling a function returns its return value — in this case undefined — the condition always evaluated to false, meaning the slicer never actually launched and the "Electron bridge not available" error alert was displayed every time even though the bridge was working correctly. The fix was straightforward: check for the function's existence first, and then call it separately inside the block if it is present. Like the other integrations, the spawned process is detached and unreferenced so it runs independently of the workbench.
 
-\subparagraph{Stability Improvements and the safeSpawn Pattern} \mbox{} \\
+\subparagraph{Stability improvements and the safeSpawn pattern} \mbox{} \\
 On 7 January 2026, a broader stability pass was made specifically targeting all external application launches. The diary notes that a more failsafe main.js platform query was introduced and applied uniformly to every non-natively developed application — BambuStudio, FreeCAD, and OrcaSlicer — rather than having each integration handle its own error cases inconsistently. This consolidation reduced code duplication and made the launch behaviour more predictable across the three integrations. A safeSpawn helper was also introduced as a wrapper around the raw Node.js childprocess.spawn call, providing centralised error handling for cases such as a missing executable, an incorrect path, or a system-level permission error. Rather than crashing the Electron main process or silently failing, safeSpawn catches these errors and logs them clearly, making the source of a failed launch much easier to diagnose.
 
 \newpage
-\subparagraph{AI-Triggered Launching} \mbox{} \\
+\subparagraph{AI-Triggered launching} \mbox{} \\
 Beyond being accessible as tiles in the app carousel, all three external applications were later wired into the workbench's AI assistant as part of a broader effort to make the platform feel more interactive and voice-driven. On 21 January 2026, the Python ChatAssistant.py backend was extended with a Command data model and a keyword scanning step that runs on every incoming user prompt. If the text contains trigger phrases such as "freecad", "starte freecad", "bambu studio", or "starte bambustudio", the assistant constructs a Command object identifying the target application and returns it alongside the normal language model reply. The frontend then forwards this command to main.js via the executeCommand IPC bridge. Before executing, the main process shows the user a native confirmation dialog — "Assistant wants to run: openfreecad. Continue?" — requiring an explicit Allow before spawning the process. This consent step was a deliberate design decision to prevent the AI from silently launching applications without the user's awareness. By the end of January 2026, this voice-triggered launch mechanism was confirmed working for OrcaSlicer, FreeCAD, and Bambu Studio.
 
 \begin{figure}[H]
@@ -697,7 +697,7 @@ Beyond being accessible as tiles in the app carousel, all three external applica
 \end{figure}
 
 \newpage
-\subsection{Frontend Software Development}
+\subsection{Frontend software development}
 The Design of the workbench is a essential and crucial choice. One of the main points for the workbench is a simple and modern looking GUI, that was something to always consider during the development process, yet it should be optimized for efficiency and compatible with older hardware. 
 
 In the beginning of development, the first prototype design was made with the use of React. This prototypes design was focused on functionality and structure, rather then visual refinements. For this, basic className assignments were used. With that, it was possible to have a rapid and yet functional development process. 
@@ -706,7 +706,7 @@ After further development it became important to have a overall design and funct
 
 For the general design we chose a transparent look with blue accents, which makes our GUI look on time with the overall design of modern GUIs. Buttons got interactive designs in our GUI such as subtle hover effects, when your mouse is over a distinct button. In the settings application, the user can select from several color schemes that apply to the background and application icons. The themes do not currently extend to the interior of individual applications. It was made sure that even with the transparent look a good readability and contrast were guaranteed. The design is also equipped with a satisfactory amount of icons to simplify the recognizing of distinct buttons and make the navigation more beginner friendly.
 
-\subsubsection{Evolution of Animations}
+\subsubsection{Evolution of animations}
 The first development of a animation within the project was implemented in the context of the boot-up sequence of the Workbench. Alex implemented this in the form of a smooth and slow zoom-in animation, in which the logo of the Workbench gradually appears on the screen and slowly expands in size, giving the startup screen a polished and professional feel. Alongside this, the text "Welcome to Holomat!" is displayed using a Typewriter Effect, meaning that the individual characters of the text write themselves out one by one in the center of the bottom half of the screen, rather than appearing all at once. This combination of the zoom-in logo animation and the Typewriter Effect gives the boot-up screen a dynamic and visually engaging appearance, making it a fitting introduction to the application.
 \newpage
 The development of the animations and the overall design language of the project also brought a number of different challenges and problems that had to be tackled along the way. One of the first and most notable of these challenges arose from an idea that Alex had for the background of the Workbench. The original concept was to implement an animated background in the style of the classic Apple Mac screensavers, in which a variety of colorful strings would appear to be "flying" through space, creating a lively and visually dynamic environment for the user interface.
@@ -737,7 +737,7 @@ Workload distribution and team coordination, managed through GitHub's project an
 
 Nevertheless we pursued through all the trouble and inconsistencies in motivation and performance. 
 \newpage
-\subsection{Development Issues}
+\subsection{Development issues}
 Several technical challenges emerged during development that had a measurable impact on both workflow efficiency and overall time management.
 
 A recurring difficulty involved the frontend styling approach. Rather than establishing a consistent and structured CSS strategy from the beginning, styling decisions were made incrementally as development progressed. This led to inconsistencies across components and required significant refactoring effort later in the project, as design rules that should have been centralized were instead scattered across individual files. A more systematic approach to styling architecture from the outset would have reduced this overhead considerably.
@@ -750,7 +750,7 @@ Portability and cross-platform compatibility introduced additional complexity th
 
 Version control and project management through GitHub, while essential to the development process, also presented difficulties. As the project grew in scope, the team maintained both a repository and a project board. Insufficient attention to branch management in the early phases led to long-lived development branches that diverged significantly over time, resulting in complex and occasionally problematic manual merge operations. These issues reflect a maturation in the team's approach to collaborative development that occurred progressively throughout the project.
 \newpage
-\subsection{Review of the Project Realization}
+\subsection{Review of the project realization}
 Reflecting on the development process as a whole, a number of the challenges encountered can be attributed to limited prior experience with the chosen technology stack. The learning curve associated with JavaScript, React, CSS, and Electron's cross-process communication model contributed to inefficiencies during the earlier phases of the project, where architectural decisions were sometimes made without a full understanding of their downstream consequences. In hindsight, a more thorough evaluation of these decisions — particularly regarding frontend structure, CSS architecture, and AI integration — during the planning phase would have reduced the amount of refactoring required later.
 
 The GitHub workflow issues similarly reflect this maturation process. As the project grew in complexity, the team's approach to branch management and merging strategy evolved considerably, though not always without friction. The difficulties encountered with long-lived branches and manual merges were ultimately a consequence of both limited experience with collaborative version control at this scale and an initial underestimation of the discipline required to manage a project of this scope effectively through GitHub.
@@ -796,7 +796,7 @@ Figure 11: The music library playing a song by a certain swedish band\dotfill35\
 Figure 12: The GameCollection\dotfill13\newline
 Figure 13: Overview of all applications\dotfill45\newline
 
-\subsection{About Style and Form}
+\subsection{About style and form}
 As you may have noticed this diploma thesis leans heavy towards the technical documentation of our project while trying to keep a simplistic style and form which are meant to help the user understand this thesis better. 
 This is achieved through technical explanations kept simple and short at most, helping to boost readability and understandibility. 
 
