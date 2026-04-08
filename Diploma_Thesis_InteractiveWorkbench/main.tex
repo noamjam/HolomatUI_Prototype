@@ -47,6 +47,27 @@
 \thispagestyle{empty}
 \newpage
 
+
+\section{Thanksgiving}
+First and foremost, we want to take a moment to thank everyone that helped us along our journey of the development of the "Interactive Workbench" and the writing of the diploma thesis. 
+We appreciate each and everyone who helped us overcome problems, find solutions and make the overall project better. 
+
+Firstly, we want to thank our advisor Professor Gerald Senarclens de Grancy who influenced our project with his incredible knowledge and expertise which helped us bring this project to life. 
+
+Without these people, our success in bringing this project and writing a good technical thesis about it would have been doubtable. 
+\section{Preword}
+Modern laptops are often come with touchscreens, which allows the user to use them like tablets, write on them with a pen or just enjoy the freedom that comes from a device that always needs a keyboard and a mouse to function properly.
+But, there has to be more to it, atleast that is what we thought when we came up with the possibility of expoloring the capabilities of touch-screen laptops as our final project and diploma thesis. 
+
+Inspired by the project of famous youtuber and influencer "ConceptBytes", who himself build an entire workbench from the ground up himself, we decided to try our best at a somewhat similar but mostly different project. 
+In contrast to him, we were only two people and a time span of about a year to work with, while he had an entire development team and financial mediums that we dont.  
+
+This quickly made us realize that what we wanted to do had to be different, and that the ouput would not be comparable. 
+So we settled on software development in itself as the one and only focus, not an entire physical workbench which is enhanced by tech. 
+
+The motivation was that, we wanted to proof that if you have a dream, the right people and the right mindset and motivation, you can achieve great things, even in little time. 
+
+\newpage
 % Inhaltsverzeichnis
 \tableofcontents
 \newpage
@@ -222,7 +243,8 @@ For reliability the system is designed to be platform-independent, supporting al
 
 While the workbench is not intended to be used in a high-security environment, its design ensures a sufficient level of reliability and security for private or educational use cases such as, schools, home maker spaces and training centers. 
 \subsubsection{Extensibility}
-In terms of extensibility, the workbench provides an excellent platform. Due to its application oriented architecture, the system can easily be extended with new applications, system improvements and additional features. With this in mind, the system can be extended without requiring a complete rewrite or make major changes to the existing system, which support long term scalability. The use of modern and widely adopted technologies ensures future development for developers and students with a low entry barrier. 
+In terms of extensibility, the workbench provides an excellent platform. Due to its application oriented architecture, the system can easily be extended with new applications, system improvements and additional features. With this in mind, the system can be extended without requiring a complete rewrite or make major changes to the existing system, which support long term scalability. 
+The use of modern and widely adopted technologies ensures future development for developers and students with a low entry barrier. For example, anyone with some knowledge of JavaScript can implement there own applications as long as there are no missing dependencies or other compatibility problems. 
 \subsection{Workflow: Block Diagram}
 % \includegraphics{blockdiagram.png}
 \begin{figure}[H]
@@ -311,6 +333,7 @@ The scheduling strategy thus ensured structured progress, milestone-oriented dev
 \newpage
 \section{Project realization and software development}
 The software development in the given time period was based on a prototype, previously developed by us. That prototype didn't have any function and was a raw model of our GUI. Build in a Virtual Machine running a Linux distribution, we started out by making a windows port which was relatively easy thanks to the flexibility of WebStorm, our IDE of choice. 
+The prototype was developed with extensibility and compatibility in mind. 
 
 \subsection{Backend software development}
 This section describes the not only the functionality but also the technical side of our applications and software offered by our workbench. 
@@ -390,6 +413,8 @@ At its current state, the AI- chat can be opened in separate React applications,
 
 Furthermore, the AI assistant can also be interacted with using voice commands. This requires a specific trigger word to be spoken. Once active, the assistant will listen and stand ready to answer the users prompts until the user tells it to go into standby mode with another trigger word. This is achieved by analyzing the user input and search it for these trigger words. In detail, the audio part is handled by the python "pyaudio" library, while the text to speech translation is handled by Googles "gTTs" service, also running locally on the users device using python. 
 
+A part of its architecture is that it is able to interact with other components of the workbench and its applications. 
+
 \newpage
 \paragraph{Iterative refinement}\mbox{} \\
 The AI assistant underwent substantial conceptual and architectural evolution during the course of development. In its earliest state, it functioned exclusively as a voice assistant understanding basic prompts but only to a certain extend. User input was limited to speech only, which was forwarded and processed by a LLM of the users choice, in our case ollama, before generating a response text which was then played auditory using python. While this implementation successfully demonstrated local speech recognition and model connectivity, it lacked flexibility and offered no alternative interaction modality as well as being slow, tiring to work with and not the best at understand user inputs. 
@@ -407,7 +432,10 @@ Overall, the AI assistant evolved from a voice-only experimental feature into a 
 
 \newpage
 \paragraph{Current limitations}\mbox{} \\
-The biggest limitation to the performance to the ai is something that we value just as much as performance, and that is security. As a consequent of running everything locally on the users device, we lose a lot of performance as the LLM can take up to about 5GB of RAM. This means that, on lower end machines, if the ai runs, it will run relatively slow. On the other hand, assured this approach a higher level of security and safety. Another limiting factor is cost. Using well performing models with a high count of parameters, not only consumes more hardware, but is also expensive because of licensing costs. 
+The biggest limitation to the performance to the ai is something that we value just as much as performance, and that is security. As a consequent of running everything locally on the users device, we lose a lot of performance as the LLM can take up to about 5GB of RAM. This means that, on lower end machines, if the ai runs, it will run relatively slow. 
+On the other hand, assured this approach a higher level of security and safety. Another limiting factor is cost. Using well performing models with a high count of parameters, not only consumes more hardware, but is also expensive because of licensing costs. 
+
+Another problem is that to set up the assistant in the first place, a stable internet connection is required. 
 
 \begin{figure}[H]
   \centering
@@ -415,6 +443,7 @@ The biggest limitation to the performance to the ai is something that we value j
   \caption{AI- Assistant: byte assistant}
   \label{fig:AI}
 \end{figure}
+
 \newpage
 \subsubsection{Text and code editor}
 This section will introduce you to the text and code editor on a deeper and more technical level. We will cover its development as well as its functionality. 
@@ -433,8 +462,10 @@ Over the course of development, the scope expanded and the support offered by th
 The transition from a plain text editor to a functional code editor marked a significant refinement stage. The application was extended to support structured code input for multiple programming languages, specifically Python and JavaScript. This extension required not only frontend improvements but also backend-level integration to enable actual code execution.
 
 The editor interface was enhanced to clearly separate input and output areas, enabling users to write code and directly observe execution results. This refinement transformed the application from a passive writing tool into an interactive development environment embedded within the workbench.
+
 The applications styling underwent a serious overhaul. We changed the layout, colors and animations. A newly added sidebar now worked as a simple file explorer hub, so the user gets a better view of current files and projects. 
 We also added some buttons which brought with them a lot of functionality. 
+
 This iteration introduced functionalities such as file creation, deletion, closing and opening in the explorer hub and form the file system, a run button to execute code and syntax highlighting. 
 The syntax highlighting was achieved using the React Monaco-Code-Editor integration. 
 
