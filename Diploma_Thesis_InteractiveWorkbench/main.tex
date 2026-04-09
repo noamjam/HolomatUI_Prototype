@@ -13,14 +13,48 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{tocloft}
-\usepackage{fancyhdr}
 \usepackage{amsmath}
-\usepackage{parskip}
-\usepackage{enumitem}
 \usepackage{float}  
 \usepackage[english]{babel}
 \usepackage{caption}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
 \renewcommand{\figurename}{Illustration}
+
+\newtcolorbox{notebox}{
+    colback=noteblue, colframe=htlblue,
+    fonttitle=\bfseries, title=Note,
+    breakable, left=4pt, right=4pt
+}
+ 
+\newtcolorbox{warnbox}{
+    colback=warnyellow, colframe=warnborder,
+    fonttitle=\bfseries, title=Important,
+    breakable, left=4pt, right=4pt
+}
+
+\definecolor{htlblue}{RGB}{0, 70, 140}
+\definecolor{noteblue}{RGB}{220, 235, 255}
+\definecolor{warnyellow}{RGB}{255, 248, 220}
+\definecolor{warnborder}{RGB}{200, 160, 0}
+
+\newcounter{stepctr}
+\newcommand{\step}[1]{%
+    \stepcounter{stepctr}%
+    \vspace{4pt}%
+    \noindent\textcolor{htlblue}{\textbf{Step \thestepctr.}}\quad #1\par
+}
+ 
 
 % Titelblatt-Setup
 \title{Diploma Thesis \\ Interactive Workbench}
@@ -58,19 +92,19 @@ essential in bringing the project to completion.
 Without the support from these individuals, the successfull completion of this project and the accompanying thesis would not have been possible. 
 
 \section{Preword}
-Modern laptops increasingly come equipped with touchscreens, allowing userers to interact with them like tablets, write on them with a stylus or just enjoy a degree of freedom that conventional devices - bound to a keyboard and mouse- cannot offer.
+Modern laptops increasingly come equipped with touchscreens, allowing users to interact with them like tablets, write on them with a stylus or just enjoy a degree of freedom that conventional devices - bound to a keyboard and mouse- cannot offer.
 Yet, we felt like there has to be more to it, more potential waiting to be unlocked, so we thought when we came up with the possibility of exploring the capabilities of touch-screen laptops as our final year project and diploma thesis. 
 
-Our inspiration came from the work of the YouTuber and content creator \textit{ConceptBytes}, who designed and built an entire phsyical workbench from the ground up, 
+Our inspiration came from the work of the YouTuber and content creator \textit{ConceptBytes}, who designed and built an entire physical workbench from the ground up, 
 enhanced by technology and custom software.
-His project captivated us- but we were just to students with roughly a year to work with, without a development team or the financial resources he had acces to and no experience with JavaScript. 
+His project captivated us- but we were just to students with roughly a year to work with, without a development team or the financial resources he had access to and no experience with JavaScript. 
 It became clear early on that our approach would have to be fundamentally different, and that any direct comparison would be neither fair nor meaningful.
 
 We therefore shifted our focus entirely to software: building a touch-optimized digital environment from scratch, designed to run on the kind of hardware
 that already sits on most desks. No custom-built physical workbench- just two people, one shared vision, and the tools available to us. 
 
 What drove us throughout this project was the belief that with the right mindset, the right partner, and genuine motivation, it is possible to create something meaningful-even within tight
-constrains of time and resources.
+constraints of time and resources.
 We hope that this thesis reflects that. 
 
 \newpage
@@ -123,58 +157,342 @@ The final implementation of the Interactive Workbench delivers a modular, cross-
 
 User interaction is centered on gesture-based input — including taps, swipes, pinches, and drag operations — supported consistently across all integrated applications. For devices without touchscreen capability, full mouse and keyboard support ensures accessibility across different hardware configurations which intern makes the workbench a go to software for a broader range of customers.
 
-Cross-platform stability and usability were validated through iterative testing with independent users across a range of scenarios, including multi-gesture sequences, AI-assisted feature calls, and concurrent application loads as well as different hardware configurations. Issues identified during testing — including gesture recognition inconsistencies, cross-platform rendering differences, and inter-process communication errors — were systematically addressed throughout development. Final benchmarks recorded satisfactory task completion rates response times fast enough so the experience does not feel slugish across tested workflows.
+Cross-platform stability and usability were validated through iterative testing with independent users across a range of scenarios, including multi-gesture sequences, AI-assisted feature calls, and concurrent application loads as well as different hardware configurations. Issues identified during testing — including gesture recognition inconsistencies, cross-platform rendering differences, and inter-process communication errors — were systematically addressed throughout development. Final benchmarks recorded satisfactory task completion rates and response times fast enough so the experience does not feel slugish across tested workflows.
 
 Almost all data processing, including AI inference and voice recognition, is executed locally on the user's device. No personal data is collected or transmitted to external servers, ensuring a sufficient standard of privacy and data security for the intended use cases of private, educational, and maker-space environments.
 
 \newpage
 \section{User manual}
-This brief user manual aims to  introduce the user to setting up the workbench and installing it on your system. Follow the steps below to set it up the proper way. 
-\subsection{Software requirements}
-\begin{itemize}
-    \item Operating system: Windows 10 or newer, macOS 12 or newer.
-    \item For local deployment: Node.js (version 10.0.0 or higher) and access to the backend/API.
-    \item Python 3.11 or higher, although the recommended version is Python 3.13.xx.
+This brief user manual aims to introduce the user to setting up the workbench and installing it on your system. Follow the steps below to set it up the proper way. 
+\section{System Requirements}
+ 
+\subsection{Software Requirements}
+ 
+\begin{center}
+\begin{tabular}{>{\bfseries}p{4cm} p{9cm}}
+\toprule
+Component & Requirement \\
+\midrule
+Operating System   & Windows 10 or newer; macOS 12 (Monterey) or newer; Linux distribution relativly new \\
+Node.js            & Version 18.0.0 or higher (LTS recommended) \\
+npm                & Bundled with Node.js \\
+Python             & Version 3.11 or higher (3.13.x recommended) \\
+WebGL              & Required for the 3D Viewer (supported by all modern GPUs) \\
+\bottomrule
+\end{tabular}
+\end{center}
+ 
+\begin{notebox}
+Linux is supported through the web-based architecture of the application. However, official testing was performed on Windows and macOS only. On Linux, manual dependency adjustments may be required.
+\end{notebox}
+ 
+\subsection{Hardware Requirements}
+ 
+\begin{center}
+\begin{tabular}{>{\bfseries}p{4cm} p{9cm}}
+\toprule
+Component & Requirement \\
+\midrule
+Display            & Touch-enabled display recommended; 16\,in diagonal or larger preferred \\
+Resolution         & Minimum 1920\,×\,1080 \\
+Processor          & Modern multi-core CPU (Intel Core i5 / AMD Ryzen 5 or better) \\
+Memory             & 8\,GB RAM minimum; 16\,GB recommended \\
+Storage            & At least 2\,GB free disk space \\
+Network            & Required during initial setup (model download); not required for daily use \\
+\bottomrule
+\end{tabular}
+\end{center}
+ 
+\begin{warnbox}
+The local AI assistant loads a large language model that can consume up to 5\,GB of RAM. On machines with 8\,GB of RAM, other applications should be closed while the AI feature is in use.
+\end{warnbox}
+ 
+\section{Installation}
+ 
+\subsection{Prerequisites}
+ 
+Before cloning the repository, ensure the following tools are installed on your system:
+ 
+\begin{itemize}[leftmargin=1.5em]
+    \item \textbf{Git} — \url{https://git-scm.com}
+    \item \textbf{Node.js} (v18 LTS or newer) — \url{https://nodejs.org}
+    \item \textbf{Python 3.11+} — \url{https://www.python.org}
 \end{itemize}
-\subsection{Hardware requirements}
-\begin{itemize}
-    \item Touch‑enabled display or laptop (recommended diagonal: 16 inches or more).
-    \item Minimum screen resolution: 1920x1080.
-    \item CPU: modern multi‑core processor (Intel i5/AMD Ryzen 5 or better).
-    \item Memory: at least 8~GB RAM (16~GB recommended).
-    \item Stable network connection to access backend and AI services.
-\end{itemize}
-\subsection{First installation}
-\begin{enumerate}
-    \item Open a supported browser and go to GitHub.
-    \item Log in with your user name and password.
-    \item Navigate to the GitHub repository and clone the project.
-    \item Open up a file explorer or the command line and navigate to the project folder. 
-    \item Install node.js and the additional libraries mentioned in the Readme or the documentation. All dependencies are saved in the package-log.json file and the requirements.txt file. 
-    \item Create a python virtual environment in the right directory and install the necessary libraries. 
-    \item If you want full touch- screen support, including the on-screen keyboard, please enable it in your systems settings.
-    Tipp: Use a virtual environment for your python libraries. 
-    \item Prompt the command "npm run build" and then proceed with "npm start". 
-    \item If it works and you are working on a windows machine, you can clone the .bat file onto your desktop for example and change its content to fit your system. 
-    \item Click the .bat file to start up the workbench. 
+ 
+\subsection{Step-by-Step Installation}
+ 
+\setcounter{stepctr}{0}
+ 
+\step{Open a terminal (Command Prompt, PowerShell, or a Unix shell) and navigate to the directory where you want to install the workbench.}
+ 
+\step{Clone the project repository from GitHub:}
+\begin{tcolorbox}[colback=black!90, coltext=green!70!white, fontupper=\ttfamily\small]
+git clone https://github.com/noamjam/HolomatUI\_Prototype.git \\
+cd HolomatUI\_Prototype
+\end{tcolorbox}
+ 
+\step{Install the JavaScript dependencies listed in \texttt{package.json}:}
+\begin{tcolorbox}[colback=black!90, coltext=green!70!white, fontupper=\ttfamily\small]
+npm install
+\end{tcolorbox}
+ 
+\step{Create a Python virtual environment in the backend directory and activate it:}
+\begin{tcolorbox}[colback=black!90, coltext=green!70!white, fontupper=\ttfamily\small]
+\# Windows \\
+python -m venv venv \\
+venv\textbackslash Scripts\textbackslash activate \\[4pt]
+\# macOS / Linux \\
+python3 -m venv venv \\
+source venv/bin/activate
+\end{tcolorbox}
+ 
+\step{Install the Python dependencies. If two \texttt{requirements.txt} files are provided, run both commands:}
+\begin{tcolorbox}[colback=black!90, coltext=green!70!white, fontupper=\ttfamily\small]
+pip install -r requirements.txt \\
+pip install -r requirements\_voice.txt \quad\# if present
+\end{tcolorbox}
+ 
+\step{Build the frontend bundle:}
+\begin{tcolorbox}[colback=black!90, coltext=green!70!white, fontupper=\ttfamily\small]
+npm run build
+\end{tcolorbox}
+ 
+\newpage
+\step{Start the workbench:}
+\begin{tcolorbox}[colback=black!90, coltext=green!70!white, fontupper=\ttfamily\small]
+npm start
+\end{tcolorbox}
+ 
+\begin{notebox}
+\textbf{Windows shortcut:} A \texttt{.bat} launcher file is included in the repository. Copy it to your Desktop, open it in a text editor, and update the path to match your installation directory. Double-clicking the file will then start the workbench directly without opening a terminal.
+\end{notebox}
+ 
+\subsection{Optional: Touchscreen Keyboard (Windows)}
+ 
+To enable the on-screen keyboard for full touchscreen support on Windows:
+ 
+\begin{enumerate}[leftmargin=1.5em]
+    \item Open \textbf{Settings} $\to$ \textbf{Accessibility} $\to$ \textbf{Keyboard}.
+    \item Enable \textit{On-screen keyboard} or \textit{Touch keyboard}.
 \end{enumerate}
+ 
+\subsection{Optional: External Application Integrations}
+ 
+The workbench can launch the following third-party applications directly from its interface. Install them separately if you intend to use these features:
+ 
+\begin{center}
+\begin{tabular}{>{\bfseries}p{3.5cm} p{9.5cm}}
+\toprule
+Application & Download \\
+\midrule
+OrcaSlicer  & \url{https://github.com/SoftFever/OrcaSlicer} \\
+FreeCAD     & \url{https://www.freecad.org} \\
+Bambu Studio & \url{https://github.com/bambulab/BambuStudio} \\
+\bottomrule
+\end{tabular}
+\end{center}
+ 
+\begin{warnbox}
+The workbench currently uses hard-coded executable paths for these applications. They must be installed to their \textbf{default directories}; otherwise the launcher will not find them. Custom path configuration is planned for a future release.
+\end{warnbox}
+ 
+\newpage
+\section{Getting Started}
+ 
+\subsection{Start-Up Sequence}
+ 
+When the workbench launches, an optional animated intro screen is displayed. The animation can be skipped at any time by tapping or clicking anywhere on the screen.
+ 
+After the animation, the \textbf{Home Screen} appears, showing all available applications as circular tiles. Two layout modes are available:
+ 
+\begin{itemize}[leftmargin=1.5em]
+    \item \textbf{Carousel} — swipe or scroll horizontally through application tiles.
+    \item \textbf{Grid} — all applications displayed in a static grid.
+\end{itemize}
+ 
+Switch between layouts using the toggle at the bottom of the Home Screen.
+ 
+\subsection{Input Methods}
+ 
+The workbench supports three input methods simultaneously:
+ 
+\begin{center}
+\begin{tabular}{>{\bfseries}p{3cm} p{9cm}}
+\toprule
+Input & Description \\
+\midrule
+Touch       & Primary interaction model. Supports tap, swipe, pinch-to-zoom, and drag. \\
+Mouse       & Full mouse support on all applications. \\
+Keyboard    & Keyboard shortcuts are available within text-based and code applications. \\
+\bottomrule
+\end{tabular}
+\end{center}
+ 
+\subsection{Common Gestures}
+ 
+\begin{center}
+\begin{tabular}{>{\bfseries}p{3.5cm} p{8.5cm}}
+\toprule
+Gesture & Action \\
+\midrule
+Tap / Click         & Launch application; confirm dialog; select item \\
+Swipe (horizontal)  & Navigate the application carousel \\
+Swipe (vertical)    & Scroll through lists \\
+Drag                & Rotate / pan 3D models; draw in paint application \\
+Pinch               & Zoom in / out in 3D viewer \\
+Two-finger drag     & Pan camera in 3D viewer \\
+\bottomrule
+\end{tabular}
+\end{center}
 
 \newpage
-\subsection{User guide}
-Interaction with the workbench is designed to be intuitive and user-friendly. As described in Section 3.3.4 “Input and Interaction Concepts”, the system supports a range of gestures across all integrated applications, enabling comprehensive touch and gesture control. This ensures a natural and efficient interaction experience, particularly on touch-enabled devices.
+\section{Application Overview}
+ 
+\subsection{AI Assistant (Byte Chat)}
+ 
+The AI assistant provides a text-based and voice-based chat interface powered by a locally running large language model via \textbf{Ollama}.
+ 
+\begin{itemize}[leftmargin=1.5em]
+    \item Type your prompt in the input field and press \textit{Send}.
+    \item Use the microphone icon to activate voice input. Speak a \textbf{trigger word} to activate the assistant, and say a \textbf{standby word} to deactivate voice listening.
+    \item The assistant can open FreeCAD, Bambu Studio, and OrcaSlicer on request. A confirmation dialog will always appear before any external application is launched.
+    \item The chat history is preserved until you press \textit{Clear Chat} or close the workbench.
+\end{itemize}
+ 
+\begin{notebox}
+A stable internet connection is required the first time the AI model is downloaded via Ollama. After that, everything runs locally — no data is sent to external servers.
+\end{notebox}
+ 
+\subsection{3D Viewer}
+ 
+Supports the file formats \textbf{GLB}, \textbf{GLTF}, \textbf{STL}, and \textbf{3MF}.
+ 
+\begin{itemize}[leftmargin=1.5em]
+    \item Click \textit{Load File} to open a model from your file system.
+    \item Use \textit{Move}, \textit{Rotate}, and \textit{Scale} buttons in the toolbar to switch transformation modes.
+    \item Hold \textbf{Cmd} (macOS) or \textbf{Ctrl} (Windows/Linux) while dragging to orbit the camera freely.
+    \item Click \textit{Save} to export the model. The output is always saved in GLTF format.
+\end{itemize}
+ 
+\subsection{Text \& Code Editor}
+ 
+Supports \textbf{plain text} (\texttt{.txt}), \textbf{Python} (\texttt{.py}), and \textbf{JavaScript} (\texttt{.js}) files.
+ 
+\begin{itemize}[leftmargin=1.5em]
+    \item Use the sidebar file explorer to create, open, save, and close files.
+    \item Select the language from the dropdown before running code.
+    \item Click \textit{Run} to execute the current file. Output is displayed in the panel below the editor.
+\end{itemize}
+ 
+\begin{warnbox}
+Code execution is subject to a timeout limit to protect system resources. Long-running scripts or infinite loops will be terminated automatically.
+\end{warnbox}
+ 
+\subsection{Markdown Editor}
+ 
+A live dual-pane editor for structured documentation.
+ 
+\begin{itemize}[leftmargin=1.5em]
+    \item Write Markdown syntax in the left panel; the rendered preview updates in real time on the right.
+    \item Mathematical expressions can be written using \LaTeX-style syntax (e.g.\ \texttt{\$E = mc\^{}2\$}).
+    \item Images can be inserted via file upload or by pasting from the clipboard.
+    \item Use \textit{Save} to write the document to a \texttt{.md} file via the system file dialog.
+\end{itemize}
+ 
+\subsection{Paint Application}
+ 
+\begin{itemize}[leftmargin=1.5em]
+    \item Drawing modes: \textbf{Freehand}, \textbf{Straight Line}, and \textbf{Circle}.
+    \item Adjust color and stroke width using the toolbar controls.
+    \item Use \textit{Undo} and \textit{Redo} to step through drawing history.
+    \item Click \textit{Save} to export the canvas as a \textbf{PNG} file.
+\end{itemize}
+ 
+\subsection{Music Library}
+ 
+\begin{itemize}[leftmargin=1.5em]
+    \item Supported format: \textbf{MP3} only.
+    \item Add tracks by copying or dragging MP3 files into the designated library folder on your file system.
+    \item Use the playback controls to play, pause, skip, and go back. The playlist loops automatically.
+\end{itemize}
+ 
+\subsection{Game Collection}
+ 
+The game collection includes the following titles:
+ 
+\begin{center}
+\begin{tabular}{>{\bfseries}p{3.5cm} p{8.5cm}}
+\toprule
+Game & Controls \\
+\midrule
+Byte Invaders   & Arrow keys / A\,D to move; Space to shoot. On-screen buttons available for touch. \\
+Snake           & Arrow keys or W\,A\,S\,D; swipe gestures on touch devices. \\
+Minesweeper     & Left-click to reveal; right-click to flag. Touch tap works natively. \\
+\bottomrule
+\end{tabular}
+\end{center}
+ 
+\subsection{Solar System Simulation}
+ 
+An interactive 3D visualization of the solar system. Click or tap any planet to focus the camera on it and display information about that body.
+ 
+\section{Settings \& Personalization}
+ 
+\begin{itemize}[leftmargin=1.5em]
+    \item Open \textbf{Settings} from the Home Screen.
+    \item Choose from several \textbf{color themes} to change the background and application icon colors.
+    \item Toggle between \textbf{Carousel} and \textbf{Grid} layout on the Home Screen.
+    \item The start-up animation can be skipped by tapping the screen during the intro.
+\end{itemize}
+ 
+\begin{notebox}
+Themes currently apply to the Home Screen and application icons only. Interior styling of individual applications is not affected and is planned for a future release.
+\end{notebox}
+ 
 
-For devices that do not support touch input, such as systems without a touchscreen, the workbench can be fully operated using external input devices including a keyboard and mouse. This guarantees accessibility and consistent usability across different hardware configurations.
+\section{Troubleshooting}
+ 
+\begin{center}
+\begin{tabular}{p{5cm} p{8cm}}
+\toprule
+\textbf{Problem} & \textbf{Solution} \\
+\midrule
+Workbench does not start & Verify that Node.js and npm are installed correctly. Run \texttt{npm install} again and check the terminal output for errors. \\[6pt]
+AI assistant shows ``Offline'' & Ensure the Python virtual environment is activated and the backend dependencies are installed. Run \texttt{npm start} from the project root, not from a subdirectory. \\[6pt]
+External app does not launch & Confirm that OrcaSlicer, FreeCAD, or Bambu Studio is installed in its \textbf{default directory}. Custom installation paths are not yet supported. \\[6pt]
+AI responses are very slow & The LLM requires significant RAM. Close other applications and, if possible, use a machine with 16\,GB or more. \\[6pt]
+Touch input not recognized & Ensure your operating system's touch input drivers are up to date. On Windows, verify that the touch keyboard is enabled in Accessibility Settings. \\[6pt]
+3D model does not appear & Check that the file format is GLB, GLTF, STL, or 3MF. Very large models may take several seconds to load with no visible progress indicator — please wait. \\[6pt]
+MP3 files not appearing in library & Make sure files are copied into the correct library folder and have the \texttt{.mp3} extension. Other audio formats are not currently supported. \\
+\bottomrule
+\end{tabular}
+\end{center}
 
-After the optional start-up animation — which can be skipped if desired — the user is presented with the home screen. The home screen provides direct one-click access to all integrated applications as well as the AI chat interface. Additionally, users can choose between two visual styles, allowing a degree of personalization according to individual preferences.
+\section{Known Limitations}
+ 
+The following limitations are present in the current release and are documented here for transparency:
+ 
+\begin{itemize}[leftmargin=1.5em]
+    \item The AI assistant may respond slowly on machines with less than 16\,GB of RAM.
+    \item External application paths (OrcaSlicer, FreeCAD, Bambu Studio) are hard-coded to their default installation locations.
+    \item The 3D Viewer exports models in GLTF format only, regardless of the original input format.
+    \item The Music Library supports MP3 files only.
+    \item Theme changes do not apply to the interiors of individual applications.
+    \item Persistent high-score storage is not available in the game collection.
+    \item Images embedded in Markdown documents may not reload correctly after the file is re-opened.
+\end{itemize}
+ 
 
-Applications are launched by selecting the corresponding icon on the home screen. Once inside an application, multi-gesture support enables seamless navigation and interaction, contributing to an efficient workflow and an overall enhanced user experience. 
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=1\textwidth]{HomeScreen.png}
-  \caption{Home Screen presented to the user after start-up}
-  \label{fig:HomeScreen}
-\end{figure}
+\section{Source Code}
+ 
+\begin{center}
+\begin{tabular}{>{\bfseries}p{3cm} p{10cm}}
+\toprule
+Repository & \url{https://github.com/noamjam/HolomatUI\_Prototype} \\
+\bottomrule
+\end{tabular}
+\end{center}
+ 
 
 \newpage
 \section{Specifications}
@@ -467,6 +785,13 @@ compatibility with the navigation and application-switching logic of the workben
 
 Over the course of development, the scope expanded and the support offered by the application went from simple text manipulation towards a structured development- oriented editor capable of supporting simple programming workflows. 
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{IDE.png}
+  \caption{Text- and Code- Editor}
+  \label{fig:IDE and plain text editor}
+\end{figure}
+
 \newpage
 \paragraph{Iterative refinement}
 \subparagraph{Extensions to code-oriented functionality}\mbox{} \\
@@ -502,13 +827,7 @@ Through these measures, the editor balances flexibility with operational safety.
 \paragraph{Current limitations}\mbox{} \\
 At its current state, there are limitations to what the Editor can do. As previously mentioned, we but a lot of thought into resource control because the workbench as it is requires resources that some devices don't have. Combine that with things like the locally running LLM, you end up with a high level of stress for your hardware. So we opted to go for things like limited execution time and such. This means that a conversion to a full on IDE is highly doubtable as that would not only require a tremendous amount of time but also resources. Language support is also something to think about, because the currently supported languages, python and JavaScript have been explicitly chosen by us as they are the main languages in use in our workbench. 
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{IDE.png}
-  \caption{Text- and Code- Editor}
-  \label{fig:IDE and plain text editor}
-\end{figure}
-
+\newpage
 \subsubsection{Markdown editor}
 This section introduces the Markdown Editor and discusses its development, architectural integration, and functional capabilities within the workbench environment. The application was designed to provide a lightweight documentation and note-taking tool that integrates seamlessly with the workbench's graphical interface and application ecosystem. 
 
@@ -573,7 +892,7 @@ Another limitation concerns the handling of large or highly complex documents. A
 
 \newpage
 Additionally, while file system integration allows users to open and save Markdown files through the operating system’s native dialogues, the editor does not currently provide a built-in document management system within the workbench itself. Users therefore rely on external file organization through their operating system.
-Furthermore, things like storage have to be considerered as the ability to render pictures in the markdown document requieres storage to save the pictures so they can be reloaded and rendered again when the markdown file is reopend. 
+Furthermore, things like storage have to be considered as the ability to render pictures in the markdown document requieres storage to save the pictures so they can be reloaded and rendered again when the markdown file is reopend. 
 
 These limitations were accepted as design trade-offs in order to maintain the lightweight nature of the application and to ensure that the Markdown editor remains responsive within the broader workbench environment. Future development could address these aspects by introducing document indexing, improved rendering optimizations, or extended project-based file management.
 \begin{figure}[H]
@@ -657,20 +976,61 @@ The first concrete step in this development journey was the creation of a Game C
 Each game entry in the collection is represented by a cover image (icon) suiting the game component, a title, and a short description, rendered in a responsive CSS grid layout. The first (and at that point only) entry was "Byte Invaders", a retro space shooter, identified by the ID byte-invaders. The component was integrated into the main app routing (App.jsx) and added to the AppCarousel alongside the other workbench applications.
 At this stage, clicking the Byte Invaders cover image did not yet launch a game — a placeholder screen (SpaceInvaders.jsx) was implemented first, confirming that the routing and state management between GameCollection and the game screens worked correctly before any game logic was written.
 
+\newpage
 \paragraph{Iterative refinement}
 \subparagraph{Game collection}\mbox{} \\
 The Game Collection itself went through several iterations before reaching its final form. In the first version the game cards were purely decorative — cover images and text with no interactive behaviour. In a second iteration each card's cover image was turned into a clickable button that passes the selected game's id through an onStartGame callback prop. In App.jsx, this callback sets an activeGame state variable, which then controls which game component is conditionally rendered. This introduced a clean two-level state separation: currentApp determines which top-level workbench application is open, while activeGame determines which individual game within the collection is running. This pattern proved to be robust and extensible — adding each new game required only appending one entry to the games array inside GameCollection.jsx and one additional conditional render block in App.jsx. All three games were integrated using exactly this mechanism.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{GameCollection.png}
+  \caption{The GameCollection}
+  \label{fig:Games}
+\end{figure}
+
 \newpage
 \subparagraph{Byte invaders}\mbox{} \\
-Byte Invaders is a Space Invaders-style retro arcade game developed by Noah. Development began on 6 November 2025 with a functional first version, followed by a significantly enhanced second iteration on 12 November 2025.
+Byte Invaders is a Space Invaders-style retro arcade game developed by Noah. 
 
-The first version established all core gameplay mechanics. The game renders entirely on an HTML5 <canvas> element and is driven by a requestAnimationFrame-based game loop. The player controls a ship at the bottom of the screen using the arrow keys or the A/D keys, and fires projectiles upward with the spacebar. The enemy formation consists of a grid of 8 columns by 3 rows of rectangular enemies that march horizontally across the canvas. Whenever any enemy reaches the left or right boundary, the entire formation reverses direction and shifts one step downward toward the player. Player projectiles are subject to a 200ms shoot cooldown to prevent rapid-fire spam, and collision detection between bullets and enemies is handled through axis-aligned bounding-box (AABB) intersection checks.
+Development began on 6 November 2025 with a functional first version, followed by a significantly enhanced second iteration on 12 November 2025.
 
-The second version introduced a wave system, escalating difficulty, a score counter, a proper game over condition, and clean reset logic. When all enemies in a formation have been destroyed, a new full formation spawns immediately, providing continuous gameplay. The horizontal movement speed of the enemy formation increases by 0.5 units per completed wave, meaning each successive wave is perceptibly faster and more demanding. Enemy speed is stored in a useRef so that it accumulates reliably across waves without being inadvertently reset by React re-renders. The score awards 100 points per destroyed enemy and is maintained using two parallel variables: a useRef for synchronous, always-current access inside the game loop, and a useState variable for triggering UI updates. This dual ref/state approach was necessary because requestAnimationFrame callbacks close over the state value at the time of their creation, meaning a useState-only approach would produce stale score readings within the loop. A game over is triggered when any enemy reaches the player's vertical position, at which point the loop terminates and a semi-transparent overlay is rendered showing the final score and three navigation options: Restart, back to Game Collection, and back to the workbench Home screen. A dedicated resetGame() function handles a clean restart by restoring all mutable references and state variables to their initial values, including player position, bullet array, enemy formation, movement speed, and score.
+The first version established all core gameplay mechanics. The game renders entirely on an HTML5 <canvas> element and is driven by a requestAnimationFrame-based game loop. 
 
+The player controls a ship at the bottom of the screen using the arrow keys or the A/D keys, and fires projectiles upward with the spacebar. 
+
+The enemy formation consists of a grid of 8 columns by 3 rows of rectangular enemies that march horizontally across the canvas. Whenever any enemy reaches the left or right boundary, the entire formation reverses direction and shifts one step downward toward the player. 
+
+Player projectiles are subject to a 200ms shoot cooldown to prevent rapid-fire spam, and collision detection between bullets and enemies is handled through axis-aligned bounding-box (AABB) intersection checks.
+
+The second version introduced a wave system, escalating difficulty, a score counter, a proper game over condition, and clean reset logic. 
+
+When all enemies in a formation have been destroyed, a new full formation spawns immediately, providing continuous gameplay. The horizontal movement speed of the enemy formation increases by 0.5 units per completed wave, meaning each successive wave is perceptibly faster and more demanding. Enemy speed is stored in a useRef so that it accumulates reliably across waves without being inadvertently reset by React re-renders. 
+
+The score awards 100 points per destroyed enemy and is maintained using two parallel variables: a useRef for synchronous, always-current access inside the game loop, and a useState variable for triggering UI updates. This dual ref/state approach was necessary because requestAnimationFrame callbacks close over the state value at the time of their creation, meaning a useState-only approach would produce stale score readings within the loop. 
+
+A game over is triggered when any enemy reaches the player's vertical position, at which point the loop terminates and a semi-transparent overlay is rendered showing the final score and three navigation options: Restart, back to Game Collection, and back to the workbench Home screen. A dedicated resetGame() function handles a clean restart by restoring all mutable references and state variables to their initial values, including player position, bullet array, enemy formation, movement speed, and score.
+
+\newpage
+In terms of styling, we opted to render both players and the enemys with rectangular shapes, filled with colour. The player is coloured blue while enemys are coloured green. 
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{Byte_Invaders.png}
+  \caption{Byte Invaders Game}
+  \label{fig:Byte Invaders Game}
+\end{figure}
+
+
+\newpage
 \subparagraph{Snake}\mbox{} \\
 The Snake game (SnakeGame.jsx) was developed by Noah and added to the workbench on 13 November 2025. It follows the classic Snake mechanics: the player steers a continuously moving snake across a bounded grid using the W/A/S/D keys or the arrow keys. Each time the snake consumes a food item, its body grows by one segment. The game ends when the snake collides with its own body or with the boundary of the play field. Like Byte Invaders, the game is rendered onto an HTML5 canvas using a requestAnimationFrame loop that updates the game state and redraws the scene on every frame. It was integrated into the Game Collection using the snake-game identifier and added to the App.jsx routing in the same way as all other games.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{Snake_Game.png}
+  \caption{Snake Game}
+  \label{fig:Snake Game}
+\end{figure}
 
 \newpage
 \subparagraph{Minesweeper}\mbox{} \\
@@ -680,18 +1040,33 @@ The game board is a 10 by 10 grid of cell objects, each carrying four properties
 
 Left-clicking a cell triggers handleCellClick(), which creates an immutable copy of the board, optionally plants mines on the first interaction, and then calls the recursive reveal() function. If the clicked cell is a mine, it is revealed with a red background and the game ends immediately. If the cell has a non-zero adjacency count, only that single cell is uncovered and its number is shown. If the adjacency count is zero — meaning no neighbouring mines — the reveal function propagates recursively in all eight directions, flood-filling outward and uncovering all connected zero-cells and their numbered borders in a single action. This flood-fill is what allows large safe areas to open up with one tap. After each reveal, a win condition is evaluated: if every non-mine cell on the board has been uncovered, the player wins.
 
+\newpage
 Right-clicking an unrevealed cell toggles its flagged state. Flagged cells display a icon and are protected from being accidentally revealed by both direct clicks and the recursive flood-fill. The board is rendered as a CSS grid of 32 by 32 pixel cells. Unrevealed cells appear in dark grey, revealed safe cells in light grey, and detonated mine cells in red. Adjacency numbers follow the classic Minesweeper colour convention: 1 in blue, 2 in green, and values above 2 in red. When the game concludes — either through a mine detonation or a fully cleared board — a semi-transparent overlay presents the result and offers the same three navigation options as the other games: Restart, Game Collection, and Home.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{Minesweeper.png}
+  \caption{Minesweeper Game}
+  \label{fig:Minesweeper Game}
+\end{figure}
+
+\newpage
 \subparagraph{Solar system simulation}\mbox{} \\
 The Solar System simulation (SolarSystem.jsx) was developed by Alex and introduced on 12 November 2025, with moons and final textures added the following day. It uses the Three.js library to render a real-time, interactive 3D model of the solar system inside the Electron-based workbench environment.
 
 All planets are represented as Three.js mesh objects with spherical geometry, orbiting a central sun. Each planet follows a circular orbital path with its own angular velocity, set to visually plausible relative values rather than astronomically precise ones, keeping the simulation readable and engaging on screen. When the user selects a planet, the camera transitions smoothly and locks onto that body while an information box appears displaying contextual data about it. 
 
-\newpage
 This camera focus animation interpolates the camera's position and target across several frames to produce a fluid transition rather than a hard cut.
 In the second iteration moons were added to the relevant planets, each following its own orbital path around its parent body. Planet and moon textures were sourced as image assets and stored in the project's public folder, then applied as Three.js texture maps to the respective mesh materials. 
 
 Unlike the games in the Game Collection, the Solar System is registered as a standalone entry in the AppCarousel array under the name "Solar System", placing it at the same level as other workbench applications such as the Paint tool, the File Manager, and the Weather app.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{SolarSystemSimulation.png}
+  \caption{Solar system simulation}
+  \label{fig:Solar system simulation}
+\end{figure}
 
 \subparagraph{Touch input capability}\mbox{} \\
 All games were initially built with keyboard input only, which was insufficient for the workbench's intended use on a touchscreen monitor. Touch compatibility was addressed as a dedicated effort on 22 January 2026.
@@ -710,16 +1085,8 @@ For the Solar System, the use of Three.js for continuous 3D rendering via WebGL 
 
 No specific performance issues were recorded in the diary, but this is an inherent characteristic of real-time 3D rendering in an Electron-hosted application context.
 
-\newpage
 \paragraph{Current limitations}\mbox{} \\
 Several limitations were apparent across the game and simulation implementations at the time documented in the diary. Byte Invaders has no enemy projectiles, meaning difficulty scales solely through movement speed rather than through increased threat complexity. None of the games implement persistent score storage; all scores are held in React state and are lost when the component unmounts, with no high-score mechanism via local storage or a backend. The Game Collection's game registry is hard-coded as a static array inside GameCollection.jsx, so every new game requires a manual update to both this array and the routing logic in App.jsx — there is no dynamic registration mechanism. Touch controls are not uniform across games: Snake uses swipe gestures while Byte Invaders uses on-screen buttons, which may produce an inconsistent experience for users. The Minesweeper board dimensions and mine count are fixed constants with no difficulty settings exposed to the player. Finally, the Solar System simulation is a visual demonstration rather than a physically accurate model — orbital periods, distances, and sizes are approximated for visual clarity, and no gravitational mechanics are simulated beyond the predefined circular orbits.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=1\textwidth]{GameCollection.png}
-  \caption{The GameCollection}
-  \label{fig:Games}
-\end{figure}
 
 \newpage
 \subsubsection{Expandability through app integrations}
@@ -1005,7 +1372,7 @@ Available at: \url{https://github.com/noamjam/HolomatUI_Prototype}
 I hereby declare,
 that I have written this diploma thesis independently and have not used any resources other than those specified. Passages taken verbatim or paraphrased from other works (books, videos, documents, WebSites, and so on) have been marked as such by citing the source and complying with the rules of academic citation.
 This reassurance includes all graphical representations, tables, sketches and drawings. 
-For the creation of this diploma thesis I have also used following generative AI-tools(for example ChatGPT, Grammarly Go, Midjourney) for the following purpose: [Bitte hier Einsatzgebiet anführen.]. Any content taken verbatim or in paraphrased form from publications or other sources has been identified as such.
+For the creation of this diploma thesis I have also used following generative AI-tools (for example ChatGPT, Grammarly Go, Midjourney) for the following purpose: proofreading, phrasing and structuring . Any content taken verbatim or in paraphrased form from publications or other sources has been identified as such.
 The used tools where completely and truthful including productversion and prompt stated.
 
 Graz, on \hspace{2cm}
