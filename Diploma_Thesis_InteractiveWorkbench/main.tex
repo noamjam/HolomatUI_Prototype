@@ -1119,8 +1119,8 @@ The initial version of the viewer was deliberately minimal. It provided a basic 
 
 
 \paragraph{Iterative improvements}\mbox{} \\
-The viewer was substantially expanded over the course of development. The final implementation relies on @react-three/fiber as the React rendering layer on top of Three.js, and makes use of the @react-three/drei helper library for higher-level controls. The full-screen Canvas component from @react-three/fiber serves as the rendering surface, configured with a perspective camera positioned at (3, 3, 3) with a 60-degree field of view.
-File format support was broadened considerably. Where the first version only accepted GLB files, the final component supports four formats: GLB and GLTF files are loaded via Three.js's GLTFLoader, STL files via the STLLoader, and 3MF files via the ThreeMFLoader. Each format triggers a different loading path inside an async loadModel function. STL files, which carry only raw geometry and no material information, are automatically paired with a default grey MeshStandardMaterial so that they render correctly without requiring the user to supply any additional data. All other formats are loaded directly as Three.js scene objects. Once loaded, the model is placed at the world origin and stored both in local state and in a objectRef for later access by the export function.
+The viewer was substantially expanded over the course of development. The final implementation relies on @react-three/fiber\cite{r3f} as the React rendering layer on top of Three.js\cite{threejs}, and makes use of the @react-three/drei\cite{drei} helper library for higher-level controls. The full-screen Canvas component from @react-three/fiber serves as the rendering surface, configured with a perspective camera positioned at (3, 3, 3) with a 60-degree field of view.
+File format support was broadened considerably. Where the first version only accepted GLB files, the final component supports four formats: GLB and GLTF files are loaded via Three.js's GLTFLoader\cite{threejs}, STL files via the STLLoader, and 3MF files via the ThreeMFLoader. Each format triggers a different loading path inside an async loadModel function. STL files, which carry only raw geometry and no material information, are automatically paired with a default grey MeshStandardMaterial so that they render correctly without requiring the user to supply any additional data. All other formats are loaded directly as Three.js scene objects. Once loaded, the model is placed at the world origin and stored both in local state and in a objectRef for later access by the export function.
 A 100 by 100 unit grid was added to the scene using Three.js's built-in gridHelper, giving the user a clear spatial reference and making it much easier to judge the scale and placement of a loaded model. This addressed the emptiness that came with the original empty black void of the early version.
 Transformation controls were introduced using the TransformControls component from @react-three/drei. The user can switch between three modes — Move (translate), Rotate, and Scale — using dedicated toolbar buttons. Each mode changes how the gizmo handles on the model behave, allowing full six-degrees-of-freedom positioning, free rotation around all axes, and non-uniform scaling. The active mode is stored in a mode state variable and passed down to the EditableModel child component, which wraps the loaded model inside a TransformControls instance.
 A camera conflict problem was identified and addressed during development: when the user interacted with the transformation gizmo and the OrbitControls were simultaneously active, both systems competed for mouse input, causing the camera to move unexpectedly whenever the user tried to move or scale the object. The fix involved dynamically enabling and disabling OrbitControls depending on what the user is doing. When the user presses and holds the Command key (or Ctrl on Windows), orbit controls are enabled so the camera can be freely repositioned. 
@@ -1189,7 +1189,7 @@ Manipulatting the workbench´s project folder is not recommended.
 
 The playlist can then be controlled by the skip and back buttons in the user interface. 
 If the end of the playlist is reached, it will start from the first song again, creating a loop. 
-In the end, the decision to use the "Audio H5 player" was made because of the clear advantages when compared to the other options, especially considering the financial constraints of a student project and the legal and privacy concerns encountered with third-party streaming services.
+In the end, the decision to use the "Audio H5 player"\cite{Audio H5 Player} was made because of the clear advantages when compared to the other options, especially considering the financial constraints of a student project and the legal and privacy concerns encountered with third-party streaming services.
 
 \newpage
 \paragraph{Problems with compatible file formats}\mbox{} \\
@@ -1203,7 +1203,7 @@ Since the MP3 format is a lossy compression format, a certain degree of audio qu
 This stands in contrast to lossless formats such as FLAC or WAV, which are able to preserve the full audio quality of the original recording without any loss of data. 
 
 \begin{notebox}
-More information about the different audio file types can be found in the \textit{Bibliography}.  
+More information about the different audio file types can be found in the \textit{Bibliography}\cite{Audio Dateiformate im Überblick}.  
 \end{notebox}
 
 \newpage
@@ -1364,7 +1364,7 @@ When the game concludes — either through a mine detonation or a fully cleared 
 \subparagraph{Solar system simulation}\mbox{} \\
 The Solar System simulation (SolarSystem.jsx) was developed by Alex and introduced on 12 November 2025, with moons and final textures added the following day. It uses the Three.js library to render a real-time, interactive 3D model of the solar system inside the Electron-based workbench environment.
 
-All planets are represented as Three.js mesh objects with spherical geometry, orbiting a central sun. Each planet follows a circular orbital path with its own angular velocity, set to visually plausible relative values rather than astronomically precise ones, keeping the simulation readable and engaging on screen. When the user selects a planet, the camera transitions smoothly and locks onto that body while an information box appears displaying contextual data about it. 
+All planets are represented as Three.js\cite{threejs} mesh objects with spherical geometry, orbiting a central sun. Each planet follows a circular orbital path with its own angular velocity, set to visually plausible relative values rather than astronomically precise ones, keeping the simulation readable and engaging on screen. When the user selects a planet, the camera transitions smoothly and locks onto that body while an information box appears displaying contextual data about it. 
 
 This camera focus animation interpolates the camera's position and target across several frames to produce a fluid transition rather than a hard cut.
 In the second iteration moons were added to the relevant planets, each following its own orbital path around its parent body. Planet and moon textures were sourced as image assets and stored in the project's public folder, then applied as Three.js texture maps to the respective mesh materials. 
@@ -1413,15 +1413,15 @@ This approach came with an acknowledged trade-off: none of these external applic
 The integration pattern used for all three applications is identical in structure. Each is represented by a React component in the workbench's frontend that auto-launches the external program when opened, communicates with Electron's main process via the electronAPI IPC bridge exposed through preload.js, and is added to the AppCarousel so it appears alongside the natively built workbench tools.
 
 \subparagraph{OrcaSlicer}\mbox{} \\
-OrcaSlicer — more specifically the Orca for Flashforge variant — was the first external application to be integrated, implemented by Noah on 16 October 2025. It was also the first application in the entire project that does not live inside the workbench's React frontend but instead runs as a completely separate native process.
+OrcaSlicer\cite{orcaslicer} — more specifically the Orca for Flashforge variant — was the first external application to be integrated, implemented by Noah on 16 October 2025. It was also the first application in the entire project that does not live inside the workbench's React frontend but instead runs as a completely separate native process.
 The frontend component, OrcaSlicer.jsx, is minimal by design. When it mounts, a useEffect hook immediately calls window.electronAPI.launchOrcaSlicer(), which sends a launch-orca-slicer IPC message to Electron's main process. The main process handles this message by resolving the hard-coded path to the OrcaSlicer executable, spawning it as a detached child process with stdio set to ignore, and then calling child.unref() to allow the slicer to continue running independently even if the workbench process itself were to close. The workbench-side screen shown to the user while the slicer is launching is a simple placeholder that confirms the launch is in progress, with a Back button to return to the home screen. There are no controls, no file interaction, and no communication between the workbench and the slicer once the process has been spawned — the user works with OrcaSlicer in its own window entirely outside the workbench's control.
 \newpage
 \subparagraph{FreeCAD}\mbox{} \\
-FreeCAD was assigned to Alex and follows the same launch-and-forget integration pattern as OrcaSlicer. When the FreeCAD entry is selected from the carousel, the corresponding component triggers the openfreecad IPC command, which in main.js spawns the FreeCAD executable as a detached, independent process. FreeCAD then opens in its own native window and the workbench effectively hands off to it entirely.
+FreeCAD\cite{freecad} was assigned to Alex and follows the same launch-and-forget integration pattern as OrcaSlicer. When the FreeCAD entry is selected from the carousel, the corresponding component triggers the openfreecad IPC command, which in main.js spawns the FreeCAD executable as a detached, independent process. FreeCAD then opens in its own native window and the workbench effectively hands off to it entirely.
 The FreeCAD integration was one of the first places in the project where cross-platform path handling was explicitly addressed. The main process checks process.platform to determine the operating system: on Windows it resolves the path to freecad.exe inside the user's local application data directory, while on macOS it uses the exec('open -a /Applications/FreeCAD.app') command to launch the application bundle through the system's standard open mechanism. This platform branching became a template that was reused across subsequent integrations.
 
 \subparagraph{Bambu Studio} \mbox{} \\
-Bambu Studio was added on 18 December 2025 as a third slicer integration, targeting Bambu Lab's own 3D printing ecosystem. The implementation follows the same structure as OrcaSlicer and FreeCAD but was notable for introducing a concrete bug during development. The initial version of BambuStudio.jsx called 
+Bambu Studio\cite{bambustudio} was added on 18 December 2025 as a third slicer integration, targeting Bambu Lab's own 3D printing ecosystem. The implementation follows the same structure as OrcaSlicer and FreeCAD but was notable for introducing a concrete bug during development. The initial version of BambuStudio.jsx called 
 
 window.electronAPI.launchBambuStudio() directly inside an if condition that was checking for the function's existence. Because calling a function returns its return value — in this case undefined — the condition always evaluated to false, meaning the slicer never actually launched and the "Electron bridge not available" error alert was displayed every time even though the bridge was working correctly. The fix was straightforward: check for the function's existence first, and then call it separately inside the block if it is present. Like the other integrations, the spawned process is detached and unreferenced so it runs independently of the workbench.
 
@@ -1744,7 +1744,7 @@ Available at: \url{https://www.jetbrains.com/webstorm/}
 \textit{GitHub -- Code Hosting Platform for Version Control and Collaboration}.
 Available at: \url{https://github.com}
 
-\bibitem{github}
+\bibitem{repo}
 \textit{GitHub -- The projects personal repository}.
 Available at: \url{https://github.com/noamjam/HolomatUI_Prototype}
 
