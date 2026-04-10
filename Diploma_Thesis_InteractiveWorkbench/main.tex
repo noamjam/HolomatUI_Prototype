@@ -90,7 +90,7 @@
  
 
 % Titelblatt-Setup
-\title{Diploma Thesis \\ Interactive Workbench}
+\title{Diploma Thesis \\ Interactive workbench}
 \author{
   2025/26 \\
   by \\
@@ -116,7 +116,7 @@
 
 
 \section{Thanksgiving}
-First and foremost, we want to thank everyone who supported us throughout the development of the "Interactive Workbench" and the writing of this diploma thesis. 
+First and foremost, we want to thank everyone who supported us throughout the development of the "Interactive workbench" and the writing of this diploma thesis. 
 We greatly appreciate all those who helped us overcome challenges, find solutions and improve the overall quality of our project. 
 
 We would especially like to thank our advisor, Professor Gerald Senarclens de Grancy, whose expertise and guidance had a significant influence on this work and were
@@ -148,13 +148,13 @@ We hope that this thesis reflects that.
 \section{Abstract}
 Desktop operating systems and their associated graphical user interfaces have traditionally been designed around mouse and keyboard interaction, a paradigm that does not translate well to touchscreen hardware. While mobile platforms such as Android and iOS have addressed touch interaction for their respective ecosystems, no equivalent solution exists for conventional desktop environments that runs natively across Windows, macOS, and Linux without platform-specific adaptations. 
 
-At the same time, desktop workflows commonly require users to switch between multiple disconnected specialized tools to complete a single end-to-end task, introducing unnecessary overhead and complexity. This diploma thesis addresses both of these gaps through the development of a touch-optimized desktop environment built entirely on web technologies — the Interactive Workbench — designed to run consistently across all major desktop operating systems and to consolidate practical workflows within a single unified interface.
+At the same time, desktop workflows commonly require users to switch between multiple disconnected specialized tools to complete a single end-to-end task, introducing unnecessary overhead and complexity. This diploma thesis addresses both of these gaps through the development of a touch-optimized desktop environment built entirely on web technologies — the Interactive workbench — designed to run consistently across all major desktop operating systems and to consolidate practical workflows within a single unified interface.
 
 The primary method of this project was the iterative design and implementation of a functional prototype. The workbench was realized as a cross-platform desktop application built on Electron, using React and JavaScript for the frontend and a Python-based backend for AI inference and voice recognition through a locally executed large language model. A range of self-developed applications — including a 3D model viewer, AI assistant, code and text editor, Markdown editor, paint application, music library, image editor, and game collection — were integrated into a single gesture-centered interface. 
 
 External open-source applications, specifically OrcaSlicer, FreeCAD, and Bambu Studio, were incorporated as native process launches to provide professional-grade 3D slicing and CAD functionality. Development followed an agile methodology structured into weekly iterations, with version control and project management handled through GitHub across the two-person development team.
 
-The resulting prototype demonstrates that a modular, touch-optimized desktop environment can be successfully implemented on the basis of web technologies and deployed consistently across Windows, macOS, and Linux. The Interactive Workbench fulfills its defined functional and architectural requirements, providing an extensible and practically usable platform for its intended use cases in private, educational, and maker-space environments. All data processing, including AI inference and voice input, is executed locally on the user's device, ensuring that no personal data is transmitted to external servers.
+The resulting prototype demonstrates that a modular, touch-optimized desktop environment can be successfully implemented on the basis of web technologies and deployed consistently across Windows, macOS, and Linux. The Interactive workbench fulfills its defined functional and architectural requirements, providing an extensible and practically usable platform for its intended use cases in private, educational, and maker-space environments. All data processing, including AI inference and voice input, is executed locally on the user's device, ensuring that no personal data is transmitted to external servers.
 
 Identified limitations in the current implementation — including reduced AI response performance on lower-specification hardware, hard-coded executable paths for external application launches, and restricted file format export options in the 3D Viewer — have been documented and form the basis for concrete recommendations for future development iterations.
 
@@ -162,13 +162,13 @@ Identified limitations in the current implementation — including reduced AI re
 \section{Kurzfassung}
 Desktop-Betriebssysteme und ihre grafischen Benutzeroberflächen wurden traditionell für die Interaktion mit Maus und Tastatur konzipiert — ein Paradigma, das sich auf Touchscreen-Hardware nur unzureichend umsetzen lässt. Während mobile Plattformen wie Android und iOS Touch-Interaktion für ihre jeweiligen Ökosysteme adressiert haben, existiert keine vergleichbare Lösung für konventionelle Desktop-Umgebungen, die nativ und ohne plattformspezifische Anpassungen unter Windows, macOS und Linux lauffähig ist. 
 
-Gleichzeitig erfordern typische Desktop-Arbeitsabläufe häufig den Wechsel zwischen \newline mehreren voneinander getrennten Spezialwerkzeugen, um eine einzige durchgehende Aufgabe zu erledigen, was unnötigen Mehraufwand und Komplexität erzeugt. Die vorliegende Diplomarbeit begegnet beiden Problemstellungen durch die Entwicklung einer touchoptimierten Desktop-Umgebung auf Basis von Webtechnologien — der Interactive Workbench — die konsistent auf allen gängigen Desktop-Betriebssystemen betrieben werden kann und praktische Arbeitsabläufe in einer einheitlichen Oberfläche konsolidiert.
+Gleichzeitig erfordern typische Desktop-Arbeitsabläufe häufig den Wechsel zwischen \newline mehreren voneinander getrennten Spezialwerkzeugen, um eine einzige durchgehende Aufgabe zu erledigen, was unnötigen Mehraufwand und Komplexität erzeugt. Die vorliegende Diplomarbeit begegnet beiden Problemstellungen durch die Entwicklung einer touchoptimierten Desktop-Umgebung auf Basis von Webtechnologien — der Interactive workbench — die konsistent auf allen gängigen Desktop-Betriebssystemen betrieben werden kann und praktische Arbeitsabläufe in einer einheitlichen Oberfläche konsolidiert.
 
-Die primäre Methode dieses Projekts war der iterative Entwurf und die Implementierung eines funktionalen Prototypen. Die Workbench wurde als plattformübergreifende Desktop-Anwendung auf Basis von Electron realisiert, wobei React und JavaScript für das Frontend sowie ein Python-basiertes Backend für AI-Inferenz und Spracherkennung über ein lokal ausgeführtes Large Language Model eingesetzt wurden. Eine Reihe selbst entwickelter Anwendungen — darunter ein 3D-Modell-Viewer, ein AI-Assistent, ein Code- und Texteditor, ein Markdown-Editor, eine Zeichenanwendung, eine Musikbibliothek, ein Bildeditor sowie eine Spielesammlung — wurden in eine einheitliche, gestenbasierte Oberfläche integriert. 
+Die primäre Methode dieses Projekts war der iterative Entwurf und die Implementierung eines funktionalen Prototypen. Die workbench wurde als plattformübergreifende Desktop-Anwendung auf Basis von Electron realisiert, wobei React und JavaScript für das Frontend sowie ein Python-basiertes Backend für AI-Inferenz und Spracherkennung über ein lokal ausgeführtes Large Language Model eingesetzt wurden. Eine Reihe selbst entwickelter Anwendungen — darunter ein 3D-Modell-Viewer, ein AI-Assistent, ein Code- und Texteditor, ein Markdown-Editor, eine Zeichenanwendung, eine Musikbibliothek, ein Bildeditor sowie eine Spielesammlung — wurden in eine einheitliche, gestenbasierte Oberfläche integriert. 
 
 Externe Open-Source-Anwendungen, konkret OrcaSlicer, FreeCAD und Bambu Studio, wurden als native Prozessstarts eingebunden, um professionelle 3D-Slicing- und CAD-Funktionalität bereitzustellen. Die Entwicklung folgte einer agilen Methodik, strukturiert in wöchentliche Iterationen, mit Versionskontrolle und Projektmanagement über GitHub im zweiköpfigen Entwicklungsteam.
 
-Der entstandene Prototyp zeigt, dass eine modulare, touchoptimierte Desktop-Umgebung auf Basis von Webtechnologien erfolgreich realisiert und konsistent unter Windows, macOS und Linux betrieben werden kann. Die Interactive Workbench erfüllt die definierten funktionalen und architektonischen Anforderungen und stellt eine erweiterbare und praktisch nutzbare Plattform für die vorgesehenen Einsatzbereiche in privaten, schulischen und Maker-Space-Umgebungen bereit. Die gesamte Datenverarbeitung, einschließlich AI-Inferenz und Spracheingabe, erfolgt lokal auf dem Gerät des Benutzers, sodass zu keinem Zeitpunkt personenbezogene Daten an externe Server übertragen werden. 
+Der entstandene Prototyp zeigt, dass eine modulare, touchoptimierte Desktop-Umgebung auf Basis von Webtechnologien erfolgreich realisiert und konsistent unter Windows, macOS und Linux betrieben werden kann. Die Interactive workbench erfüllt die definierten funktionalen und architektonischen Anforderungen und stellt eine erweiterbare und praktisch nutzbare Plattform für die vorgesehenen Einsatzbereiche in privaten, schulischen und Maker-Space-Umgebungen bereit. Die gesamte Datenverarbeitung, einschließlich AI-Inferenz und Spracheingabe, erfolgt lokal auf dem Gerät des Benutzers, sodass zu keinem Zeitpunkt personenbezogene Daten an externe Server übertragen werden. 
 
 Identifizierte Einschränkungen der aktuellen Implementierung — darunter reduzierte AI-Antwortleistung auf leistungsschwächerer Hardware, fest kodierte Pfade für externe Anwendungsstarts sowie eingeschränkte Dateiformat-Exportoptionen im 3D-Viewer — wurden dokumentiert und bilden die Grundlage für konkrete Empfehlungen für zukünftige Entwicklungsiterationen.
 
@@ -183,13 +183,13 @@ as mentioned in section \textit{Bibliography}, where several articles and studie
 Beyond the challenge of touch compatibility, modern workflows often require users to switch between multiple disconnected tools to complete a single task — moving from a 3D viewer to a slicer, from a text editor to an AI assistant, and back again. Each transition introduces overhead, breaks concentration, and adds unnecessary complexity to what should be a fluid creative or productive process.
 Furthermore, the constellation of different developers and their applications necessary to completely form a workflow, these applications can cause interference and problems which hence leads to a performance drop and a not so fluent workflow. 
 
-The "Interactive Workbench" was developed to address both of these problems. The goal was to create a touch-optimized, unified digital environment that consolidates practical tools into a single coherent interface, reducing both the friction of touch interaction and the overhead of switching between applications. The system was designed from the ground up with gesture-based input as the primary interaction model, while maintaining full compatibility with conventional mouse and keyboard input for devices without touchscreen support without lacking in compatibility or performance.
+The "Interactive workbench" was developed to address both of these problems. The goal was to create a touch-optimized, unified digital environment that consolidates practical tools into a single coherent interface, reducing both the friction of touch interaction and the overhead of switching between applications. The system was designed from the ground up with gesture-based input as the primary interaction model, while maintaining full compatibility with conventional mouse and keyboard input for devices without touchscreen support without lacking in compatibility or performance.
 
 This thesis documents the motivation behind the project, the technical decisions and architectural choices made during development, the iterative refinements applied throughout, and an honest reflection on the challenges encountered and the limitations that remain in the current implementation.
 
 \newpage
 \subsection{The final implementation}
-The final implementation of the Interactive Workbench delivers a modular, cross-platform application that runs on Windows, macOS, and Linux, developed and tested using the WebStorm integrated-development-environment (IDE) across multiple hardware configurations. The system provides a range of self-developed applications covering practical domains including 3D model visualization, AI-assisted interaction, document editing, code execution, image editing, and casual gaming, all accessible through a unified touch-optimized interface.
+The final implementation of the Interactive workbench delivers a modular, cross-platform application that runs on Windows, macOS, and Linux, developed and tested using the WebStorm integrated-development-environment (IDE) across multiple hardware configurations. The system provides a range of self-developed applications covering practical domains including 3D model visualization, AI-assisted interaction, document editing, code execution, image editing, and casual gaming, all accessible through a unified touch-optimized interface.
 
 User interaction is centered on gesture-based input — including taps, swipes, pinches, and drag operations — supported consistently across all integrated applications. For devices without touchscreen capability, full mouse and keyboard support ensures accessibility across different hardware configurations which intern makes the workbench a go to software for a broader range of customers.
 
@@ -541,7 +541,7 @@ Themes currently apply to the Home Screen and application icons only. Interior s
 \toprule
 \textbf{Problem} & \textbf{Solution} \\
 \midrule
-Workbench does not start & Verify that Node.js and npm are installed correctly. Run \texttt{npm install} again and check the terminal output for errors. \\[6pt]
+workbench does not start & Verify that Node.js and npm are installed correctly. Run \texttt{npm install} again and check the terminal output for errors. \\[6pt]
 AI assistant shows ``Offline'' & Ensure the Python virtual environment is activated and the backend dependencies are installed. Run \texttt{npm start} from the project root, not from a subdirectory. \\[6pt]
 External app does not launch & Confirm that OrcaSlicer, FreeCAD, or Bambu Studio is installed in its \textbf{default directory}. Custom installation paths are not yet supported. \\[6pt]
 AI responses are very slow & The LLM requires significant RAM. Close other applications and, if possible, use a machine with 16\,GB or more. \\[6pt]
@@ -584,13 +584,13 @@ Repository & \url{https://github.com/noamjam/HolomatUI\_Prototype} \\
 \section{Specifications}
 \subsection{General specifications}
 % Füge hier Inhalte ein
-The “Interactive Workbench” presents an innovative and efficient System, it makes the interaction between human and machine seamless and natural. Applications like 3D-designer integrated voice assistant and more, will eliminate the need of additional monitors or the switching between Systems.
-The use case for the "Interactive Workbench" was originally only for private use. After longer development it was clear that the use case could also be spread to public institutions like schools, maker spaces, trainings centers and so on. To meet the requirements of the user it is important to meet certain quality requirements. This can be seen in the 3D-designer and its support of mainstream formats like STL, OBJ, STEP.
+The “Interactive workbench” presents an innovative and efficient System, it makes the interaction between human and machine seamless and natural. Applications like 3D-designer integrated voice assistant and more, will eliminate the need of additional monitors or the switching between Systems.
+The use case for the "Interactive workbench" was originally only for private use. After longer development it was clear that the use case could also be spread to public institutions like schools, maker spaces, trainings centers and so on. To meet the requirements of the user it is important to meet certain quality requirements. This can be seen in the 3D-designer and its support of mainstream formats like STL, OBJ, STEP.
 The overall system design prioritizes practicability and visual appeal while maintaining consideration for performance. 
 Technical constraints, such as the support of OS-compatible functions and touch input, were accounted for throughout the development process.
  
 \subsection{Main objective}
-The main task of this diploma project was the development of a touch‑input‑centered, easy‑to‑use digital workbench that replaces fragmented, tool‑specific workflows with a unified digital environment for bringing ideas to life. The Interactive Workbench provides a modular user interface with several self‑developed applications that focus on intuitive gesture and touch interaction instead of classic mouse‑ and keyboard‑driven HMIs, in order to reduce time lost on portability and compatibility issues of conventional manufacturing tools. The software is implemented as a platform‑independent, open‑source web application, developed and tested using the WebStorm IDE on common desktop operating systems (Windows, macOS and Linux), so that a broad range of users can benefit from stable operation and consistent behavior across devices. A core part of the task was to design and iteratively refine the interaction concept, application architecture, and visual layout so that typical workflows around 3D‑printing and digital fabrication can be executed efficiently on a single central interface, and to validate this through practical test sessions with representative users.  
+The main task of this diploma project was the development of a touch‑input‑centered, easy‑to‑use digital workbench that replaces fragmented, tool‑specific workflows with a unified digital environment for bringing ideas to life. The Interactive workbench provides a modular user interface with several self‑developed applications that focus on intuitive gesture and touch interaction instead of classic mouse‑ and keyboard‑driven HMIs, in order to reduce time lost on portability and compatibility issues of conventional manufacturing tools. The software is implemented as a platform‑independent, open‑source web application, developed and tested using the WebStorm IDE on common desktop operating systems (Windows, macOS and Linux), so that a broad range of users can benefit from stable operation and consistent behavior across devices. A core part of the task was to design and iteratively refine the interaction concept, application architecture, and visual layout so that typical workflows around 3D‑printing and digital fabrication can be executed efficiently on a single central interface, and to validate this through practical test sessions with representative users.  
 
 \newpage
 \subsection{Technical specifications}
@@ -626,7 +626,7 @@ The following block diagram displays the architecture and user input workflow us
 
 \newpage
 \subsubsection{Input and interaction concepts}
-User interaction with the Interactive Workbench is deliberately centered on direct multi‑
+User interaction with the Interactive workbench is deliberately centered on direct multi‑
 touch input, complemented by full mouse and keyboard support to remain usable on any standard laptop.  
 The interface is optimized for finger‑based operation: large actionable areas, generous spacing and clear visuals help users recognize where interaction is possible and minimize accidental input.  A single tap (or mouse click) is used to launch applications from the home interface, confirm dialogues, and select items such as files or 3D models.
 
@@ -674,7 +674,7 @@ HolomatUI_Prototype/
 |-- .gitignore
 |-- chat.html
 |-- index.html
-|-- InteractiveWorkbench.bat
+|-- Interactiveworkbench.bat
 |-- main.js
 |-- package.json
 |-- package-lock.json
@@ -698,7 +698,7 @@ These formats are also supported in our ToastUI Image Editor~\cite{toastui}.
 \newpage
 \subsubsection{Security and reliability}
 For security reasons, the workbench is designed as a client-side focused application. 
-For context, a client-side focused application is a software application where the majority of the processing, rendering, and business logic is handled on the client (e.g., in the browser using JavaScript or in a react application), while the server mainly provides data or APIs.~\cite{clientside}
+For context, a client-side focused application is a software application where the majority of the processing, rendering, and business logic is handled on the client (e.g., in the browser using JavaScript or in a react application), while the server mainly provides data or application programming interfaces (APIs).~\cite{clientside}
 That means, almost all data is being processed locally on the device and is not uploaded to any external servers. This significantly reduces the risk of any unauthorized access to sensitive data, as no personal user information is required or stored. The voice input for the AI is processed locally, significantly reducing the risk of unintentionally sending requests to an external server.
 
 For reliability the system is designed to be platform-independent, supporting all major operating systems. This ensures reliability and consistent behavior across different hardware environments. By using established programming languages such as JavaScript and libraries like React, a well tested and stability oriented user environment can be assured.
@@ -722,8 +722,9 @@ The use of modern and widely adopted technologies ensures future improvements ar
 
 This block diagram represents the systems capabilities and workflows such as its start up and the possible interactions that allow the user to access the workbench´s applications, either for productivity or gaming. 
 
+\newpage
 \subsection{Software requirements}
-The “Interactive Workbench” can run on all major operating systems. For the use of the workbench some downloads are required, as some of them are required in some applications or for the overall system. 
+The “Interactive workbench” can run on all major operating systems. For the use of the workbench some downloads are required, as some of them are required in some applications or for the overall system. 
 
 For JavaScript, no specific developer environment is required, making it easily accessible to users. However, certain features, such as custom application or advanced design functions, rely on additional libraries like React and Node.js/npm for local build or development purposes. Due to applications such as the 3D-Viewer the support of WebGL\cite{webgl} is required for 3D rendering. 
 Furthermore, the React H5 Audio player\cite{reacth5audio} was used to guarantee a well working music library. Our Image Editor requires the ToastUI Image Editor to work, which is another React Component that needs to be included when setting up the workbench and will be installed automatically if you follow the installation steps shown in section \textit{Installation}. The weather application uses the API from open-meteo\cite{openmeteo} which not only provides the weather data but also accompany's the data with corresponding widgets which are directly used in the workbench. 
@@ -937,7 +938,7 @@ Consider that to set up the assistant in the first place, a stable internet conn
 \newpage
 \subsubsection{Text and code editor}
 This section will introduce you to the text and code editor on a deeper and more technical level. We will cover its development as well as its functionality. 
-
+The motivation behind this application was to offer the user a programm with which they could track and record the development of their project developed using the interactive workbench or similar use cases. 
 \paragraph{Initial implementation and functional scope}\mbox{} \\
 Initially, the text and code editor was introduced as an independent productivity application within the workbench. In its first state the component provided basic text editing functionality, allowing the user to create and modify plain text within a structured graphical interface. The primary objective at this stage was the interface integration and consistency with the overall visual and interaction design of the workbench. 
 
@@ -1410,27 +1411,61 @@ Several limitations were apparent across the game and simulation implementations
 \subparagraph{Motivation and Approach} \mbox{} \\
 A core goal of the workbench was to serve as a practical tool for a 3D printing and engineering context. This meant that professional-grade software for slicing 3D models and designing parts needed to be accessible from within the workbench interface. The team initially considered building a slicer from scratch, but after research concluded that a functional slicer requires a team of 20 or more experienced developers and is far outside the scope of a two-person diploma project. The decision was therefore made to integrate existing open-source applications — OrcaSlicer, FreeCAD, and later Bambu Studio — directly into the workbench rather than attempting to replicate their functionality.
 This approach came with an acknowledged trade-off: none of these external applications match the workbench's visual design language. They open in their own native windows with their own UI, breaking the immersive, themed aesthetic of the rest of the platform. The team were candid in the diary about not being entirely happy with this compromise, but accepted it as the only realistic path to providing this category of functionality.
-The integration pattern used for all three applications is identical in structure. Each is represented by a React component in the workbench's frontend that auto-launches the external program when opened, communicates with Electron's main process via the electronAPI IPC bridge exposed through preload.js, and is added to the AppCarousel so it appears alongside the natively built workbench tools.
+The integration pattern used for all three applications is identical in structure. Each is represented by a React component in the workbench's frontend that auto-launches the external program when opened, communicates with Electron's main process via the electron API IPC bridge exposed through preload.js, and is added to the AppCarousel so it appears alongside the natively built workbench tools.
 
 \subparagraph{OrcaSlicer}\mbox{} \\
 OrcaSlicer\cite{orcaslicer} — more specifically the Orca for Flashforge variant — was the first external application to be integrated, implemented by Noah on 16 October 2025. It was also the first application in the entire project that does not live inside the workbench's React frontend but instead runs as a completely separate native process.
-The frontend component, OrcaSlicer.jsx, is minimal by design. When it mounts, a useEffect hook immediately calls window.electronAPI.launchOrcaSlicer(), which sends a launch-orca-slicer IPC message to Electron's main process. The main process handles this message by resolving the hard-coded path to the OrcaSlicer executable, spawning it as a detached child process with stdio set to ignore, and then calling child.unref() to allow the slicer to continue running independently even if the workbench process itself were to close. The workbench-side screen shown to the user while the slicer is launching is a simple placeholder that confirms the launch is in progress, with a Back button to return to the home screen. There are no controls, no file interaction, and no communication between the workbench and the slicer once the process has been spawned — the user works with OrcaSlicer in its own window entirely outside the workbench's control.
+The frontend component, OrcaSlicer.jsx, is minimal by design. When it mounts, a useEffect hook immediately calls window.electronAPI.launchOrcaSlicer(), which sends a launch-orca-slicer IPC message to Electron's main process. The main process handles this message by resolving the hard-coded path to the OrcaSlicer executable, spawning it as a detached child process with stdio set to ignore, and then calling child.unref() to allow the slicer to continue running independently even if the workbench process itself were to close. The workbench-side screen shown to the user while the slicer is launching is a simple placeholder that confirms the launch is in progress, with a back button to return to the home screen. There are no controls, no file interaction, and no communication between the workbench and the slicer once the process has been spawned — the user works with OrcaSlicer in its own window outside of the workbench's control.
 \newpage
 \subparagraph{FreeCAD}\mbox{} \\
-FreeCAD\cite{freecad} was assigned to Alex and follows the same launch-and-forget integration pattern as OrcaSlicer. When the FreeCAD entry is selected from the carousel, the corresponding component triggers the openfreecad IPC command, which in main.js spawns the FreeCAD executable as a detached, independent process. FreeCAD then opens in its own native window and the workbench effectively hands off to it entirely.
-The FreeCAD integration was one of the first places in the project where cross-platform path handling was explicitly addressed. The main process checks process.platform to determine the operating system: on Windows it resolves the path to freecad.exe inside the user's local application data directory, while on macOS it uses the exec('open -a /Applications/FreeCAD.app') command to launch the application bundle through the system's standard open mechanism. This platform branching became a template that was reused across subsequent integrations.
+FreeCAD\cite{freecad} was assigned to Alex and follows the same launch-and-forget integration pattern as OrcaSlicer. 
+When the FreeCAD entry is selected from the carousel, the corresponding component triggers the openfreecad IPC command, which in main.js spawns the FreeCAD executable as a detached, independent process. 
+FreeCAD then opens in its own native window and the workbench does not interfere with it in any way.
+The FreeCAD integration was one of the first places in the project where cross-platform path handling was explicitly addressed. 
+The main process checks process.platform to determine the operating system: on Windows it resolves the path to freecad.exe inside the user's local application data directory, while on macOS it uses the exec('open -a /Applications/FreeCAD.app') command to launch the application bundle through the system's standard open mechanism. 
+
+\begin{notebox}
+On Linux, FreeCAD is typically installed via the system package manager 
+(e.g.\ \texttt{apt}, \texttt{dnf}, or \texttt{pacman}) and is registered 
+as a system-wide command. The executable can therefore be launched directly 
+by name — \texttt{freecad} or \texttt{FreeCAD} — without resolving a 
+hard-coded path. In the current implementation, Linux support for the 
+external application launchers has not been explicitly tested or 
+implemented beyond the web-based architecture of the workbench itself. 
+A future improvement could extend the \texttt{process.platform} check 
+to include a \texttt{linux} branch that spawns the executable by name, 
+making the integration fully cross-platform across all three supported 
+operating systems.
+This however does not mean that the workbench does not work on Linux. The only consequence to this is that the external applications may not be usable through the workbench. 
+\end{notebox}
+
+This platform branching became a template that was reused across subsequent integrations.
 
 \subparagraph{Bambu Studio} \mbox{} \\
-Bambu Studio\cite{bambustudio} was added on 18 December 2025 as a third slicer integration, targeting Bambu Lab's own 3D printing ecosystem. The implementation follows the same structure as OrcaSlicer and FreeCAD but was notable for introducing a concrete bug during development. The initial version of BambuStudio.jsx called 
-
+Bambu Studio\cite{bambustudio} was added on 18 December 2025 as a second slicer integration, targeting Bambu Lab's own 3D printing ecosystem. The implementation follows the same structure as OrcaSlicer and FreeCAD but was notable for introducing a concrete bug during development. The initial version of BambuStudio.jsx called \newline
 window.electronAPI.launchBambuStudio() directly inside an if condition that was checking for the function's existence. Because calling a function returns its return value — in this case undefined — the condition always evaluated to false, meaning the slicer never actually launched and the "Electron bridge not available" error alert was displayed every time even though the bridge was working correctly. The fix was straightforward: check for the function's existence first, and then call it separately inside the block if it is present. Like the other integrations, the spawned process is detached and unreferenced so it runs independently of the workbench.
 
+\newpage
 \subparagraph{Stability improvements and the safeSpawn pattern} \mbox{} \\
-On 7 January 2026, a broader stability pass was made specifically targeting all external application launches. The diary notes that a more failsafe main.js platform query was introduced and applied uniformly to every non-natively developed application — BambuStudio, FreeCAD, and OrcaSlicer — rather than having each integration handle its own error cases inconsistently. This consolidation reduced code duplication and made the launch behaviour more predictable across the three integrations. A safeSpawn helper was also introduced as a wrapper around the raw Node.js childprocess.spawn call, providing centralised error handling for cases such as a missing executable, an incorrect path, or a system-level permission error. Rather than crashing the Electron main process or silently failing, safeSpawn catches these errors and logs them clearly, making the source of a failed launch much easier to diagnose.
+On 7 January 2026, a broader stability rework was made specifically targeting all external application launches. 
+As noted in the diary\cite{diary}, a more failsafe main.js platform query was introduced and applied uniformly to every non-native application — BambuStudio, FreeCAD, and OrcaSlicer — rather than having each integration handle its own error cases. 
+This consolidation reduced code duplication and made the launch behaviour more predictable across the different integrations. A safeSpawn helper was also introduced as a wrapper around the raw Node.js childprocess.spawn call, providing centralised error handling for cases such as a missing executable, an incorrect path, or a system-level permission error. Rather than crashing the Electron main process or silently failing, safeSpawn catches these errors and logs them clearly, making the source of a failed launch much easier to diagnose.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{Launcher.png}
+  \caption{Launching bambu studio from the workbench}
+  \label{fig:Bambu}
+\end{figure}
 
 \newpage
 \subparagraph{AI-Triggered launching} \mbox{} \\
-Beyond being accessible as tiles in the app carousel, all three external applications were later wired into the workbench's AI assistant as part of a broader effort to make the platform feel more interactive and voice-driven. On 21 January 2026, the Python ChatAssistant.py backend was extended with a Command data model and a keyword scanning step that runs on every incoming user prompt. If the text contains trigger phrases such as "freecad", "starte freecad", "bambu studio", or "starte bambustudio", the assistant constructs a Command object identifying the target application and returns it alongside the normal language model reply. The frontend then forwards this command to main.js via the executeCommand IPC bridge. Before executing, the main process shows the user a native confirmation dialog — "Assistant wants to run: openfreecad. Continue?" — requiring an explicit Allow before spawning the process. This consent step was a deliberate design decision to prevent the AI from silently launching applications without the user's awareness. By the end of January 2026, this voice-triggered launch mechanism was confirmed working for OrcaSlicer, FreeCAD, and Bambu Studio.
+Beyond being accessible as tiles in the app carousel, all three external applications were later wired into the workbench's AI assistant as part of a broader effort to make the platform feel more interactive and voice-driven. 
+On 21 January 2026, the Python ChatAssistant.py backend was extended with a Command data model and a keyword scanning step that runs on every incoming user prompt. If the text contains trigger phrases such as "freecad", "starte freecad", "bambu studio", or "starte bambu studio", the assistant constructs a Command object identifying the target application and returns it alongside the normal language model reply as a json package. 
+The frontend then forwards this command to main.js via the executeCommand IPC bridge. 
+Before executing, the main process shows the user a native confirmation dialog — "Assistant wants to run: openfreecad. Continue?" — requiring an explicit "Allow" before spawning the process.
+The user can confirm the start of an application by clicking "yes" in the native confirmation dialog, "no" forbids the start up process. 
+This consent step was a deliberate design decision to prevent the AI from launching applications without the user's awareness. By the end of January 2026, this voice-triggered launch mechanism was confirmed working for OrcaSlicer, FreeCAD, and Bambu Studio.
 
 \begin{figure}[H]
   \centering
@@ -1439,87 +1474,169 @@ Beyond being accessible as tiles in the app carousel, all three external applica
   \label{fig:View}
 \end{figure}
 
-\newpage
-\subsection{Frontend software development}
-The Design of the workbench is a essential and crucial choice. One of the main points for the workbench is a simple and modern looking GUI, that was something to always consider during the development process, yet it should be optimized for efficiency and compatible with older hardware. 
+\begin{notebox}
+The workbench does not have any sort of filter functionality concerning the applications presented to the users on the homescreen. 
+\end{notebox}
 
-In the beginning of development, the first prototype design was made with the use of React. This prototypes design was focused on functionality and structure, rather then visual refinements. For this, basic className assignments were used. With that, it was possible to have a rapid and yet functional development process. 
+\newpage
+\subsection{Visualization and design}
+The design of the workbench is a essential and crucial choice. One of the main points for the workbench is a simple and modern looking GUI, that was something to always consider during the development process, yet it should be optimized for efficiency and compatible with older hardware. 
+
+In the beginning, the first prototype design was made with the use of React. 
+This prototypes design was focused on functionality and structure, rather then visual refinements. 
+For this, basic className assignments were used. This permitted a rapid development process. 
 
 After further development it became important to have a overall design and functionality for the whole GUI. The choice fell on CSS (Cascading Style Sheets), because as a Stylesheet-language it could be added without difficulty to our JavaScript based code. CSS made a clear separation between structure and design, improving the readability of the code and the process of generalization of the design over all applications. 
 
-For the general design we chose a transparent look with blue accents, which makes our GUI look on time with the overall design of modern GUIs. Buttons got interactive designs in our GUI such as subtle hover effects, when your mouse is over a distinct button. In the settings application, the user can select from several color schemes that apply to the background and application icons. The themes do not currently extend to the interior of individual applications. It was made sure that even with the transparent look a good readability and contrast were guaranteed. The design is also equipped with a satisfactory amount of icons to simplify the recognizing of distinct buttons and make the navigation more beginner friendly.
+For the general design we chose a transparent look with blue accents, which makes our GUI look futurisctic and performative. 
+Buttons got interactive designs in our GUI such as subtle hover effects. In the settings application, the user can select from several color schemes that apply to the background and application icons. 
+
+\begin{notebox}
+The themes do not currently extend to the interior of individual applications. This could be something to improve and worth mentioning in the section \textit{Recommendations for further improvements}.   
+\end{notebox}
+
+It was made sure that even with the transparent look a good readability and contrast were guaranteed. 
+The design is also equipped with a satisfactory amount of icons to facilitate the recognition of distinct buttons and make the navigation more beginner friendly.
 
 \newpage
 \subsubsection{Evolution of animations}
-The first development of a animation within the project was implemented in the context of the boot-up sequence of the Workbench. Alex implemented this in the form of a smooth and slow zoom-in animation, in which the logo of the Workbench gradually appears on the screen and slowly expands in size, giving the startup screen a polished and professional feel. Alongside this, the text "Welcome to Holomat!" is displayed using a Typewriter Effect, meaning that the individual characters of the text write themselves out one by one in the center of the bottom half of the screen, rather than appearing all at once. This combination of the zoom-in logo animation and the Typewriter Effect gives the boot-up screen a dynamic and visually engaging appearance, making it a fitting introduction to the application.
+The first development of an animation within the project was implemented in the context of the boot-up sequence of the workbench. Alex implemented this in the form of a smooth and slow zoom-in animation, in which the logo of the workbench gradually appears on the screen and slowly expands in size, giving the startup screen a polished and professional feel. Alongside this, the text "Welcome to Holomat!" is displayed using a Typewriter Effect, meaning that the individual characters of the text write themselves out one by one in the center of the bottom half of the screen, rather than appearing all at once. This combination of the zoom-in logo animation and the Typewriter Effect gives the boot-up screen a dynamic and visually engaging appearance, making it a fitting introduction to the application.
 
-The development of the animations and the overall design language of the project also brought a number of different challenges and problems that had to be tackled along the way. One of the first and most notable of these challenges arose from an idea that Alex had for the background of the Workbench. The original concept was to implement an animated background in the style of the classic Apple Mac screensavers, in which a variety of colorful strings would appear to be "flying" through space, creating a lively and visually dynamic environment for the user interface.
+The development of the animations and the overall design language of the project also brought a number of different challenges and problems that had to be tackled along the way. One of the first and most notable of these challenges arose from an idea that Alex had for the background of the workbench. The original concept was to implement an animated background in the style of the classic Apple Mac screensavers, in which a variety of colorful strings would appear to be "flying" through space, creating a lively and visually dynamic environment for the user interface.
 
-An initial prototype of this concept was built using HTML and showed a considerable amount of potential at first glance. The animation looked visually professional and gave the Workbench a distinctive and engaging atmosphere. However, despite its appealing appearance, the problems that came with it quickly proved to be too overwhelming to ignore. The performance of the animation told a completely different story compared to its visual quality. Even when running on proper and capable development hardware, the machine began to heat up noticeably fast, making it very clear that the animation was placing a significant load on the system. These signs made it obvious that the animation would require a substantial amount of optimization before it could properly fulfill its intended purpose within the application.
+An initial prototype of this concept was built using HTML and showed a considerable amount of potential at first glance. 
+The animation looked visually professional and gave the workbench a distinct and engaging atmosphere. 
+However, despite its appealing appearance, this methodology had an overwhelming amount of problems. 
+The performance of the animation told a completely different story compared to its visual quality. 
+Even when running on proper and capable development hardware, the machine began to heat up noticeably fast, making it very clear that the animation was placing a significant load on the system. These signs made it obvious that the animation would require a substantial amount of optimization before it could properly fulfill its intended purpose within the application.
 
-Because of these performance concerns, the decision was made to move away from the original concept entirely and to go back to a simpler but equally effective alternative. The new approach for the background animation was based on the idea of a subtle and continuously looping color transition, shifting between a blue and a darker shade of blue. This transition flows in a directional loop, starting from the bottom right corner of the screen and gradually moving towards the top left corner, creating a smooth and gentle movement across the entire background. While this solution is considerably more understated compared to the original flying strings concept, it achieves a similar goal of giving the Workbench a living and breathing feel without placing any significant load on the system. The result is a clean and visually appealing background animation that complements the overall design language of the application while remaining fully optimized for performance.
+Because of these performance concerns, the decision was made to move away from the original concept entirely and to go back to a simpler but equally effective alternative. The new approach for the background animation was based on the idea of a subtle and continuously looping color transition, shifting between a blue and a darker shade of blue. This transition flows in a directional loop, starting from the bottom right corner of the screen and gradually moving towards the top left corner, creating a smooth and gentle movement across the entire background. While this solution is considerably more understated compared to the original flying strings concept, it achieves a similar goal of giving the workbench a living and breathing feel without placing any significant load on the system. The result is a clean and visually appealing background animation that complements the overall design language of the application while remaining fully optimized for performance.
 
 \newpage
 \subsubsection{Evolution of the design}
-The overall design of the Workbench had to go through a longer and more involved development process, which is not uncommon in the context of a graphical user interface, where the visual design plays an especially important and defining role for the quality and feel of the entire program. What the user sees and interacts with on a daily basis is shaped heavily by the design decisions made during development, which is why this aspect of the project required a considerable amount of iteration and refinement over time.
+The overall design of the workbench had to go through a longer and more involved development process, which is not uncommon in the context of a graphical user interface.
+The visual design plays an especially important and defining role for the quality and user experience of the entire program. 
+What the user sees and interacts with on a daily basis is shaped heavily by the design decisions made during development, which is why this aspect of the project required a considerable amount of iteration and refinement over time.
 
-The very first designs that were created for the prototypes of the different applications, buttons, and controls were at most simple and plain inline styles, styled with a basic blue color and lacking any form of transparency or visual depth. While these early designs were sufficient for the purposes of initial prototyping and functionality testing, they were far from the polished and cohesive visual identity that the Workbench would eventually take on. It was through the continued development and refinement of the interface that transparency became one of the most defining and important elements of the overall design language, ultimately shaping the final appearance of the Workbench in a significant way.
+The very first designs that were created for the prototypes of the different applications, buttons, and controls were at most simple and plain inline styles, styled with a basic blue color and lacking any form of transparency or visual depth. 
+While these early designs were sufficient for the purposes of initial prototyping and testing, they were far from the polished and cohesive visual identity that the workbench would eventually take on. 
+It was through the continued development and refinement of the interface that transparency became one of the most important elements of the overall design language, ultimately shaping the final appearance of the workbench in a significant way.
 
-After the first implementations of the design had been completed, a few weeks into the development process Alex came to the insight that the overall design language of the Workbench needed to be fundamentally reworked and finalized in its appearance. The goal was to establish a clear and consistent visual rulebook that all future applications within the Workbench could refer back to, ensuring that the entire graphical user interface would feel cohesive, unified, and intuitive for the end user.
+After the first implementations of the design had been completed, a few weeks into the development process Alex came to the insight that the overall design language of the workbench needed to be fundamentally reworked and finalized in its appearance. 
+The goal was to establish a clear and consistent visual rulebook that all future applications within the workbench could refer to, ensuring that the entire graphical user interface would feel cohesive, unified, and intuitive for the end user.
 
-As previously mentioned, transparency had already emerged as an important factor in the design vision. The core idea from Alex was that the design should be timeless, modern, and performance efficient all at once, striking a balance between visual appeal and technical practicality. In the pursuit of these goals, it became clear that CSS was a far more organized, maintainable, and reliable approach to styling compared to the use of inline styles, which had served their purpose during the early prototyping phase but were no longer suitable for a fully developed and scalable user interface.
+As previously mentioned, transparency had already emerged as an important factor in the design vision. 
+The core idea from Alex was that the design should be futurisctic, well rounded, and performance efficient, striking a balance between visual appeal and technical practicality. In the pursuit of these goals, it became clear that CSS was a far more organized, maintainable, and reliable approach to styling compared to the use of inline styles, which had served their purpose during the early prototyping phase but were no longer suitable for a fully developed and scalable user interface.
 
-With this new direction in mind, the entire graphical user interface was redesigned from the ground up. The new design language featured transparent buttons with a subtle blue shine, giving the interface a sleek and modern appearance. A gentle increase in size was added as a hover effect, providing the user with clear and satisfying visual feedback when moving the mouse over buttons and interactive elements. The overall applications were styled in a blue and cyan color scheme, tying the entire Workbench together into a consistent and polished visual identity.
-The design had to be redone several times- why? How? Problems like the design changes not working etc could be covered here and there fix could be covered here. 
+With this new direction in mind, the entire graphical user interface was redesigned from the ground up. 
+This rework started in the early days of December 2025 and continued through until the last subtle changes had been made at the end of January 2026. 
+The switch to CSS allowed us to efficiently overhaul the desgin as we applied the CSS style classes almost everywhere in the workbench. 
+
+\begin{notebox}
+More complex applications that were primarily developed with function over form are not styled using the CSS style sheet. 
+This is something that could be improved in further implementations. 
+More on this in section \textit{Recommendations for further improvements}. 
+\end{notebox}
+
 
 \newpage
 \section{Discussion}
-The final implementation of the Interactive Workbench fulfills the core objectives defined at the outset of the project, delivering a modular, touch-optimized digital environment that consolidates a broad range of practical tools within a single unified interface. The platform covers domains ranging from 3D manufacturing and software development to AI-assisted interaction and casual entertainment, demonstrating both the versatility of the chosen architecture and the feasibility of the underlying concept.
+The final implementation of the interactive workbench fulfills the core objectives defined at the outset of the project, delivering a modular, touch-optimized digital environment that consolidates a broad range of practical tools within a single unified interface. The platform covers domains ranging from 3D manufacturing and software development to AI-assisted interaction and casual entertainment, demonstrating both the versatility of the chosen architecture and the feasibility of the underlying concept.
 
-The development process was not without significant challenges. Throughout the project, time proved to be one of the most constrained resources. Technical difficulties — particularly those arising from cross-environment integration and touch input compatibility — frequently required unplanned debugging effort, which reduced the time available for feature development. A recurring pattern emerged in which the introduction of a new feature would expose previously hidden issues elsewhere in the system, making sustained progress difficult at certain stages of development. Despite this, every challenge encountered was ultimately resolved, and no issue proved permanently blocking to the project's completion.
+The development process was not without significant challenges. 
+Throughout the project, time proved to be one of the most constrained resources. 
 
-Workload distribution and team coordination, managed through GitHub's project and repository tooling, played an important role in maintaining progress throughout the development period. The structured division of responsibilities ensured that there was always active development taking place across different components of the system, which helped sustain momentum even during more demanding phases of the project. That said, coordinating a project of this complexity as a two-person team introduced its own difficulties, and periods of reduced availability due to attendance and health-related absences required additional effort to recover through overtime work outside of scheduled development time.
+Technical difficulties — particularly those arising from cross-environment integration and touch input compatibility — frequently required unplanned debugging effort, which reduced the time available for feature development. 
+A recurring pattern emerged in which the introduction of a new feature would expose previously hidden issues elsewhere in the system, making sustained progress difficult at certain stages of development. 
+Despite this, every challenge encountered was ultimately resolved, and no issue permanently blocked the project's completion.
 
-Nevertheless we pursued through all the trouble and inconsistencies in motivation and performance. 
+Workload distribution and team coordination, managed through GitHub\cite{repo}\cite{github}, played an important role in maintaining progress throughout the development period. 
+The structured division of responsibilities ensured that there was always active development taking place across different components of the system, which helped sustain momentum even during more demanding phases of the project. 
+That said, coordinating a project of this complexity as a two-person team introduced its own difficulties, and periods of reduced availability due to health-related absences required additional effort to recover through overtime work outside of scheduled development time.
+
+Nevertheless we pursued through all the trouble.
 \newpage
 \subsection{Development issues}
 Several technical challenges emerged during development that had a measurable impact on both workflow efficiency and overall time management.
 
-A recurring difficulty involved the frontend styling approach. Rather than establishing a consistent and structured CSS strategy from the beginning, styling decisions were made incrementally as development progressed. This led to inconsistencies across components and required significant refactoring effort later in the project, as design rules that should have been centralized were instead scattered across individual files. A more systematic approach to styling architecture from the outset would have reduced this overhead considerably.
+A recurring difficulty involved the frontend styling approach. 
+Rather than establishing a consistent and structured CSS strategy from the beginning, styling decisions were made incrementally as development progressed. 
+This led to inconsistencies across components and required significant refactoring effort later in the project, as design rules that should have been centralized were instead scattered across individual files. 
+A more systematic approach to styling from the get go would have reduced this overhead considerably.
 
 The integration of the AI assistant presented another major technical challenge. The implementation required stable communication between the JavaScript-based frontend and a Python-based backend process, a cross-environment dependency that introduced recurring issues including connection errors, execution inconsistencies, and timeout-related server crashes. Resolving these problems demanded substantial debugging effort and careful architectural restructuring before reliable inter-process communication could be achieved.
 
-Perhaps the most pervasive challenge throughout the project was the requirement to make every component of the workbench compatible with touch input. This constraint influenced design decisions across all applications and frequently required unconventional solutions. The Byte Invaders game serves as a clear example: standard swipe-based directional input was insufficient for continuous movement control, necessitating the development of persistent on-screen touch buttons as an alternative interaction model. Ensuring consistent and intuitive touch behavior across applications with fundamentally different interaction requirements proved to be one of the most time-consuming aspects of the project.
+Perhaps the most pervasive challenge throughout the project was the requirement to make every component of the workbench compatible with touch input. 
+This constraint influenced design decisions across all applications and frequently required unconventional solutions. 
+The Byte Invaders game serves as a clear example: standard swipe-based directional input was insufficient for continuous movement control, necessitating the development of persistent on-screen touch buttons as an alternative interaction model. 
 
-Portability and cross-platform compatibility introduced additional complexity throughout development. Ensuring stable and consistent behavior across Windows, macOS, and Linux required careful attention to platform-specific differences in path handling, process spawning, and rendering behavior, as discussed in detail in the Technical Specifications chapter.
+Portability and cross-platform compatibility introduced additional complexity throughout development. 
+Ensuring stable and consistent behavior across Windows, macOS, and Linux required careful attention to platform-specific differences in path handling, process spawning, and rendering behavior, as discussed in detail in the Technical Specifications chapter.
 
-Version control and project management through GitHub, while essential to the development process, also presented difficulties. As the project grew in scope, the team maintained both a repository and a project board. Insufficient attention to branch management in the early phases led to long-lived development branches that diverged significantly over time, resulting in complex and occasionally problematic manual merge operations. These issues reflect a maturation in the team's approach to collaborative development that occurred progressively throughout the project.
+Version control and project management through GitHub, while essential to the development process, also presented difficulties. 
+As the project grew in scope, the team maintained both a repository and a project board. 
+Insufficient attention to branch management in the early phases led to long-lived development branches that diverged significantly over time, resulting in complex and occasionally problematic manual merge operations. 
+These issues lead to maturation in the team's approach to collaborative development that occurred progressively throughout the project.
+
 \newpage
 \subsection{Review of the project realization}
 Reflecting on the development process as a whole, a number of the challenges encountered can be attributed to limited prior experience with the chosen technology stack. The learning curve associated with JavaScript, React, CSS, and Electron's cross-process communication model contributed to inefficiencies during the earlier phases of the project, where architectural decisions were sometimes made without a full understanding of their downstream consequences. In hindsight, a more thorough evaluation of these decisions — particularly regarding frontend structure, CSS architecture, and AI integration — during the planning phase would have reduced the amount of refactoring required later.
 
-The GitHub workflow issues similarly reflect this maturation process. As the project grew in complexity, the team's approach to branch management and merging strategy evolved considerably, though not always without friction. The difficulties encountered with long-lived branches and manual merges were ultimately a consequence of both limited experience with collaborative version control at this scale and an initial underestimation of the discipline required to manage a project of this scope effectively through GitHub.
+The GitHub workflow issues similarly reflect this maturation process. 
+As the project grew in complexity, the team's approach to branch management and merging strategy evolved considerably, though not always without friction. 
+Since first encountering these problems, we shifted towards shorter lived development branches and frequent merging of the different development branches. 
+The difficulties encountered with long-lived branches and manual merges were ultimately a consequence of both limited experience with collaborative version control at this scale and an initial underestimation of the discipline required to manage a project of this scope effectively through GitHub.
 
-Despite these setbacks, the iterative development methodology proved to be well-suited to the project's needs. The ability to implement, evaluate, and refine components in successive cycles allowed the team to recover from technical obstacles without compromising the overall direction of the project. The workbench as delivered meets the functional and architectural requirements defined at the outset, and the development process as a whole represents a substantial gain in practical engineering experience across system architecture, cross-platform development, and project management.
-Nevertheless, the iterative development approach allowed continuous refinement of the system. Despite setbacks, the project objectives were achieved, and the final workbench fulfills the defined functional and architectural requirements. The development process therefore represents not only a technical achievement but also a substantial learning experience in project planning and system design.
+Despite these setbacks, the iterative development methodology proved to be well-suited to the project's needs. 
+The ability to implement, evaluate, and refine components in successive cycles allowed the team to recover from technical obstacles without compromising the overall direction of the project. 
+The workbench as delivered meets our functional and architectural requirements, and the development process as a whole represents a substantial gain in practical engineering experience across system architecture, cross-platform development, and project management.
 
 \newpage
 \subsection{Recommendations for further improvements}
 The current implementation of the workbench provides a solid and extensible foundation, and several directions for future development have been identified based on the experience gained during this project.
 
-The theming system currently applies selected color schemes only to the application icons and home screen background. Extending theme support to the interior of individual applications would produce a significantly more cohesive visual experience and bring the design language into full consistency across the platform.
+The theming system currently applies selected color schemes only to the application icons and home screen background. 
+Extending theme support to the interior of individual applications would produce a significantly more consistent visual experience and bring the design language into full consistency across the platform.
+This also means that, applications that are not styled with CSS, as mentioned in section \textit{Evolution of the design}, need to be converted to using the CSS style sheet first. 
 
-The AI assistant, while functional, remains constrained by the performance limitations inherent to running a large language model locally on consumer hardware. A more capable and responsive AI integration would substantially improve the usability and perceived modernity of the platform. Future development in this area should preserve the local-first processing approach to maintain the data security guarantees established in the current implementation. It is worth noting that an improved version of the AI assistant is already in private development at the time of writing.
+\begin{notebox}
+We would recommend to not change the logical part of the source code when editing the design. 
+Furthermore, introducing CSS to applications which are stlyed using other methods like html could resolve in some problems, so this could take some time. 
+We want to note that changes like this are in the works.   
+\end{notebox}
 
-General system performance represents another area for improvement. On mid-tier hardware the workbench operates satisfactorily, but noticeably slower than on 
-higher-specification machines. 
-Performance differences between operating systems — particularly between Windows and macOS — were also observed during development. Future versions of React and npm may address some of these differences, and targeted rewrites of performance-critical components could further improve responsiveness across hardware configurations.
+Organization of the workbench´s homescreen could also help with readability and to preserve a good overview of the broad range of applications offered to the user by the workbench. 
+This could be done by adding filters which work by sorting applications into classes like "productivity", "games" and so on. 
+Other than that, simple sorting mechanisms could be added too. 
 
-The hard-coded executable paths used to launch external applications such as OrcaSlicer, FreeCAD, and Bambu Studio represent one of the most significant practical limitations of the current implementation. Any device that installs these applications to a non-standard directory will encounter launch failures. This could be addressed by implementing an automatic path detection mechanism or providing a user-configurable path settings interface.
+The AI assistant, while functional, remains constrained by the performance limitations inherent to running a large language model locally on consumer hardware. 
+A more capable and responsive AI integration would substantially improve the usability and perceived modernity of the platform. 
+Future development in this area should preserve the local-first processing approach to maintain the data security guarantees established in the current implementation. 
+It is worth noting that an improved version of the AI assistant is already in development at the time of writing this thesis and is almost established.
 
-The game collection's current architecture requires manual changes to both the application routing logic and the collection registry whenever a new game is added. As the collection grows, this approach becomes increasingly fragile. A self-registering plugin system — in which each game declares its own metadata and the collection assembles itself dynamically at runtime — would be considerably more maintainable and scalable. Related to this, persistent score storage is entirely absent from the current game implementations. Given that the workbench already runs within Electron and has access to the local filesystem, implementing high-score persistence via a local JSON file would be straightforward and would meaningfully improve the replay value of the game collection.
+General system performance represents another area for improvement. 
+\newline On mid-tier hardware the workbench operates satisfactorily, but noticeably slower than on higher-specification machines. 
+Performance differences between operating systems — particularly between Windows and macOS — were also observed during development. 
+Future versions of React and npm may address some of these differences, and targeted rewrites of performance-critical components could improve responsiveness across hardware configurations.
+
+The hard-coded executable paths used to launch external applications such as OrcaSlicer, FreeCAD, and Bambu Studio represent one of the most significant practical limitations of the current implementation. 
+Any device that installs these applications to a non-standard directory will encounter launch failures. 
+This could be addressed by implementing an automatic path detection mechanism or providing user-configurable paths without editing the source code.
+As previously mentioned in section \textit{Expandability through app integrations}, the functionalty of these external applications has not been tested. 
 
 \newpage
+What we know though is that, on Linux, FreeCAD and the other named applications are typically installed via the system package manager 
+(e.g.\ \texttt{apt}, \texttt{dnf}, or \texttt{pacman}) and are registered 
+as a system-wide command. The applications therefore should launch directly 
+by name — \texttt{freecad} or \texttt{FreeCAD} — without resolving a 
+hard-coded path.
+
+The game collection's current architecture requires manual changes to both the application routing logic and the collection registry whenever a new game is added. 
+As the collection grows, this approach becomes increasingly fragile. 
+A self-registering plugin system — in which each game declares its own metadata and the collection assembles itself dynamically at runtime — would be considerably more maintainable and scalable. 
+Related to this, persistent storage is entirely absent from the current game implementations. 
+Given that the workbench already runs within Electron and has access to the local filesystem, implementing high-score persistence via a local JSON file would be straightforward and would meaningfully improve the value of the game collection.
+
 The 3D Viewer's export functionality is currently limited to the GLTF format regardless of the original input format. Since STL is the dominant format in the 3D printing workflow the workbench is designed to support, users who import STL files and wish to re-export them after applying transformations are forced to convert the output before it can be used in a slicer. Supporting STL as an export format — or preserving the original input format where possible — would make the viewer a considerably more practical component of the 3D printing workflow.
 
 Furthermore, the gradual memory leak identified in the 3D Viewer, caused by the 
@@ -1537,17 +1654,9 @@ models in a single session.
 Finally, the integrations with OrcaSlicer, FreeCAD, and Bambu Studio are currently unidirectional — the workbench can launch these applications but has no awareness of what occurs within them. Deeper bidirectional integration, such as monitoring a known output directory for newly exported files and surfacing them as shortcuts within the 3D Viewer, or reading slicer log output to surface status information within the workbench interface, would strengthen the platform's identity as a genuine unified hub rather than simply a launcher for external tools.
 
 \newpage
-\section{Directories}
-\subsection{List of illustrations}    
-
 \listoffigures
 
-\subsection{About style and form}
-As you may have noticed this diploma thesis leans heavy towards the technical documentation of our project while trying to keep a simplistic style and form which are meant to help the user understand this thesis better. 
-This is achieved through technical explanations kept simple and short at most, helping to boost readability and understandibility. 
-
 \newpage
-\section{Bibliography}
 
 \begin{thebibliography}{99}
 % Allgemein
