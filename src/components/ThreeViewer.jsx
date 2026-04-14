@@ -292,7 +292,7 @@ export default function ThreeViewer({ onBack }) {
             </div>
 
             {/* 3D-Canvas */}
-            <Canvas camera={{ position: [3, 3, 3], fov: 60 }} className="w-full h-full absolute top-0 left-0">
+            <Canvas camera={{ position: [100, 100, 100], fov: 80}} className="w-full h-full absolute top-0 left-0">
                 <ambientLight intensity={0.5} />
                 <pointLight position={[10, 10, 10]} />
 
