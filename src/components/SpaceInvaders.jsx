@@ -17,15 +17,19 @@ const styleButton = {
     cursor: "pointer",
     transform: "translateY(0)",
     transition:
-        "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease",
+        "transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease, color 150ms ease, border-color 150ms ease",
 };
 
 export default function SpaceInvaders({ onBack, onHome }) {
     const canvasRef = useRef(null);
+    const animationRef = useRef(null);
+
     const [isGameOver, setIsGameOver] = useState(false);
     const [score, setScore] = useState(0);
     const [level, setLevel] = useState(1);
+    const [isLightMode, setIsLightMode] = useState(false);
 
+    const themeRef = useRef(false);
     const scoreRef = useRef(0);
     const levelRef = useRef(1);
     const player = useRef({ x: 375, y: 560, w: 50, h: 20 });
@@ -34,110 +38,52 @@ export default function SpaceInvaders({ onBack, onHome }) {
     const enemyDir = useRef(1);
     const enemySpeed = useRef(1);
     const lastShot = useRef(0);
-    const animationRef = useRef(null);
     const keys = useRef({ left: false, right: false, shoot: false });
     const touchInput = useRef({ move: 0, shooting: false });
 
     const bulletSpeed = 8;
     const shootCooldown = 300;
 
-    const layoutStyles = {
-        root: {
-            position: "fixed",
-            inset: 0,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "black",
-            color: "white",
-            fontFamily:
-                "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-            zIndex: 50,
-        },
-        backButton: {
-            ...styleButton,
-            position: "absolute",
-            top: 16,
-            left: 16,
-        },
-        title: {
-            fontSize: "28px",
-            fontWeight: "bold",
-            color: "#22d3ee",
-            marginBottom: 16,
-            textShadow: "0 0 6px #22d3ee",
-        },
-        canvas: {
-            border: "1px solid #22d3ee",
-            borderRadius: 12,
-            backgroundColor: "black",
-            touchAction: "none",
-        },
-        infoText: {
-            marginTop: 24,
-            color: "#9ca3af",
-            fontSize: "13px",
-        },
-        touchBarWrapper: {
-            marginTop: 32,
-            width: 800,
-            display: "flex",
-            justifyContent: "center",
-            userSelect: "none",
-        },
-        touchBarInner: {
-            display: "flex",
-            gap: 24,
-            width: "100%",
-            maxWidth: 820,
-        },
-        touchButton: {
-            ...styleButton,
-            flex: 1,
-            justifyContent: "center",
-        },
-        touchButtonShoot: {
-            ...styleButton,
-            flex: 1,
-            justifyContent: "center",
-            backgroundColor: "#b91c1c",
-            border: "1px solid #b91c1c",
-        },
-        overlay: {
-            position: "absolute",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.9)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "white",
-        },
-        overlayTitle: {
-            fontSize: "36px",
-            fontWeight: "bold",
-            marginBottom: 24,
-        },
-        overlayScore: {
-            fontSize: "18px",
-            marginBottom: 16,
-        },
-        overlayButton: {
-            ...styleButton,
-            marginBottom: 8,
-        },
-        overlayButtonGray: {
-            ...styleButton,
-            marginBottom: 8,
-            backgroundColor: "#4b5563",
-            border: "1px solid #4b5563",
-        },
-        overlayButtonRed: {
-            ...styleButton,
-            backgroundColor: "#b91c1c",
-            border: "1px solid #b91c1c",
-        },
+    useEffect(() => {
+        themeRef.current = isLightMode;
+    }, [isLightMode]);
+
+    const theme = isLightMode
+        ? {
+            appBg: "#ffffff",
+            canvasBg: "#ffffff",
+            overlayBg: "rgba(255,255,255,0.92)",
+            text: "#0f172a",
+            mutedText: "#334155",
+            accent: "#0891b2",
+            accentGlow: "none",
+            border: "#0891b2",
+            player: "#06b6d4",
+            bullet: "#dc2626",
+            enemy: "#16a34a",
+            buttonText: "#0f172a",
+            buttonBg: "rgba(255,255,255,0.75)",
+            buttonBorder: "rgba(15,23,42,0.25)",
+        }
+        : {
+            appBg: "#000000",
+            canvasBg: "#000000",
+            overlayBg: "rgba(0,0,0,0.9)",
+            text: "#ffffff",
+            mutedText: "#9ca3af",
+            accent: "#22d3ee",
+            accentGlow: "0 0 6px #22d3ee",
+            border: "#22d3ee",
+            player: "#22d3ee",
+            bullet: "#ef4444",
+            enemy: "#00ff00",
+            buttonText: "#e5e7eb",
+            buttonBg: "rgba(2,6,23,0.6)",
+            buttonBorder: "rgba(71,85,105,0.7)",
+        };
+
+    const toggleBackground = () => {
+        setIsLightMode((prev) => !prev);
     };
 
     const spawnEnemies = () => {
@@ -148,6 +94,7 @@ export default function SpaceInvaders({ onBack, onHome }) {
         const spacingY = 50;
         const offsetX = 80;
         const offsetY = 60;
+
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < cols; x++) {
                 newEnemies.push({
@@ -159,6 +106,7 @@ export default function SpaceInvaders({ onBack, onHome }) {
                 });
             }
         }
+
         enemies.current = newEnemies;
     };
 
@@ -172,22 +120,30 @@ export default function SpaceInvaders({ onBack, onHome }) {
         levelRef.current = 1;
         setScore(0);
         setLevel(1);
+        setIsGameOver(false);
         touchInput.current = { move: 0, shooting: false };
+        lastShot.current = 0;
     };
 
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === "ArrowLeft" || e.key === "a") keys.current.left = true;
             if (e.key === "ArrowRight" || e.key === "d") keys.current.right = true;
-            if (e.key === " ") keys.current.shoot = true;
+            if (e.key === " ") {
+                e.preventDefault();
+                keys.current.shoot = true;
+            }
         };
+
         const handleKeyUp = (e) => {
             if (e.key === "ArrowLeft" || e.key === "a") keys.current.left = false;
             if (e.key === "ArrowRight" || e.key === "d") keys.current.right = false;
             if (e.key === " ") keys.current.shoot = false;
         };
+
         window.addEventListener("keydown", handleKeyDown);
         window.addEventListener("keyup", handleKeyUp);
+
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
             window.removeEventListener("keyup", handleKeyUp);
@@ -197,9 +153,25 @@ export default function SpaceInvaders({ onBack, onHome }) {
     const gameLoop = (timestamp) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
-        const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "black";
+        const ctx = canvas.getContext("2d");
+        const activeTheme = themeRef.current
+            ? {
+                canvasBg: "#ffffff",
+                text: "#0f172a",
+                player: "#06b6d4",
+                bullet: "#dc2626",
+                enemy: "#16a34a",
+            }
+            : {
+                canvasBg: "#000000",
+                text: "#ffffff",
+                player: "#22d3ee",
+                bullet: "#ef4444",
+                enemy: "#00ff00",
+            };
+
+        ctx.fillStyle = activeTheme.canvasBg;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         const p = player.current;
@@ -231,18 +203,19 @@ export default function SpaceInvaders({ onBack, onHome }) {
             .filter((b) => b.y > 0);
 
         let shiftDown = false;
-        for (let e of enemies.current) {
+        for (const e of enemies.current) {
             if (!e.alive) continue;
             e.x += enemyDir.current * enemySpeed.current;
             if (e.x < 10 || e.x + e.w > 790) shiftDown = true;
         }
+
         if (shiftDown) {
             enemyDir.current *= -1;
-            for (let e of enemies.current) e.y += 20;
+            for (const e of enemies.current) e.y += 20;
         }
 
-        for (let b of bullets.current) {
-            for (let e of enemies.current) {
+        for (const b of bullets.current) {
+            for (const e of enemies.current) {
                 if (!e.alive) continue;
                 if (
                     b.x < e.x + e.w &&
@@ -257,9 +230,10 @@ export default function SpaceInvaders({ onBack, onHome }) {
                 }
             }
         }
+
         bullets.current = bullets.current.filter((b) => !b.hit);
 
-        for (let e of enemies.current) {
+        for (const e of enemies.current) {
             if (!e.alive) continue;
             if (
                 e.x < p.x + p.w &&
@@ -280,16 +254,20 @@ export default function SpaceInvaders({ onBack, onHome }) {
             spawnEnemies();
         }
 
-        ctx.fillStyle = "cyan";
+        ctx.fillStyle = activeTheme.player;
         ctx.fillRect(p.x, p.y, p.w, p.h);
 
-        ctx.fillStyle = "red";
-        for (let b of bullets.current) ctx.fillRect(b.x, b.y, b.w, b.h);
+        ctx.fillStyle = activeTheme.bullet;
+        for (const b of bullets.current) {
+            ctx.fillRect(b.x, b.y, b.w, b.h);
+        }
 
-        ctx.fillStyle = "lime";
-        for (let e of enemies.current) if (e.alive) ctx.fillRect(e.x, e.y, e.w, e.h);
+        ctx.fillStyle = activeTheme.enemy;
+        for (const e of enemies.current) {
+            if (e.alive) ctx.fillRect(e.x, e.y, e.w, e.h);
+        }
 
-        ctx.fillStyle = "white";
+        ctx.fillStyle = activeTheme.text;
         ctx.font = "16px Orbitron, monospace";
         ctx.fillText(`Score: ${scoreRef.current}`, 680, 30);
         ctx.fillText(`Level: ${levelRef.current}`, 680, 50);
@@ -304,7 +282,6 @@ export default function SpaceInvaders({ onBack, onHome }) {
 
     const handleRestart = () => {
         resetGame();
-        setIsGameOver(false);
         requestAnimationFrame(() => startGame());
     };
 
@@ -314,10 +291,138 @@ export default function SpaceInvaders({ onBack, onHome }) {
         return () => cancelAnimationFrame(animationRef.current);
     }, []);
 
+    const layoutStyles = {
+        root: {
+            position: "fixed",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: theme.appBg,
+            color: theme.text,
+            fontFamily:
+                "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+            zIndex: 50,
+            transition: "background-color 180ms ease, color 180ms ease",
+        },
+        backButton: {
+            ...styleButton,
+            position: "absolute",
+            top: 16,
+            left: 16,
+            backgroundColor: theme.buttonBg,
+            border: `1px solid ${theme.buttonBorder}`,
+            color: theme.buttonText,
+        },
+        toggleButton: {
+            ...styleButton,
+            position: "absolute",
+            top: 16,
+            right: 16,
+            minWidth: 56,
+            backgroundColor: theme.buttonBg,
+            border: `1px solid ${theme.buttonBorder}`,
+            color: theme.buttonText,
+        },
+        title: {
+            fontSize: "28px",
+            fontWeight: "bold",
+            color: theme.accent,
+            marginBottom: 16,
+            textShadow: theme.accentGlow,
+        },
+        canvas: {
+            border: `1px solid ${theme.border}`,
+            borderRadius: 12,
+            backgroundColor: theme.canvasBg,
+            touchAction: "none",
+            transition: "background-color 180ms ease, border-color 180ms ease",
+        },
+        infoText: {
+            marginTop: 24,
+            color: theme.mutedText,
+            fontSize: "13px",
+        },
+        touchBarWrapper: {
+            marginTop: 32,
+            width: 800,
+            display: "flex",
+            justifyContent: "center",
+            userSelect: "none",
+        },
+        touchBarInner: {
+            display: "flex",
+            gap: 24,
+            width: "100%",
+            maxWidth: 820,
+        },
+        touchButton: {
+            ...styleButton,
+            flex: 1,
+            justifyContent: "center",
+            backgroundColor: theme.buttonBg,
+            border: `1px solid ${theme.buttonBorder}`,
+            color: theme.buttonText,
+        },
+        touchButtonShoot: {
+            ...styleButton,
+            flex: 1,
+            justifyContent: "center",
+            backgroundColor: "#b91c1c",
+            border: "1px solid #b91c1c",
+            color: "#ffffff",
+        },
+        overlay: {
+            position: "absolute",
+            inset: 0,
+            backgroundColor: theme.overlayBg,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            color: theme.text,
+            transition: "background-color 180ms ease, color 180ms ease",
+        },
+        overlayTitle: {
+            fontSize: "36px",
+            fontWeight: "bold",
+            marginBottom: 24,
+        },
+        overlayScore: {
+            fontSize: "18px",
+            marginBottom: 16,
+        },
+        overlayButton: {
+            ...styleButton,
+            marginBottom: 8,
+            backgroundColor: theme.buttonBg,
+            border: `1px solid ${theme.buttonBorder}`,
+            color: theme.buttonText,
+        },
+        overlayButtonGray: {
+            ...styleButton,
+            marginBottom: 8,
+            backgroundColor: "#4b5563",
+            border: "1px solid #4b5563",
+            color: "#ffffff",
+        },
+        overlayButtonRed: {
+            ...styleButton,
+            backgroundColor: "#b91c1c",
+            border: "1px solid #b91c1c",
+            color: "#ffffff",
+        },
+    };
+
     return (
         <div style={layoutStyles.root}>
             <button onClick={onBack} style={layoutStyles.backButton}>
                 ⬅ Back
+            </button>
+
+            <button onClick={toggleBackground} style={layoutStyles.toggleButton}>
+                {isLightMode ? "🌙" : "☀️"}
             </button>
 
             <h1 style={layoutStyles.title}>Byte Invaders</h1>
@@ -349,6 +454,7 @@ export default function SpaceInvaders({ onBack, onHome }) {
                     >
                         ◀ Links
                     </button>
+
                     <button
                         style={layoutStyles.touchButton}
                         onTouchStart={(e) => {
@@ -362,6 +468,7 @@ export default function SpaceInvaders({ onBack, onHome }) {
                     >
                         Rechts ▶
                     </button>
+
                     <button
                         style={layoutStyles.touchButtonShoot}
                         onTouchStart={(e) => {
@@ -384,22 +491,16 @@ export default function SpaceInvaders({ onBack, onHome }) {
                     <p style={layoutStyles.overlayScore}>
                         Score: {scoreRef.current}
                     </p>
-                    <button
-                        onClick={handleRestart}
-                        style={layoutStyles.overlayButton}
-                    >
+
+                    <button onClick={handleRestart} style={layoutStyles.overlayButton}>
                         Restart
                     </button>
-                    <button
-                        onClick={onBack}
-                        style={layoutStyles.overlayButtonGray}
-                    >
+
+                    <button onClick={onBack} style={layoutStyles.overlayButtonGray}>
                         Game Collection
                     </button>
-                    <button
-                        onClick={onHome}
-                        style={layoutStyles.overlayButtonRed}
-                    >
+
+                    <button onClick={onHome} style={layoutStyles.overlayButtonRed}>
                         Home Menu
                     </button>
                 </div>
