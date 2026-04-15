@@ -983,6 +983,18 @@ The execution process is isolated from the renderer process, preserving applicat
 This separation between interface and execution logic reinforces modularity and prevents frontend instability from propagating into system-level operations.
 
 \newpage
+\paragraph{Styling}\mbox{} \\
+In terms of styling, the "Text and code editor" was one of the few applications to not support the universal design language provided by our style sheet. 
+This meant that it looked out of order when compared to the other applications in the workbench. 
+That is why Noah, on the 15th of April 2026, decided to overhaul the editor’s design, switching to CSS for style and colouring. 
+As can be seen in the pictures in this section, the new style fits perfectly with applications like the markdwon editor or the music library. 
+All of the changes were done with CSS and to put it simply, what we did was: 
+\begin{itemize}
+  \item Move the canvas in which the text editing happens to the right, centered in the editor shell. 
+  \item Move the buttons to the top and change their style. 
+  \item While keeping the list of files on the left, but changing their style as well. 
+\end{itemize}
+
 \paragraph{Stability, safety, and resource control}\mbox{} \\
 Allowing arbitrary code execution within a desktop environment introduces potential risks regarding performance and system integrity. To address these concerns, multiple control mechanisms were implemented.
 Execution time is limited through a defined timeout mechanism. If a process exceeds the allowed runtime, it is terminated automatically which will be shown to the user via a pop- up window. 
@@ -1005,7 +1017,13 @@ Language support is also something to think about, because the currently support
   \label{fig:IDE and plain text editor}
 \end{figure}
 
-% Notiz: Weißen Hintergrung verwenden
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{Running_python.png}
+  \caption{Text- and code- editor running a python script}
+  \label{fig:IDE and plain text editor 2}
+\end{figure}
+
 
 \newpage
 \subsubsection{Markdown editor}
@@ -1284,7 +1302,7 @@ The second version introduced a wave system, escalating difficulty, a score coun
 When all enemies in a formation have been destroyed, a new full formation spawns immediately, providing continuous gameplay. The horizontal movement speed of the enemy formation increases by 0.5 per completed wave, meaning each successive wave is perceptibly faster and more demanding. Enemy speed is stored in a useRef so that it accumulates reliably across waves without being inadvertently reset by React re-renders. 
 
 The score awards 100 points per destroyed enemy and is maintained using two parallel variables: a useRef for synchronous, always-current access inside the game loop, and a useState variable for triggering UI updates. This dual ref/state approach was necessary because requestAnimationFrame callbacks close over the state value at the time of their creation, meaning a useState-only approach would produce stale score readings within the loop. 
-
+\newpage
 Game over is triggered when any enemy reaches the player's vertical position, at which point the loop terminates and a semi-transparent overlay is rendered showing the final score and three navigation options: Restart, back to Game Collection, and back to the workbench home screen. A dedicated resetGame() function handles a clean restart by restoring all mutable references and state variables to their initial values, including player position, bullet array, enemy formation, movement speed, and score.
 
 In terms of styling, we opted to render both players and the enemys with rectangular shapes, filled with colour. The player is coloured blue while enemys are coloured green. 
@@ -1295,6 +1313,12 @@ In terms of styling, we opted to render both players and the enemys with rectang
   \caption{Byte Invaders Game}
   \label{fig:Byte Invaders Game}
 \end{figure}
+
+\begin{notebox}
+  As you can see in the image above, the background in every game is set to white to improve readability.
+  This however, is not the default, as the default background color for every game is black. 
+  In each game, there is a button which switches between the light and the dark mode. 
+\end{notebox}
 
 
 \newpage
