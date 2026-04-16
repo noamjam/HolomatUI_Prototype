@@ -201,7 +201,7 @@ No changes to the core architecture are required. Anyone with basic JavaScript a
 
 **Noah Maringer** and **Alexander Stenitzer** 
 
-##License
+## License
 
 **GNU APGLv3 License**
 **Copyright (C) 2026 Noah Maringer and Alexander Stenitzer** 
