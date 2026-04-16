@@ -199,7 +199,11 @@ No changes to the core architecture are required. Anyone with basic JavaScript a
 
 ## Authors
 
-**Noah Maringer** and **Alexander Stenitzer** — 5BHEL, HTBLuVA Graz-Gösting  
-Diploma Thesis 2025/26 — advised by Professor Gerald Senarclens de Grancy
+**Noah Maringer** and **Alexander Stenitzer** 
+
+## License
+
+**GNU APGLv3 License**
+**Copyright (C) 2026 Noah Maringer and Alexander Stenitzer** 
 
 
