@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import TextEditor from "./TextEditor.jsx";
 
-const STORAGE_KEY =  "vscodeLayoutFiles";
+const STORAGE_KEY = "vscodeLayoutFiles";
 
 const languageByExt = (ext) => {
     switch (ext) {
@@ -23,10 +23,8 @@ function VSCodeLayout({ onBack }) {
     const [activeFileId, setActiveFileId] = useState(null);
     const [nextId, setNextId] = useState(1);
     const [newFileExt, setNewFileExt] = useState("txt");
-
     const [runOutput, setRunOutput] = useState("");
     const [showRunOutput, setShowRunOutput] = useState(false);
-
     const fileInputRef = useRef(null);
 
     const activeFile = files.find((f) => f.id === activeFileId) || null;
@@ -38,9 +36,7 @@ function VSCodeLayout({ onBack }) {
             const parsed = JSON.parse(raw);
             if (Array.isArray(parsed.files) && parsed.files.length > 0) {
                 setFiles(parsed.files);
-                setActiveFileId(
-                    parsed.activeFileId ?? parsed.files[0].id
-                );
+                setActiveFileId(parsed.activeFileId ?? parsed.files[0].id);
                 setNextId(parsed.nextId ?? parsed.files.length + 1);
             }
         } catch (e) {
@@ -48,20 +44,15 @@ function VSCodeLayout({ onBack }) {
         }
     }, []);
 
-    // ---- persist session whenever files / active change ----
     useEffect(() => {
-        const payload = {
-            files,
-            activeFileId,
-            nextId,
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({ files, activeFileId, nextId })
+        );
     }, [files, activeFileId, nextId]);
 
-    // ---- Run code, show popup output ----
     const runCode = async () => {
         if (!activeFile) return;
-
         try {
             const res = await fetch("http://127.0.0.1:5000/api/run", {
                 method: "POST",
@@ -74,23 +65,17 @@ function VSCodeLayout({ onBack }) {
             });
 
             const contentType = res.headers.get("content-type") || "";
-
-            // Wenn keine JSON-Antwort oder HTTP-Fehler -> als Text anzeigen
             if (!res.ok || !contentType.includes("application/json")) {
                 const text = await res.text().catch(() => "");
-                const msg =
-                    `Run failed (status ${res.status})\n` +
-                    (text ? text : "No body / non-JSON response");
-                console.error("Run error response:", msg);
-                setRunOutput(msg);
+                setRunOutput(
+                    `Run failed (status ${res.status})\n${text || "No body / non-JSON response"}`
+                );
                 setShowRunOutput(true);
                 return;
             }
 
-            const data = await res.json(); // hier ist sicher JSON
-            setRunOutput(
-                data.output ?? data.error ?? "No output (empty JSON response)"
-            );
+            const data = await res.json();
+            setRunOutput(data.output ?? data.error ?? "No output (empty JSON response)");
             setShowRunOutput(true);
         } catch (err) {
             console.error("Run error", err);
@@ -99,16 +84,12 @@ function VSCodeLayout({ onBack }) {
         }
     };
 
-    const handleFileClick = (id) => {
-        setActiveFileId(id);
-    };
+    const handleFileClick = (id) => setActiveFileId(id);
 
     const handleEditorContentChange = (newContent) => {
         setFiles((prev) =>
             prev.map((file) =>
-                file.id === activeFileId
-                    ? { ...file, content: newContent }
-                    : file
+                file.id === activeFileId ? { ...file, content: newContent } : file
             )
         );
     };
@@ -117,7 +98,6 @@ function VSCodeLayout({ onBack }) {
         if (onBack) onBack();
     };
 
-    // ----- language handling -----
     const languages = [
         { id: "plaintext", label: "Plain text" },
         { id: "javascript", label: "JavaScript" },
@@ -130,14 +110,11 @@ function VSCodeLayout({ onBack }) {
         if (!activeFile) return;
         setFiles((prev) =>
             prev.map((file) =>
-                file.id === activeFileId
-                    ? { ...file, language: langId }
-                    : file
+                file.id === activeFileId ? { ...file, language: langId } : file
             )
         );
     };
 
-    // ----- new file handling -----
     const newFileOptions = [
         { ext: "txt", label: "Text (.txt)" },
         { ext: "js", label: "JavaScript (.js)" },
@@ -161,11 +138,7 @@ function VSCodeLayout({ onBack }) {
         setNextId(id + 1);
     };
 
-    // ----- open/save handling -----
-    const handleOpenClick = () => {
-        // Here we use the OS picker – this is for "Open" only
-        fileInputRef.current?.click();
-    };
+    const handleOpenClick = () => fileInputRef.current?.click();
 
     const handleLoadedFile = (event) => {
         const fileObj = event.target.files?.[0];
@@ -176,8 +149,8 @@ function VSCodeLayout({ onBack }) {
             const text = e.target?.result?.toString() ?? "";
             const ext = (fileObj.name.split(".").pop() || "txt").toLowerCase();
             const lang = languageByExt(ext);
-
             const id = nextId;
+
             const newFile = {
                 id,
                 name: fileObj.name,
@@ -189,12 +162,12 @@ function VSCodeLayout({ onBack }) {
             setActiveFileId(id);
             setNextId(id + 1);
         };
+
         reader.readAsText(fileObj, "utf-8");
         event.target.value = "";
     };
 
-    const closeFile = () =>
-    {
+    const closeFile = () => {
         if (!activeFile) return;
 
         setFiles((prev) => {
@@ -203,23 +176,20 @@ function VSCodeLayout({ onBack }) {
 
             const newFiles = prev.filter((f) => f.id !== activeFileId);
 
-            // pick next active file: prefer the one to the left, otherwise first
             if (newFiles.length === 0) {
                 setActiveFileId(null);
             } else {
-                const next =
-                    newFiles[idx - 1] || newFiles[0];
+                const next = newFiles[idx - 1] || newFiles[0];
                 setActiveFileId(next.id);
             }
 
             return newFiles;
         });
-    }
+    };
 
-
-    // "Save" bedeutet hier: aktuelle Version als Datei herunterladen
     const handleSaveActiveFile = useCallback(() => {
         if (!activeFile) return;
+
         const blob = new Blob([activeFile.content || ""], {
             type: "text/plain;charset=utf-8",
         });
@@ -235,319 +205,124 @@ function VSCodeLayout({ onBack }) {
         URL.revokeObjectURL(url);
     }, [activeFile]);
 
-    // ----- keyboard shortcuts (Ctrl/Cmd+O, Ctrl/Cmd+S) -----
     useEffect(() => {
         const handleKey = (e) => {
             const key = e.key.toLowerCase();
             if ((e.ctrlKey || e.metaKey) && key === "s") {
                 e.preventDefault();
-                handleSaveActiveFile(); // überschreibt direkt die "Datei" unter gleichem Namen
+                handleSaveActiveFile();
             }
             if ((e.ctrlKey || e.metaKey) && key === "o") {
                 e.preventDefault();
                 handleOpenClick();
             }
         };
+
         window.addEventListener("keydown", handleKey);
         return () => window.removeEventListener("keydown", handleKey);
     }, [handleSaveActiveFile]);
 
-    // ----- styles -----
-    const buttonSmall = {
-        padding: "4px 8px",
-        fontSize: "12px",
-        borderRadius: "6px",
-        border: "1px solid #374151",
-        backgroundColor: "#111827",
-        color: "#e5e7eb",
-        cursor: "pointer",
-        whiteSpace: "nowrap",
-    };
-
     return (
-        <div
-            style={{
-                display: "flex",
-                height: "100vh",
-                width: "100vw",
-                overflow: "hidden",
-                backgroundColor: "#020617",
-                color: "#e5e7eb",
-                fontFamily:
-                    "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-            }}
-        >
-            {/* Sidebar / Explorer */}
-            <div
-                style={{
-                    width: "260px",
-                    backgroundColor: "#0b1120",
-                    borderRight: "1px solid #1f2937",
-                    display: "flex",
-                    flexDirection: "column",
-                }}
-            >
-                {/* Run button */}
-                <button
-                    onClick={runCode}
-                    style={{
-                        padding: "4px 8px",
-                        fontSize: "12px",
-                        borderRadius: 0,
-                        border: "none",
-                        backgroundColor: "#16a34a",
-                        color: "#e5e7eb",
-                        cursor: "pointer",
-                        width: "100%",
-                    }}
-                >
-                    Run
-                </button>
+        <div className="vscode-layout-shell">
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept=".txt,.js,.jsx,.ts,.tsx,.py,.css,.json,text/plain"
+                style={{ display: "none" }}
+                onChange={handleLoadedFile}
+            />
+            <aside className="vscode-sidebar">
+                <div className="vscode-sidebar-header">Explorer</div>
 
-                {/* Header + actions */}
-                <div
-                    style={{
-                        padding: "10px 12px 8px",
-                        borderBottom: "1px solid #1f2937",
-                    }}
-                >
-                    <div
-                        style={{
-                            fontSize: "12px",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.08em",
-                            color: "#9ca3af",
-                            marginBottom: "6px",
-                        }}
-                    >
-                        Explorer
-                    </div>
-
-                    {/* Open / Save / Close */}
-                    <div style={{ display: "flex", gap: "21px", flexWrap: "wrap" }}>
-                        <button
-                            style={buttonSmall}
-                            onClick={handleOpenClick}
-                            title="Ctrl+O"
-                        >
-                            Open file
-                        </button>
-                        <button
-                            style={buttonSmall}
-                            onClick={handleSaveActiveFile}
-                            title="Ctrl+S"
-                        >
-                            Save file
-                        </button>
-                        <button
-                            style={buttonSmall}
-                            onClick={closeFile}
-                            title="Ctrl+S"
-                        >
-                            Close file
-                        </button>
-                    </div>
-
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept=".txt,.js,.jsx,.ts,.tsx,.py,.css,.json,text/plain"
-                        style={{ display: "none" }}
-                        onChange={handleLoadedFile}
-                    />
-
-                    {/* New file controls */}
-                    <div
-                        style={{
-                            display: "flex",
-                            gap: "6px",
-                            marginTop: "8px",
-                            alignItems: "center",
-                        }}
-                    >
-                        <select
-                            value={newFileExt}
-                            onChange={(e) => setNewFileExt(e.target.value)}
-                            style={{
-                                flex: 1,
-                                padding: "4px 6px",
-                                fontSize: "12px",
-                                borderRadius: "6px",
-                                backgroundColor: "#020617",
-                                color: "#e5e7eb",
-                                border: "1px solid #374151",
-                            }}
-                        >
-                            {newFileOptions.map((opt) => (
-                                <option key={opt.ext} value={opt.ext}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
-                        <button
-                            style={buttonSmall}
-                            onClick={() => createNewFile(newFileExt)}
-                        >
-                            New
-                        </button>
-                    </div>
-
-                    {/* Language selector for active file */}
-                    <div style={{ marginTop: "8px" }}>
-                        <select
-                            value={currentLanguage}
-                            onChange={(e) => handleLanguageChange(e.target.value)}
-                            style={{
-                                width: "100%",
-                                padding: "4px 6px",
-                                fontSize: "12px",
-                                borderRadius: "6px",
-                                backgroundColor: "#020617",
-                                color: "#e5e7eb",
-                                border: "1px solid #374151",
-                            }}
-                        >
-                            {languages.map((lang) => (
-                                <option key={lang.id} value={lang.id}>
-                                    {lang.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                {/* File list */}
-                <div style={{ padding: "8px 0", overflowY: "auto", flex: 1 }}>
+                <div className="vscode-filelist">
                     {files.map((file) => (
                         <button
                             key={file.id}
                             onClick={() => handleFileClick(file.id)}
-                            style={{
-                                display: "flex",
-                                width: "100%",
-                                padding: "4px 12px",
-                                fontSize: "13px",
-                                textAlign: "left",
-                                border: "none",
-                                backgroundColor:
-                                    activeFileId === file.id ? "#111827" : "transparent",
-                                color:
-                                    activeFileId === file.id ? "#e5e7eb" : "#9ca3af",
-                                cursor: "pointer",
-                            }}
+                            className={`vscode-file-item ${activeFileId === file.id ? "active" : ""}`}
                         >
-              <span
-                  style={{
-                      marginRight: "6px",
-                      color: "#60a5fa",
-                      fontSize: "12px",
-                  }}
-              >
-                ●
-              </span>
-                            {file.name}
+                            <span className="vscode-file-dot">●</span>
+                            <span className="vscode-file-name">{file.name}</span>
                         </button>
                     ))}
                 </div>
+            </aside>
 
-                {/* Back button */}
-                <button
-                    onClick={handleBackClick}
-                    style={{
-                        margin: "8px 12px 12px",
-                        padding: "6px 10px",
-                        fontSize: "12px",
-                        borderRadius: "8px",
-                        border: "1px solid #374151",
-                        backgroundColor: "#111827",
-                        color: "#e5e7eb",
-                        cursor: "pointer",
-                    }}
-                >
-                    Zurück
-                </button>
-            </div>
+            <main className="vscode-main-panel">
+                <div className="vscode-topbar">
+                    <div className="vscode-topbar-left">
+                        <button onClick={handleBackClick} className="editor-pill-btn">
+                            ← Back
+                        </button>
+                    </div>
 
-            {/* Editor area on the right */}
-            <div style={{ flex: 1, minWidth: 0 }}>
-                <TextEditor
-                    initialContent={activeFile ? activeFile.content : ""}
-                    onChangeContent={handleEditorContentChange}
-                    language={activeFile?.language || "plaintext"}
-                />
-            </div>
+                    <div className="vscode-topbar-center">
+        <span className="vscode-active-filename">
+          {activeFile?.name || "Untitled.txt"}
+        </span>
+                    </div>
 
-            {/* Run output popup */}
+                    <div className="vscode-topbar-right">
+                        <button className="editor-pill-btn" onClick={handleOpenClick}>Open</button>
+                        <button className="editor-pill-btn" onClick={() => createNewFile(newFileExt)}>New</button>
+                        <button className="editor-pill-btn" onClick={handleSaveActiveFile}>Save</button>
+                        <button className="editor-pill-btn" onClick={closeFile}>Close</button>
+                        <button className="editor-pill-btn editor-pill-btn-primary" onClick={runCode}>Run</button>
+                    </div>
+                </div>
+
+                <div className="vscode-toolbar-row">
+                    <select
+                        value={newFileExt}
+                        onChange={(e) => setNewFileExt(e.target.value)}
+                        className="editor-pill-select"
+                    >
+                        {newFileOptions.map((opt) => (
+                            <option key={opt.ext} value={opt.ext}>{opt.label}</option>
+                        ))}
+                    </select>
+
+                    <select
+                        value={currentLanguage}
+                        onChange={(e) => handleLanguageChange(e.target.value)}
+                        className="editor-pill-select"
+                    >
+                        {languages.map((lang) => (
+                            <option key={lang.id} value={lang.id}>{lang.label}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="vscode-editor-panel">
+                    <TextEditor
+                        initialContent={activeFile ? activeFile.content : ""}
+                        onChangeContent={handleEditorContentChange}
+                        language={activeFile?.language || "plaintext"}
+                    />
+                </div>
+            </main>
             {showRunOutput && (
                 <div
-                    style={{
-                        position: "fixed",
-                        inset: 0,
-                        backgroundColor: "rgba(15,23,42,0.75)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        zIndex: 60,
-                    }}
+                    className="vscode-output-overlay"
                     onClick={() => setShowRunOutput(false)}
                 >
                     <div
-                        style={{
-                            width: "70%",
-                            maxWidth: "800px",
-                            maxHeight: "70vh",
-                            backgroundColor: "#020617",
-                            borderRadius: "12px",
-                            border: "1px solid #4b5563",
-                            padding: "16px",
-                            boxShadow: "0 20px 40px rgba(0,0,0,0.8)",
-                            display: "flex",
-                            flexDirection: "column",
-                        }}
+                        className="vscode-output-modal"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div
-                            style={{
-                                marginBottom: "8px",
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                            }}
-                        >
-              <span style={{ fontSize: "14px", fontWeight: 600 }}>
-                Run output – {activeFile?.name || "untitled"}
-              </span>
+                        <div className="vscode-output-header">
+                            <span>Run output – {activeFile?.name || "untitled"}</span>
                             <button
                                 onClick={() => setShowRunOutput(false)}
-                                style={{
-                                    padding: "4px 8px",
-                                    fontSize: "12px",
-                                    borderRadius: "6px",
-                                    border: "1px solid #4b5563",
-                                    backgroundColor: "#111827",
-                                    color: "#e5e7eb",
-                                    cursor: "pointer",
-                                }}
+                                className="editor-pill-btn"
                             >
                                 Close
                             </button>
                         </div>
-                        <pre
-                            style={{
-                                flex: 1,
-                                margin: 0,
-                                padding: "8px",
-                                borderRadius: "8px",
-                                backgroundColor: "#020617",
-                                color: "#e5e7eb",
-                                fontFamily: "monospace",
-                                fontSize: "13px",
-                                overflow: "auto",
-                                whiteSpace: "pre-wrap",
-                            }}
-                        >
-              {runOutput}
-            </pre>
+
+                        <pre className="vscode-output-pre">
+            {runOutput}
+          </pre>
                     </div>
                 </div>
             )}
